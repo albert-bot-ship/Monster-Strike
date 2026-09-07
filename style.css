@@ -471,3 +471,30 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 @media (min-width:600px) {
   .stats { grid-template-columns:repeat(4,1fr); }
 }
+
+/* ── 自訂下拉（Custom Dropdown）──────────────────── */
+.cdd { margin-bottom: 0; }
+.cdd-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 12px; border-radius: var(--radius-sm); cursor: pointer;
+  background: linear-gradient(180deg, #2c3468 0%, #1e2858 100%);
+  border: 1px solid var(--border); border-top-color: var(--border2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+  font-size: 13px; color: var(--text); user-select: none;
+  transition: border-radius .15s;
+}
+.cdd-hdr.open { border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.cdd-lbl { flex: 1; }
+.cdd-arr { color: var(--sub); font-size: 10px; transition: transform .2s; }
+.cdd-hdr.open .cdd-arr { transform: rotate(180deg); }
+.cdd-body {
+  display: none; padding: 8px 5px 6px;
+  border: 1px solid var(--border); border-top: none;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  background: rgba(18,22,54,.95); overflow-y: auto; max-height: 200px;
+}
+.cdd-body.open { display: block; }
+.cdd-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* 篩選左右欄 */
+.filter-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
