@@ -401,8 +401,11 @@
       <span class="view-stars" id="vStars"></span>
     </div>
     <div class="view-name" id="vName"></div>
-    <div class="view-img-wrap" id="vImgWrap"></div>
-    <div class="view-dots" id="vDotsWrap"></div>
+    <div class="view-img-outer" id="vImgOuter">
+      <div class="view-img-wrap" id="vImgWrap"></div>
+      <button type="button" class="view-img-arrow left" id="vArrowLeft" onclick="switchViewImage(0)" style="display:none;">‹</button>
+      <button type="button" class="view-img-arrow right" id="vArrowRight" onclick="switchViewImage(1)" style="display:none;">›</button>
+    </div>
     <div class="view-info-row" id="vInfoRow"></div>
 
     <div class="view-section">
@@ -1068,6 +1071,7 @@ function pickCopyChar(accId, charId){
 
 // ── 角色簡表（檢視）───────────────────────────────────
 let viewCharId = null;
+let currentViewImgIdx = 0;
 function openViewModal(id){
   const c = currentChars().find(x=>x.id===id); if(!c) return;
   viewCharId = id;
@@ -1082,15 +1086,11 @@ function openViewModal(id){
     ? `<img src="${c.imageData}" alt="${c.name}">`
     : `<span class="card-placeholder" style="font-size:44px;">${ATTR_EMOJI[c.attribute]||'？'}</span>`;
 
-  const dotsWrap = document.getElementById('vDotsWrap');
-  if (c.imageData2) {
-    dotsWrap.innerHTML = `
-      <span class="view-dot active" onclick="switchViewImage(0)"></span>
-      <span class="view-dot" onclick="switchViewImage(1)"></span>`;
-    dotsWrap.style.display = 'flex';
-  } else {
-    dotsWrap.innerHTML = ''; dotsWrap.style.display = 'none';
-  }
+  const showNav = !!c.imageData2;
+  document.getElementById('vArrowLeft').style.display = showNav ? 'flex' : 'none';
+  document.getElementById('vArrowRight').style.display = showNav ? 'flex' : 'none';
+  currentViewImgIdx = 0;
+  updateViewArrowState();
 
   document.getElementById('vInfoRow').innerHTML = `
     <span class="view-info-chip"><span class="card-attr attr-${c.attribute}" style="position:static;display:inline-block;margin-right:4px;"></span>${c.attribute||'—'}</span>
@@ -1128,7 +1128,12 @@ function switchViewImage(idx){
   imgWrap.className = 'view-img-wrap' + (img?'':' bg-'+c.attribute);
   imgWrap.innerHTML = img ? `<img src="${img}" alt="${c.name}">` : `<span class="card-placeholder" style="font-size:44px;">${ATTR_EMOJI[c.attribute]||'？'}</span>`;
   document.getElementById('vNo').textContent = no || '';
-  document.querySelectorAll('#vDotsWrap .view-dot').forEach((d,i)=>d.classList.toggle('active', i===idx));
+  currentViewImgIdx = idx;
+  updateViewArrowState();
+}
+function updateViewArrowState(){
+  document.getElementById('vArrowLeft').classList.toggle('active', currentViewImgIdx===0);
+  document.getElementById('vArrowRight').classList.toggle('active', currentViewImgIdx===1);
 }
 function editFromView(){
   const id=viewCharId; closeViewModal();
