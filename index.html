@@ -86,6 +86,11 @@
     <div class="sg3" id="fSkillGrid"></div>
   </div>
   <div class="drawer-section">
+    <div class="drawer-lbl">殺手（可多選，點選展開）</div>
+    <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
+    <div class="cdd-body" id="fKillerBody"></div></div>
+  </div>
+  <div class="drawer-section">
     <div class="drawer-lbl">超反技能（可多選）</div>
     <div class="sg3" id="fSuperGrid"></div>
   </div>
@@ -272,6 +277,11 @@
       </div>
       <div class="accordion-body">
         <div class="sg3" id="mSkillGrid"></div>
+        <div style="margin-top:8px;">
+          <div class="drawer-lbl" style="margin-bottom:6px;">殺手（可多選，點選展開）</div>
+          <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
+          <div class="cdd-body" id="mKillerBody"></div></div>
+        </div>
       </div>
     </div>
 
@@ -304,7 +314,8 @@
 
 <script>
 // ── 常數 ─────────────────────────────────────────────
-const SKILLS        = ['反重力護罩','反傷害壁','反傳送','掃雷者/飛行','掃雷者','飛行','反板塊','反風','反魔法陣/魔法陣增幅','反減速壁','反移轉壁','反減速板','反多層','殺手','耐性','破壞者','SS回合','回復','異常狀態回復','護罩','阻停雷射','其他'];
+const SKILLS        = ['反重力護罩','反傷害壁','反傳送','掃雷者/飛行','掃雷者','飛行','反板塊','反風','反魔法陣/魔法陣增幅','反減速壁','反移轉壁','反減速板','反多層','耐性','破壞者','SS回合','回復','異常狀態回復','護罩','阻停雷射','其他'];
+const KILLER_GROUPS  = {'屬性殺手':['火屬性','水屬性','木屬性','光屬性','闇屬性'],'種族殺手':['龍','機械','魔人','神','鳥','獸','亞人','魔族','妖精','礦物','魔王','幻獸','宇宙','聖騎士','武士','同盟國','軸心國','幻妖','麒神','神獸','怪獸','使徒','鬥士','巨人'],'其他':['反擊','弱點','重力護罩','毒','活力','致命','連擊','雷射護罩','初擊','位置','攻擊回合','雜兵','中BOSS','BOSS','攻擊變化','防禦變化']};
 const SUPER_SKILLS  = ['超反重力護罩','超反傷害壁','超反傳送','超掃雷者','超反風','超反減速壁','超反移轉壁'];
 const FRIEND_SKILLS = ['爆炸','光暈','雷射','導引彈','能量環','擴散彈','衝擊波','散彈槍','電漿','追蹤型貫通彈','衛星彈','隕石','跳彈','電擊','斬擊','橫斬刀','波動','追擊貫通彈','吐息','氣彈','分裂彈','增殖彈','漸伸線','YO-YO彈','炸裂彈','牆壁移動','穿牆','分身彈','交叉刺針彈','圓鋸片','火焰','爆風','彈跳炸彈','血族脈衝','環域','毒','拷貝','數值提升','數值下降','速度提升','SS回合','回復','其他','合作活動'];
 const RACES         = ['龍','機械','魔人','神','鳥','獸','亞人','魔族','妖精','礦物','魔王','幻獸','外星','宇宙','聖騎士','武士','同盟國','軸心國','幻妖','鬥神','神獸','聖域獵人','怪獸','EVA駕駛員','使徒','鬥士','妖怪','青銅聖鬥士','黃金聖鬥士','人造人','怪異','巨人','魔神','人偶','嵌合蟻','米奇與好朋友','死神','燃燒者','BORDER隊員','近界民','十刃','假面軍勢'];
@@ -399,8 +410,34 @@ function init() {
   buildFriendGrid('mFriendMainGrid', null,             false, true);
   buildFriendGrid('mFriendSubGrid',  'friendSkillsSub', false, false);
   buildHFCdd('mHeroFruitBody', false);
+  buildKillerCdd('fKillerBody', true);
+  buildKillerCdd('mKillerBody', false);
   document.getElementById('searchBox').addEventListener('input', renderList);
   enhanceEggIcons();
+}
+
+// 殺手（分組：屬性殺手／種族殺手／其他，選項併入 skills）
+function buildKillerCdd(bodyId, isFilter) {
+  const body = document.getElementById(bodyId); if(!body) return;
+  body.innerHTML = '';
+  const set = isFilter ? fSets.skills : mSets.skills;
+  Object.entries(KILLER_GROUPS).forEach(([cat, items]) => {
+    const grp = document.createElement('div'); grp.className='hf-group';
+    grp.innerHTML = `<div class="hf-group-label">${cat}</div>`;
+    const grid = document.createElement('div'); grid.className='sg4';
+    items.forEach(label => {
+      const val = label + '殺手';
+      const b = document.createElement('div'); b.className='skill-btn'; b.textContent=label; b.dataset.val=val;
+      if (set.has(val)) b.classList.add('active');
+      b.onclick = () => {
+        toggleSet(b, 'skills', val, isFilter);
+        updateCddLabel(b.closest('.cdd'));
+        if (isFilter) renderList(); else updateCntBadge('cntSkill','skills','cntSuper','superSkills');
+      };
+      grid.appendChild(b);
+    });
+    grp.appendChild(grid); body.appendChild(grp);
+  });
 }
 
 // ── 友情技（主／副）建構 ───────────────────────────────
@@ -738,6 +775,12 @@ function prefillModal(c){
   activateSet('skills',       c.skills,         'mSkillGrid',     false);
   activateSet('superSkills',  c.superSkills,    'mSuperGrid',     false);
   activateSet('obtain',       c.obtainMethods,  'mObtainGrid',    false);
+
+  const killerBody = document.getElementById('mKillerBody');
+  if (killerBody) {
+    killerBody.querySelectorAll('.skill-btn').forEach(b => b.classList.toggle('active', mSets.skills.has(b.dataset.val)));
+    updateCddLabel(killerBody.closest('.cdd'));
+  }
 
   mFriendMain = c.friendSkillMain || '';
   const mainGrid = document.getElementById('mFriendMainGrid');
