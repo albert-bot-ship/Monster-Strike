@@ -481,7 +481,7 @@
     <h2>🎨 外觀設定</h2>
 
     <div class="appear-section">
-      <div class="appear-label">背景圖片</div>
+      <div class="appear-label" id="bgSectionLabel">背景圖片</div>
       <div class="bg-preview" id="bgPreviewBox">
         <span id="bgPreviewHint">尚未設定背景圖</span>
         <img id="bgPreviewImg" style="display:none;">
@@ -558,7 +558,22 @@ const EGG_ICON_B64  = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
 let charactersByAccount = {}, accounts = [{id:'a1',name:'帳號1'},{id:'a2',name:'帳號2'},{id:'a3',name:'帳號3'},{id:'a4',name:'帳號4'}];
 let activeAccount = '__ALL__';
 let hasUnsaved = false, editCharId = null, uploadedImg = null, uploadedImg2 = null, modalAttr = '火';
-let customBg = null, themeMode = 'auto', uploadedBgTemp = null;
+let customBgDesktop = null, customBgMobile = null, themeMode = 'auto', uploadedBgTemp = null;
+// 裝置判斷：iPhone/iPad/iPod/Android 視為手機版，其餘（含 Mac/Windows）視為電腦版
+function isMobileDevice(){ return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent); }
+function currentBg(){ return isMobileDevice() ? customBgMobile : customBgDesktop; }
+// 讀取背景欄位：相容舊版單一 customBg 格式（沒有新欄位時，兩邊都先帶入舊圖，之後可各自替換）
+function loadBgFields(data){
+  if(data.customBgDesktop !== undefined || data.customBgMobile !== undefined){
+    customBgDesktop = data.customBgDesktop || null;
+    customBgMobile = data.customBgMobile || null;
+  } else if(data.customBg){
+    customBgDesktop = data.customBg;
+    customBgMobile = data.customBg;
+  } else {
+    customBgDesktop = null; customBgMobile = null;
+  }
+}
 let multiSelectMode = false, selectedIds = new Set();
 let swipeJustHappened = false;
 
@@ -1202,7 +1217,7 @@ const LS_KEY='msCollectAutoSave';
 let lsQuotaWarned=false;
 function persistToLocalStorage(){
   try{
-    localStorage.setItem(LS_KEY, JSON.stringify({accounts, charactersByAccount, customBg, themeMode}));
+    localStorage.setItem(LS_KEY, JSON.stringify({accounts, charactersByAccount, customBgDesktop, customBgMobile, themeMode}));
   }catch(e){
     if(!lsQuotaWarned){ lsQuotaWarned=true; alert('本機自動存檔空間不足（可能角色圖片太多），請記得手動匯出備份，避免資料遺失。'); }
   }
@@ -1561,10 +1576,12 @@ function removeUploadedImg(which){
 
 // ── 外觀設定：背景圖片 ────────────────────────────────
 function openAppearanceModal(){
-  const box=document.getElementById('bgPreviewBox');
   const img=document.getElementById('bgPreviewImg');
   const hint=document.getElementById('bgPreviewHint');
-  if(customBg){ img.src=customBg; img.style.display='block'; hint.style.display='none'; }
+  const label=document.getElementById('bgSectionLabel');
+  const bg=currentBg();
+  label.textContent = isMobileDevice() ? '背景圖片（手機版）' : '背景圖片（電腦版）';
+  if(bg){ img.src=bg; img.style.display='block'; hint.style.display='none'; }
   else { img.style.display='none'; hint.style.display='block'; }
   document.querySelectorAll('.theme-opt').forEach(el=>el.classList.toggle('active', el.dataset.mode===themeMode));
   document.getElementById('appearanceModal').classList.add('open');
@@ -1575,19 +1592,22 @@ function closeAppearanceModal(){
 function handleBgUpload(e){
   const file=e.target.files[0]; if(!file)return;
   compressImage(file, 1920, 0.82).then(dataUrl=>{
-    customBg=dataUrl; applyBackground(); saveState();
+    if(isMobileDevice()){ customBgMobile=dataUrl; } else { customBgDesktop=dataUrl; }
+    applyBackground(); saveState();
     const img=document.getElementById('bgPreviewImg'); const hint=document.getElementById('bgPreviewHint');
-    img.src=customBg; img.style.display='block'; hint.style.display='none';
+    img.src=dataUrl; img.style.display='block'; hint.style.display='none';
   }).catch(()=>alert('圖片處理失敗，請換一張圖片'));
 }
 function clearBg(){
-  customBg=null; applyBackground(); saveState();
+  if(isMobileDevice()){ customBgMobile=null; } else { customBgDesktop=null; }
+  applyBackground(); saveState();
   document.getElementById('bgPreviewImg').style.display='none';
   document.getElementById('bgPreviewHint').style.display='block';
 }
 function applyBackground(){
-  if(customBg){
-    document.body.style.backgroundImage = `linear-gradient(rgba(12,14,34,.72), rgba(12,14,34,.72)), url(${customBg})`;
+  const bg=currentBg();
+  if(bg){
+    document.body.style.backgroundImage = `linear-gradient(rgba(12,14,34,.72), rgba(12,14,34,.72)), url(${bg})`;
     document.body.style.backgroundSize='cover';
     document.body.style.backgroundPosition='center';
     document.body.style.backgroundAttachment='fixed';
@@ -1613,7 +1633,7 @@ function applyTheme(){
 
 
 function exportBackup(){
-  dl(JSON.stringify({version:3,accounts,charactersByAccount,customBg,themeMode},null,2),'backup.json');
+  dl(JSON.stringify({version:4,accounts,charactersByAccount,customBgDesktop,customBgMobile,themeMode},null,2),'backup.json');
   hasUnsaved=false; document.getElementById('unsavedBadge').style.display='none';
 }
 function importBackup(e){
@@ -1625,7 +1645,7 @@ function importBackup(e){
       if(data.accounts)accounts=data.accounts;
       charactersByAccount=migrateToPerAccount(data);
       activeAccount='__ALL__';
-      customBg = data.customBg !== undefined ? data.customBg : null;
+      loadBgFields(data);
       themeMode = data.themeMode || 'auto';
       applyBackground(); applyTheme();
       hasUnsaved=false; document.getElementById('unsavedBadge').style.display='none';
@@ -1849,7 +1869,7 @@ if(lsData){
   if(lsData.accounts) accounts=lsData.accounts;
   charactersByAccount=migrateToPerAccount(lsData);
   activeAccount='__ALL__';
-  customBg = lsData.customBg || null;
+  loadBgFields(lsData);
   themeMode = lsData.themeMode || 'auto';
   applyBackground(); applyTheme();
   init(); renderAll();
@@ -1860,7 +1880,7 @@ if(lsData){
       if(data.accounts)accounts=data.accounts;
       charactersByAccount=migrateToPerAccount(data);
       activeAccount='__ALL__';
-      customBg = data.customBg || null;
+      loadBgFields(data);
       themeMode = data.themeMode || 'auto';
       applyBackground(); applyTheme();
       init(); renderAll();
