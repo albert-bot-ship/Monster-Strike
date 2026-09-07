@@ -34,6 +34,8 @@
 </head>
 <body>
 
+<div class="pull-refresh-indicator" id="pullRefreshIndicator">↓ 下拉重新整理</div>
+
 <header>
   <div class="title-row">
     <span class="app-title">Monster Strike Collect</span>
@@ -377,11 +379,10 @@
 
     <div class="accordion-section">
       <div class="accordion-header" onclick="toggleAcc(this)">
-        型態技能<span class="acc-arrow">▼</span>
+        型態<span class="acc-arrow">▼</span>
       </div>
       <div class="accordion-body">
-        <div id="mFormsContainer"></div>
-        <span class="add-form-link" onclick="addFormRow()">＋ 新增型態</span>
+        <div class="sg3" id="mFormStageGrid"></div>
       </div>
     </div>
 
@@ -425,8 +426,8 @@
     </div>
 
     <div class="view-section" id="vFormsWrap">
-      <div class="view-section-title">型態技能</div>
-      <div id="vForms"></div>
+      <div class="view-section-title">型態</div>
+      <div class="view-tag-grid" id="vForms"></div>
     </div>
 
     <div class="mbtnrow" style="margin-top:16px;">
@@ -448,6 +449,18 @@
   </div>
 </div>
 
+<!-- 下拉更新前的備份提醒 -->
+<div class="modal-overlay" id="backupReminderModal">
+  <div class="modal-box" style="max-width:340px;">
+    <h2>⚠️ 尚未備份</h2>
+    <p style="font-size:13px;color:var(--sub);line-height:1.6;margin-bottom:16px;">你有尚未備份的變更，重新整理會重新抓取資料，未備份的內容將會遺失。請先備份，備份完成後會自動重新整理。</p>
+    <div class="mbtnrow">
+      <button class="mcancel" onclick="closeBackupReminder()">取消</button>
+      <button class="mconfirm" onclick="backupThenRefresh()">備份後重新整理</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── 常數 ─────────────────────────────────────────────
 const SKILLS        = ['反重力護罩','反傷害壁','反傳送','掃雷者/飛行','掃雷者','飛行','反板塊','反風','反魔法陣/魔法陣增幅','反減速壁','反移轉壁','反減速板','反多層','耐性','破壞者','SS回合','回復','異常狀態回復','護罩','阻停雷射'];
@@ -457,6 +470,7 @@ const KILLER_GROUPS  = {'屬性殺手':['火屬性','水屬性','木屬性','光
 const SUPER_SKILLS  = ['超反重力護罩','超反傷害壁','超反傳送','超掃雷者','超反風','超反減速壁','超反移轉壁'];
 const FRIEND_SKILLS = ['爆炸','光暈','雷射','導引彈','能量環','擴散彈','衝擊波','散彈槍','電漿','追蹤型貫通彈','衛星彈','隕石','跳彈','電擊','斬擊','橫斬刀','波動','追擊貫通彈','吐息','氣彈','分裂彈','增殖彈','漸伸線','YO-YO彈','炸裂彈','牆壁移動','穿牆','分身彈','交叉刺針彈','圓鋸片','火焰','爆風','彈跳炸彈','血族脈衝','環域','毒','拷貝','數值提升','數值下降','速度提升','SS回合','回復','其他','合作活動'];
 const RACES         = ['龍','機械','魔人','神','鳥','獸','亞人','魔族','妖精','礦物','魔王','幻獸','外星','宇宙','聖騎士','武士','同盟國','軸心國','幻妖','鬥神','神獸','聖域獵人','怪獸','EVA駕駛員','使徒','鬥士','妖怪','青銅聖鬥士','黃金聖鬥士','人造人','怪異','巨人','魔神','人偶','嵌合蟻','米奇與好朋友','死神','燃燒者','BORDER隊員','近界民','十刃','假面軍勢'];
+const FORM_STAGES    = ['進化','神化','獸神化','獸神化改','真獸神化'];
 const HERO_FRUITS   = {'數值強化':['同族','擊種','戰型','加攻','加速','加命','孤高'],'怪物強化':['熱血友擊','傷害減輕','將命削減','兵命削減','一擊失心','加速必殺','耐毒','小小治癒','愛心'],'冒險效果':['學習','發財','超速過關','S級別','賺取點數']};
 const EVO_STATES    = ['進化前','進化/神化前','進化/神化','獸神化解禁','獸神化','獸神化·改解禁','獸神化·改','真獸神化解禁','真獸神化'];
 const OBTAIN        = ['幸運轉蛋','幸運轉蛋🥚','其他'];
@@ -518,7 +532,7 @@ function sortChars(arr) {
 const fSets = { skills:new Set(), superSkills:new Set(), strikeType:new Set(), battleType:new Set(), rarity:new Set(), races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), evo:new Set(), obtain:new Set(), collab:new Set() };
 let filterAttr = '';
 let filterFriendMain = '';
-const mSets = { races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), skills:new Set(), superSkills:new Set(), obtain:new Set() };
+const mSets = { races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), skills:new Set(), superSkills:new Set(), obtain:new Set(), formStages:new Set() };
 // modal single-select states
 let mRarity = '6', mStrike = '反射型', mBattle = '平衡', mEvo = '', mFriendMain = '';
 
@@ -532,6 +546,7 @@ function init() {
   buildGrid('mSkillGrid',  SKILLS,       'skills',       'sg3', false);
   buildGrid('mSuperGrid',  SUPER_SKILLS, 'superSkills',  'sg3', false);
   buildGrid('mObtainGrid', OBTAIN,       'obtain',       'sg3', false);
+  buildGrid('mFormStageGrid', FORM_STAGES, 'formStages',  'sg3', false);
   // 表單單選按鈕格
   buildSingleGrid('mRarityGrid', RARITY_NUMS, v => { mRarity = v; }, () => mRarity, r => '★'+r);
   buildSingleGrid('mStrikeGrid', STRIKE_TYPES, v => { mStrike = v; }, () => mStrike);
@@ -930,7 +945,6 @@ function clearModalForm(){
   document.getElementById('newSSName').value='';
   document.getElementById('newSSDesc').value='';
   document.getElementById('newGokuUn').checked=false;
-  document.getElementById('mFormsContainer').innerHTML='';
   resetModalSets(); selectAttr('火');
   updateGokuUnVisibility();
   // refresh single-select grids
@@ -1008,12 +1022,11 @@ function prefillModal(c){
       if(id==='mEvoBody'){b.classList.toggle('active',b.dataset.val===mEvo); if(b.dataset.val===mEvo)updateCddLabel(b.closest('.cdd'));}
     });
   });
-  document.getElementById('mFormsContainer').innerHTML='';
-  (c.forms||[]).forEach(f=>addFormRow(f));
+  activateSet('formStages', c.formStages, 'mFormStageGrid', false);
   updateCntBadge('cntSkill','skills','cntSuper','superSkills');
 }
 
-function openAddModal(){editCharId=null;document.getElementById('modalTitle').textContent='新增角色';clearModalForm();addFormRow({formName:'進化前'});document.getElementById('copyFromAccBtn').style.display='block';const m=document.getElementById('addCharModal');m.classList.add('open');m.scrollTop=0;}
+function openAddModal(){editCharId=null;document.getElementById('modalTitle').textContent='新增角色';clearModalForm();document.getElementById('copyFromAccBtn').style.display='block';const m=document.getElementById('addCharModal');m.classList.add('open');m.scrollTop=0;}
 function openEditModal(id){
   editCharId=id; const c=currentChars().find(x=>x.id===id); if(!c)return;
   document.getElementById('modalTitle').textContent='編輯角色';clearModalForm();prefillModal(c);
@@ -1100,15 +1113,9 @@ function openViewModal(id){
   document.getElementById('vFriendSub').innerHTML = (c.friendSkillsSub||[]).map(s=>`<span class="view-tag">${s}</span>`).join('');
 
   const formsWrap = document.getElementById('vFormsWrap');
-  const forms = c.forms||[];
-  formsWrap.style.display = forms.length ? '' : 'none';
-  document.getElementById('vForms').innerHTML = forms.map(f=>`
-    <div class="view-form-block">
-      <div class="view-form-name">${f.formName||'型態'}</div>
-      ${f.active?`<div class="view-text"><b>主動技：</b>${f.active}</div>`:''}
-      ${f.passive?`<div class="view-text"><b>被動技能：</b>${f.passive}</div>`:''}
-      ${f.friend?`<div class="view-text"><b>型態友情技：</b>${f.friend}</div>`:''}
-    </div>`).join('');
+  const stages = c.formStages||[];
+  formsWrap.style.display = stages.length ? '' : 'none';
+  document.getElementById('vForms').innerHTML = stages.map(s=>`<span class="view-tag">${s}</span>`).join('');
 
   document.getElementById('viewCharModal').classList.add('open');
 }
@@ -1132,22 +1139,11 @@ function editFromView(){
 function confirmChar(){
   const name=document.getElementById('newName').value.trim(); if(!name){alert('請輸入角色名稱');return;}
   const qty=Math.max(1, parseInt(document.getElementById('newQty').value)||1);
-  const forms=[]; document.querySelectorAll('.form-row-box').forEach(row=>{
-    const fn=row.querySelector('.fname').value.trim(), fa=row.querySelector('.factive').value.trim(), fp=row.querySelector('.fpassive').value.trim(), ff=row.querySelector('.ffriend').value.trim();
-    if(fn||fa||fp||ff)forms.push({formName:fn||'型態',active:fa,passive:fp,friend:ff});
-  });
-  const data={charNo:document.getElementById('newCharNo').value.trim(),charNo2:document.getElementById('newCharNo2').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,evolutionState:mEvo,collab:document.getElementById('newCollab').value.trim(),quantity:qty,hasGokuUn:document.getElementById('newGokuUn').checked,ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:uploadedImg,imageData2:uploadedImg2,forms};
+  const data={charNo:document.getElementById('newCharNo').value.trim(),charNo2:document.getElementById('newCharNo2').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,evolutionState:mEvo,collab:document.getElementById('newCollab').value.trim(),quantity:qty,hasGokuUn:document.getElementById('newGokuUn').checked,ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:uploadedImg,imageData2:uploadedImg2,formStages:[...mSets.formStages]};
   const list=currentChars();
   if(editCharId!==null){const idx=list.findIndex(x=>x.id===editCharId);if(idx>=0)list[idx]={id:editCharId,...data};}
   else{const maxId=list.reduce((m,c)=>Math.max(m,c.id||0),0);list.push({id:maxId+1,...data});}
   closeModal(); saveState(); renderAll();
-}
-
-function addFormRow(prefill){
-  const c=document.getElementById('mFormsContainer');
-  const row=document.createElement('div'); row.className='form-row-box';
-  row.innerHTML=`<div class="form-row-head"><input type="text" class="minput fname" placeholder="型態名稱" style="flex:1" value="${prefill?.formName||''}"><span class="remove-form" onclick="this.closest('.form-row-box').remove()">✕</span></div><textarea class="mtarea factive" placeholder="主動技">${prefill?.active||''}</textarea><textarea class="mtarea fpassive" placeholder="被動技能（選填）">${prefill?.passive||''}</textarea><textarea class="mtarea ffriend" placeholder="型態友情技（選填）">${prefill?.friend||''}</textarea>`;
-  c.appendChild(row);
 }
 
 // ── 合作活動自動完成 ─────────────────────────────────
@@ -1225,6 +1221,18 @@ function migrateCharacterFields(c){
   if(c.charNo2 === undefined) c.charNo2 = '';
   if(c.imageData2 === undefined) c.imageData2 = null;
   if(c.hasGokuUn === undefined) c.hasGokuUn = false;
+  if(c.formStages === undefined){
+    c.formStages = [];
+    (c.forms||[]).forEach(f=>{
+      const n = f.formName||'';
+      if(n.includes('真獸神化')) c.formStages.push('真獸神化');
+      else if(n.includes('獸神化改') || n.includes('獸神化・改') || n.includes('獸神化·改')) c.formStages.push('獸神化改');
+      else if(n.includes('獸神化')) c.formStages.push('獸神化');
+      else if(n.includes('神化')) c.formStages.push('神化');
+      else if(n.includes('進化')) c.formStages.push('進化');
+    });
+    c.formStages = [...new Set(c.formStages)];
+  }
   return c;
 }
 
@@ -1258,6 +1266,55 @@ function migrateToPerAccount(data){
   }
   return result;
 }
+
+// ── 下拉更新（重新抓取 backup.json）───────────────────
+let pullStartY = 0, pulling = false, pullDist = 0;
+const PULL_THRESHOLD = 70;
+
+function initPullToRefresh(){
+  const ind = document.getElementById('pullRefreshIndicator');
+  document.addEventListener('touchstart', e=>{
+    if ((document.scrollingElement?.scrollTop||0) <= 0) {
+      pullStartY = e.touches[0].clientY;
+      pulling = true;
+    }
+  }, {passive:true});
+
+  document.addEventListener('touchmove', e=>{
+    if (!pulling) return;
+    const dy = e.touches[0].clientY - pullStartY;
+    if (dy > 0 && (document.scrollingElement?.scrollTop||0) <= 0) {
+      pullDist = Math.min(dy, 130);
+      ind.classList.add('pulling');
+      ind.style.transform = `translateY(${pullDist - 42}px)`;
+      if (pullDist > PULL_THRESHOLD) { ind.classList.add('ready'); ind.textContent = '放開以重新整理'; }
+      else { ind.classList.remove('ready'); ind.textContent = '↓ 下拉重新整理'; }
+    } else {
+      pulling = false;
+    }
+  }, {passive:true});
+
+  document.addEventListener('touchend', ()=>{
+    if (!pulling) return;
+    ind.classList.remove('pulling');
+    ind.style.transform = 'translateY(-100%)';
+    if (pullDist > PULL_THRESHOLD) triggerPullRefresh();
+    pulling = false; pullDist = 0;
+  }, {passive:true});
+}
+
+function triggerPullRefresh(){
+  if (hasUnsaved) openBackupReminder();
+  else location.reload();
+}
+function openBackupReminder(){ document.getElementById('backupReminderModal').classList.add('open'); }
+function closeBackupReminder(){ document.getElementById('backupReminderModal').classList.remove('open'); }
+function backupThenRefresh(){
+  exportBackup();
+  closeBackupReminder();
+  setTimeout(()=>location.reload(), 400);
+}
+initPullToRefresh();
 
 // ── 載入 ─────────────────────────────────────────────
 fetch('backup.json')
