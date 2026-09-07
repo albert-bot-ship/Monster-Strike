@@ -293,22 +293,6 @@
         角色性能<span class="acc-arrow">▼</span>
       </div>
       <div class="accordion-body">
-        <div class="mfield">
-          <label>被動技能</label>
-          <textarea class="mtarea" id="newPassiveSkill" placeholder="請輸入被動技能內容"></textarea>
-        </div>
-        <div class="mfield">
-          <label>射擊技能</label>
-          <textarea class="mtarea" id="newShootingSkill" placeholder="請輸入射擊技能內容"></textarea>
-        </div>
-        <div class="mfield">
-          <label>支援技能</label>
-          <textarea class="mtarea" id="newSupportSkill" placeholder="請輸入支援技能內容"></textarea>
-        </div>
-        <div class="mfield">
-          <label>連攜條件（獸神化・改専用，其他型態可留空）</label>
-          <textarea class="mtarea" id="newLinkCondition" placeholder="請輸入連攜發動條件"></textarea>
-        </div>
         <div class="filter-2col" style="margin-bottom:10px;">
           <div class="mfield" style="margin-bottom:0;">
             <label>主友情技</label>
@@ -415,18 +399,6 @@
     <div class="view-section">
       <div class="view-section-title">技能</div>
       <div class="view-tag-grid" id="vSkills"></div>
-    </div>
-    <div class="view-section" id="vShootingWrap">
-      <div class="view-section-title">射擊技能</div>
-      <div class="view-text" id="vShooting"></div>
-    </div>
-    <div class="view-section" id="vSupportWrap">
-      <div class="view-section-title">支援技能</div>
-      <div class="view-text" id="vSupport"></div>
-    </div>
-    <div class="view-section" id="vLinkWrap">
-      <div class="view-section-title">連攜技能</div>
-      <div class="view-text" id="vLink"></div>
     </div>
 
     <div class="view-section">
@@ -928,10 +900,6 @@ function clearModalForm(){
   document.getElementById('newName').value='';
   document.getElementById('newCollab').value='';
   document.getElementById('newQty').value='1';
-  document.getElementById('newPassiveSkill').value='';
-  document.getElementById('newShootingSkill').value='';
-  document.getElementById('newSupportSkill').value='';
-  document.getElementById('newLinkCondition').value='';
   document.getElementById('newSSRounds').value='';
   document.getElementById('newSSName').value='';
   document.getElementById('newSSDesc').value='';
@@ -961,10 +929,6 @@ function prefillModal(c){
   document.getElementById('newName').value=c.name||'';
   document.getElementById('newCollab').value=c.collab||'';
   document.getElementById('newQty').value=c.quantity||1;
-  document.getElementById('newPassiveSkill').value=c.passiveSkill||'';
-  document.getElementById('newShootingSkill').value=c.shootingSkill||'';
-  document.getElementById('newSupportSkill').value=c.supportSkill||'';
-  document.getElementById('newLinkCondition').value=c.linkCondition||'';
   document.getElementById('newSSRounds').value=c.ssRounds||'';
   document.getElementById('newSSName').value=c.ssName||'';
   document.getElementById('newSSDesc').value=c.ssDesc||'';
@@ -1095,19 +1059,6 @@ function openViewModal(id){
     ? skillTags.map(s=>`<span class="view-tag">${s}</span>`).join('')
     : '<span class="view-empty">無</span>';
 
-  const shootWrap = document.getElementById('vShootingWrap');
-  shootWrap.style.display = c.shootingSkill ? '' : 'none';
-  document.getElementById('vShooting').textContent = c.shootingSkill || '';
-
-  const supportWrap = document.getElementById('vSupportWrap');
-  supportWrap.style.display = c.supportSkill ? '' : 'none';
-  document.getElementById('vSupport').textContent = c.supportSkill || '';
-
-  const linkWrap = document.getElementById('vLinkWrap');
-  const isKaizo = c.evolutionState === '獸神化·改';
-  linkWrap.style.display = (isKaizo && c.linkCondition) ? '' : 'none';
-  document.getElementById('vLink').textContent = c.linkCondition || '';
-
   document.getElementById('vSSRounds').textContent = c.ssRounds ? `回合：${c.ssRounds}` : '';
   document.getElementById('vSSName').textContent = c.ssName || '';
   document.getElementById('vSSDesc').textContent = c.ssDesc || '';
@@ -1155,7 +1106,7 @@ function confirmChar(){
     const fn=row.querySelector('.fname').value.trim(), fa=row.querySelector('.factive').value.trim(), fp=row.querySelector('.fpassive').value.trim(), ff=row.querySelector('.ffriend').value.trim();
     if(fn||fa||fp||ff)forms.push({formName:fn||'型態',active:fa,passive:fp,friend:ff});
   });
-  const data={charNo:document.getElementById('newCharNo').value.trim(),charNo2:document.getElementById('newCharNo2').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,evolutionState:mEvo,collab:document.getElementById('newCollab').value.trim(),quantity:qty,passiveSkill:document.getElementById('newPassiveSkill').value.trim(),shootingSkill:document.getElementById('newShootingSkill').value.trim(),supportSkill:document.getElementById('newSupportSkill').value.trim(),linkCondition:document.getElementById('newLinkCondition').value.trim(),ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:uploadedImg,imageData2:uploadedImg2,forms};
+  const data={charNo:document.getElementById('newCharNo').value.trim(),charNo2:document.getElementById('newCharNo2').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,evolutionState:mEvo,collab:document.getElementById('newCollab').value.trim(),quantity:qty,ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:uploadedImg,imageData2:uploadedImg2,forms};
   const list=currentChars();
   if(editCharId!==null){const idx=list.findIndex(x=>x.id===editCharId);if(idx>=0)list[idx]={id:editCharId,...data};}
   else{const maxId=list.reduce((m,c)=>Math.max(m,c.id||0),0);list.push({id:maxId+1,...data});}
@@ -1238,10 +1189,6 @@ function migrateCharacterFields(c){
   if(c.friendSkillMain === undefined) c.friendSkillMain = '';
   if(c.friendSkillsSub === undefined) c.friendSkillsSub = [];
   if(c.quantity === undefined) c.quantity = 1;
-  if(c.passiveSkill === undefined) c.passiveSkill = '';
-  if(c.shootingSkill === undefined) c.shootingSkill = '';
-  if(c.supportSkill === undefined) c.supportSkill = '';
-  if(c.linkCondition === undefined) c.linkCondition = '';
   if(c.ssRounds === undefined) c.ssRounds = '';
   if(c.ssName === undefined) c.ssName = '';
   if(c.ssDesc === undefined) c.ssDesc = '';
