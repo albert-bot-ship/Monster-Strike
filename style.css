@@ -649,3 +649,16 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
   cursor: pointer; font-size: 13px; color: var(--text);
 }
 .copy-picker-item:hover { background: rgba(80,112,200,.28); }
+
+/* 極運圖示 */
+.card-gokuun-icon {
+  width: 10px; height: 10px; object-fit: contain;
+  vertical-align: middle; margin-right: 3px;
+}
+.view-gokuun-icon {
+  width: 16px; height: 16px; object-fit: contain;
+  vertical-align: middle; margin-right: 5px;
+}
+.gokuun-icon-label {
+  width: 20px; height: 20px; object-fit: contain; flex-shrink: 0;
+}
