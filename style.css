@@ -37,17 +37,41 @@
   --nav-h:    68px;
   --radius:   8px;
   --radius-sm:6px;
+
+  /* BMW M 三色（用於強調線／光暈，深色主題預設） */
+  --m-blue:  #1c69d4;
+  --m-red:   #e2231a;
+  --m-violet:#6f42c1;
+  --body-radial: #28205a;
+}
+
+/* ── 淺色主題（白天自動切換 / 手動選擇）───────────────── */
+html[data-theme="light"] {
+  --bg:      #f4f5f8;
+  --bg2:     #eceef4;
+  --panel:   #ffffff;
+  --panel2:  #eef0f6;
+  --card:    #ffffff;
+  --border:  #dbdfe8;
+  --border2: #c4cae0;
+
+  --text:  #1b1e2b;
+  --sub:   #6b7180;
+  --muted: #9096a8;
+
+  --body-radial: rgba(28,105,212,.06);
 }
 
 /* ── Reset ─────────────────────────────────────────── */
 *,*::before,*::after { box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
 body {
   background: var(--bg);
-  background-image: radial-gradient(ellipse 100% 50% at 50% 0%, #28205a 0%, transparent 65%);
+  background-image: radial-gradient(ellipse 100% 50% at 50% 0%, var(--body-radial) 0%, transparent 65%);
   background-attachment: fixed;
   color: var(--text);
   font-family: "Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
   min-height: 100vh;
+  transition: background-color .3s ease, color .3s ease;
 }
 
 /* ── 遊戲風金屬按鈕 ─────────────────────────────── */
@@ -110,6 +134,22 @@ header {
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
+html[data-theme="light"] header {
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(244,245,248,.95));
+}
+header::after {
+  content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+  background: linear-gradient(90deg, var(--m-blue), var(--m-violet), var(--m-red));
+  opacity:.85;
+}
+html:not([data-theme="light"]) header::after {
+  animation: mStripeGlow 3s ease-in-out infinite;
+}
+html[data-theme="light"] header::after { opacity:.55; }
+@keyframes mStripeGlow {
+  0%,100% { box-shadow: 0 0 6px var(--m-blue), 0 0 10px var(--m-violet); }
+  50%     { box-shadow: 0 0 10px var(--m-red), 0 0 16px var(--m-violet); }
+}
 .title-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; }
 .app-title {
   font-size: 15px; font-weight: 700; letter-spacing: .4px;
@@ -138,6 +178,16 @@ header {
   color: #fff;
 }
 .acc-edit { font-size:11px; color:rgba(255,255,255,.35); }
+
+.all-tab {
+  border-color: var(--gold) #c09030 #806020 #c09030 !important;
+  background: linear-gradient(180deg, #4a3a10, #302408) !important;
+}
+.all-tab.active {
+  background: linear-gradient(180deg, var(--gold2), var(--gold)) !important;
+  color: #241800 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 0 12px var(--gold-glow) !important;
+}
 
 /* ── Main ──────────────────────────────────────────── */
 main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 auto; }
@@ -183,7 +233,22 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 .attr-circle.dark.active  { border-color:#ee99ff; box-shadow:0 0 18px var(--dark-glow);  filter:none; }
 
 /* ── 統計 ───────────────────────────────────────────── */
-.stats { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:14px; }
+.stats-toggle {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 9px 13px; margin-bottom:8px;
+  background: linear-gradient(180deg, var(--panel), var(--panel2));
+  border: 1px solid var(--border); border-top-color: var(--border2);
+  border-radius: var(--radius); cursor:pointer;
+  font-size:13px; color: var(--text); user-select:none;
+}
+.stats-arrow { transition: transform .2s ease; color: var(--sub); font-size:11px; }
+.stats-arrow.open { transform: rotate(180deg); }
+.stats {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:8px;
+  max-height:0; opacity:0; margin-bottom:0; overflow:hidden;
+  transition: max-height .25s ease, opacity .2s ease, margin-bottom .25s ease;
+}
+.stats.open { max-height:300px; opacity:1; margin-bottom:14px; }
 .stat-card {
   background: linear-gradient(180deg, var(--panel), var(--panel2));
   border: 1px solid var(--border); border-top-color: var(--border2);
@@ -271,6 +336,21 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
   font-size:9px; font-weight:700;
   display:flex; align-items:center; justify-content:center;
   box-shadow: 0 0 5px rgba(61,220,132,.5);
+}
+
+/* 全帳號搜尋卡片：帳號持有小圓點列 */
+.card-acc-tags {
+  position:absolute; left:0; right:0; bottom:19px; z-index:2;
+  display:flex; justify-content:center; gap:4px;
+}
+.acc-tag {
+  width:7px; height:7px; border-radius:50%;
+  background: rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3);
+}
+.acc-tag.owned {
+  background: var(--good); border-color: rgba(255,255,255,.5);
+  box-shadow: 0 0 4px rgba(61,220,132,.7);
+  cursor:pointer;
 }
 
 /* 卡片底部名稱 */
@@ -445,6 +525,28 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 .form-row-head { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
 .remove-form { color:var(--bad); cursor:pointer; font-size:16px; margin-left:auto; }
 .add-form-link { font-size:13px; color:#7090e8; cursor:pointer; display:inline-block; margin-top:4px; }
+
+/* 外觀設定 modal */
+.appear-section { margin-bottom:18px; }
+.appear-label { font-size:13px; color:var(--sub); margin-bottom:8px; font-weight:600; }
+.bg-preview {
+  width:100%; height:110px; border-radius:var(--radius-sm);
+  border: 2px dashed var(--border2); background:var(--panel2);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; position:relative; margin-bottom:8px;
+}
+.bg-preview img { width:100%; height:100%; object-fit:cover; }
+.bg-preview span { font-size:12px; color:var(--muted); }
+.appear-btn-row { display:flex; gap:8px; }
+.appear-btn-row .gbtn { flex:1; text-align:center; }
+.theme-btn-row { display:flex; gap:8px; margin-bottom:6px; }
+.theme-opt {
+  flex:1; text-align:center; padding:10px 4px; border-radius:var(--radius-sm);
+  border:1px solid var(--border); background:var(--panel2); cursor:pointer;
+  font-size:13px; color:var(--sub); transition: all .15s;
+}
+.theme-opt.active { border-color:var(--gold); color:var(--gold); background:var(--panel); box-shadow:0 0 8px var(--gold-dim); }
+.appear-hint { font-size:11px; color:var(--muted); line-height:1.5; }
 
 /* 圖片上傳 */
 .img-upload-area {
@@ -660,6 +762,12 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 .card-gokuun-icon {
   width: 24px; height: 24px; object-fit: contain;
   display: block; margin: 0 auto;
+  filter: drop-shadow(0 0 4px var(--gold)) drop-shadow(0 0 8px var(--gold-glow));
+  animation: gokuunGlowPulse 2.2s ease-in-out infinite;
+}
+@keyframes gokuunGlowPulse {
+  0%, 100% { filter: drop-shadow(0 0 4px var(--gold)) drop-shadow(0 0 8px var(--gold-glow)); }
+  50%      { filter: drop-shadow(0 0 7px var(--gold2)) drop-shadow(0 0 14px var(--gold-glow)); }
 }
 .view-gokuun-icon {
   width: 16px; height: 16px; object-fit: contain;
