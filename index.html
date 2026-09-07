@@ -91,6 +91,11 @@
     <div class="cdd-body" id="fKillerBody"></div></div>
   </div>
   <div class="drawer-section">
+    <div class="drawer-lbl">其他（可多選，點選展開）</div>
+    <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
+    <div class="cdd-body sg3" id="fOtherSkillBody"></div></div>
+  </div>
+  <div class="drawer-section">
     <div class="drawer-lbl">超反技能（可多選）</div>
     <div class="sg3" id="fSuperGrid"></div>
   </div>
@@ -282,6 +287,11 @@
           <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
           <div class="cdd-body" id="mKillerBody"></div></div>
         </div>
+        <div style="margin-top:8px;">
+          <div class="drawer-lbl" style="margin-bottom:6px;">其他（可多選，點選展開）</div>
+          <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
+          <div class="cdd-body sg3" id="mOtherSkillBody"></div></div>
+        </div>
       </div>
     </div>
 
@@ -314,7 +324,8 @@
 
 <script>
 // ── 常數 ─────────────────────────────────────────────
-const SKILLS        = ['反重力護罩','反傷害壁','反傳送','掃雷者/飛行','掃雷者','飛行','反板塊','反風','反魔法陣/魔法陣增幅','反減速壁','反移轉壁','反減速板','反多層','耐性','破壞者','SS回合','回復','異常狀態回復','護罩','阻停雷射','其他'];
+const SKILLS        = ['反重力護罩','反傷害壁','反傳送','掃雷者/飛行','掃雷者','飛行','反板塊','反風','反魔法陣/魔法陣增幅','反減速壁','反移轉壁','反減速板','反多層','耐性','破壞者','SS回合','回復','異常狀態回復','護罩','阻停雷射'];
+const OTHER_SKILLS   = ['友情技','潛力','衝刺','無效','授予','防護','維持怒能倍率/凍身','模式','氣場','觸壁增幅','充能','經驗值提升','BOSS掉落提升'];
 const KILLER_GROUPS  = {'屬性殺手':['火屬性','水屬性','木屬性','光屬性','闇屬性'],'種族殺手':['龍','機械','魔人','神','鳥','獸','亞人','魔族','妖精','礦物','魔王','幻獸','宇宙','聖騎士','武士','同盟國','軸心國','幻妖','麒神','神獸','怪獸','使徒','鬥士','巨人'],'其他':['反擊','弱點','重力護罩','毒','活力','致命','連擊','雷射護罩','初擊','位置','攻擊回合','雜兵','中BOSS','BOSS','攻擊變化','防禦變化']};
 const SUPER_SKILLS  = ['超反重力護罩','超反傷害壁','超反傳送','超掃雷者','超反風','超反減速壁','超反移轉壁'];
 const FRIEND_SKILLS = ['爆炸','光暈','雷射','導引彈','能量環','擴散彈','衝擊波','散彈槍','電漿','追蹤型貫通彈','衛星彈','隕石','跳彈','電擊','斬擊','橫斬刀','波動','追擊貫通彈','吐息','氣彈','分裂彈','增殖彈','漸伸線','YO-YO彈','炸裂彈','牆壁移動','穿牆','分身彈','交叉刺針彈','圓鋸片','火焰','爆風','彈跳炸彈','血族脈衝','環域','毒','拷貝','數值提升','數值下降','速度提升','SS回合','回復','其他','合作活動'];
@@ -412,6 +423,8 @@ function init() {
   buildHFCdd('mHeroFruitBody', false);
   buildKillerCdd('fKillerBody', true);
   buildKillerCdd('mKillerBody', false);
+  buildCddBody('fOtherSkillBody', OTHER_SKILLS, 'skills', true);
+  buildCddBody('mOtherSkillBody', OTHER_SKILLS, 'skills', false);
   document.getElementById('searchBox').addEventListener('input', renderList);
   enhanceEggIcons();
 }
@@ -780,6 +793,11 @@ function prefillModal(c){
   if (killerBody) {
     killerBody.querySelectorAll('.skill-btn').forEach(b => b.classList.toggle('active', mSets.skills.has(b.dataset.val)));
     updateCddLabel(killerBody.closest('.cdd'));
+  }
+  const otherSkillBody = document.getElementById('mOtherSkillBody');
+  if (otherSkillBody) {
+    otherSkillBody.querySelectorAll('.skill-btn').forEach(b => b.classList.toggle('active', mSets.skills.has(b.dataset.val)));
+    updateCddLabel(otherSkillBody.closest('.cdd'));
   }
 
   mFriendMain = c.friendSkillMain || '';
