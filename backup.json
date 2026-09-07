@@ -58,7 +58,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 2,
@@ -100,7 +104,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 3,
@@ -142,7 +150,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 4,
@@ -183,7 +195,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 5,
@@ -225,7 +241,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 6,
@@ -267,7 +287,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 7,
@@ -308,7 +332,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 8,
@@ -349,7 +377,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 9,
@@ -391,7 +423,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 10,
@@ -432,7 +468,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 11,
@@ -474,7 +514,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 12,
@@ -516,7 +560,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 13,
@@ -557,7 +605,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 14,
@@ -599,7 +651,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 15,
@@ -639,7 +695,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 16,
@@ -681,7 +741,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 17,
@@ -723,7 +787,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 18,
@@ -765,7 +833,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 19,
@@ -807,7 +879,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 20,
@@ -850,7 +926,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 21,
@@ -892,7 +972,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 22,
@@ -935,7 +1019,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 23,
@@ -977,7 +1065,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 24,
@@ -1017,7 +1109,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 25,
@@ -1059,7 +1155,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 26,
@@ -1100,7 +1200,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 27,
@@ -1141,7 +1245,11 @@
         "friendSkillMain": "",
         "passiveSkill": "",
         "linkCondition": "",
-        "ssRounds": ""
+        "ssRounds": "",
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       },
       {
         "id": 28,
@@ -1176,7 +1284,11 @@
             "passive": "",
             "friend": ""
           }
-        ]
+        ],
+        "shootingSkill": "",
+        "supportSkill": "",
+        "ssName": "",
+        "ssDesc": ""
       }
     ],
     "a2": [],
