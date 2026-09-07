@@ -49,9 +49,10 @@
 
 <main>
   <div class="searchbar">
-    <input class="search-input" type="text" id="searchBox" placeholder="🔍 搜尋角色名稱...">
+    <input class="search-input" type="text" id="searchBox" placeholder="🔍 搜尋角色名稱..." autocomplete="off">
     <button class="gbtn" onclick="resetAllFilters()">↺ 重置</button>
     <button class="gbtn" onclick="openFilter()">▼ 篩選</button>
+    <div class="search-suggest" id="searchSuggest"></div>
   </div>
   <div class="attr-row">
     <div class="attr-circle all active" data-attr="" onclick="setAttr(this)">全</div>
@@ -627,7 +628,9 @@ function init() {
   buildKillerCdd('mKillerGrid', false);
   buildCddBody('fOtherSkillGrid', OTHER_SKILLS, 'skills', true);
   buildCddBody('mOtherSkillGrid', OTHER_SKILLS, 'skills', false);
-  document.getElementById('searchBox').addEventListener('input', renderList);
+  document.getElementById('searchBox').addEventListener('input', ()=>{ renderList(); updateSearchSuggest(); });
+  document.getElementById('searchBox').addEventListener('focus', updateSearchSuggest);
+  document.getElementById('searchBox').addEventListener('blur', ()=>{ setTimeout(()=>document.getElementById('searchSuggest').classList.remove('open'), 150); });
   enhanceEggIcons();
   document.getElementById('gokuUnIconLabel').src = GOKUUN_ICON_B64;
   document.querySelectorAll('#mObtainGrid .skill-btn').forEach(b=>{
@@ -894,7 +897,49 @@ function getAllAccountsMatches() {
 
 function resetAllFilters() {
   document.getElementById('searchBox').value = '';
+  document.getElementById('searchSuggest').classList.remove('open');
   resetFilter();
+}
+
+// ── 搜尋關鍵字建議下拉（含模糊比對，打錯字也能抓到相似名稱）───
+function fuzzyScore(query, name) {
+  const nameChars=[...name]; const used=new Array(nameChars.length).fill(false);
+  let matchCount=0;
+  for(const ch of query) {
+    const idx=nameChars.findIndex((c,i)=>c===ch && !used[i]);
+    if(idx!==-1){ matchCount++; used[idx]=true; }
+  }
+  return matchCount/query.length;
+}
+function updateSearchSuggest() {
+  const box=document.getElementById('searchSuggest');
+  const q=document.getElementById('searchBox').value.trim();
+  if(!q){ box.classList.remove('open'); box.innerHTML=''; return; }
+  const source = activeAccount==='__ALL__'
+    ? accounts.flatMap(a=>charactersByAccount[a.id]||[])
+    : currentChars();
+  const allNames=[...new Set(source.map(c=>c.name))];
+  let items=allNames.filter(n=>n.includes(q) && n!==q).map(n=>({name:n, exact:true}));
+  if(items.length<8) {
+    const have=new Set(items.map(x=>x.name));
+    const fuzzy=allNames
+      .filter(n=>n!==q && !have.has(n) && !n.includes(q))
+      .map(n=>({name:n, exact:false, score:fuzzyScore(q,n)}))
+      .filter(x=>x.score>=0.5)
+      .sort((a,b)=>b.score-a.score)
+      .slice(0, 8-items.length);
+    items=items.concat(fuzzy);
+  }
+  if(!items.length){ box.classList.remove('open'); box.innerHTML=''; return; }
+  box.innerHTML=items.slice(0,8).map(m=>
+    `<div class="search-suggest-item" onmousedown="selectSuggest('${m.name.replace(/'/g,"\\'")}')">${m.name}${m.exact?'':'<span class="suggest-fuzzy-tag">你是不是要找</span>'}</div>`
+  ).join('');
+  box.classList.add('open');
+}
+function selectSuggest(name) {
+  document.getElementById('searchBox').value=name;
+  document.getElementById('searchSuggest').classList.remove('open');
+  renderList();
 }
 
 function resetFilter() {
