@@ -9,6 +9,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Monster Strike Collect">
 <link rel="apple-touch-icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.jpg">
+<link rel="apple-touch-icon" href="icon.jpeg">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#181c38">
 <link rel="stylesheet" href="style.css">
@@ -37,6 +39,12 @@
     <div class="attr-circle dark"  data-attr="暗" onclick="setAttr(this)"></div>
   </div>
   <div class="stats" id="statsArea"></div>
+  <div class="sort-bar">
+    <span class="sort-lbl">排序：</span>
+    <div class="sort-btn active" onclick="setSort('no',this)">No.</div>
+    <div class="sort-btn" onclick="setSort('name',this)">名稱</div>
+    <div class="sort-btn" onclick="setSort('attr',this)">屬性</div>
+  </div>
   <div class="char-grid" id="charGrid"></div>
 </main>
 
@@ -141,9 +149,15 @@
       </div>
     </div>
 
-    <div class="mfield">
-      <label>角色名稱 *</label>
-      <input type="text" class="minput" id="newName" placeholder="請輸入角色名稱">
+    <div class="filter-2col" style="margin-bottom:10px;">
+      <div class="mfield" style="margin-bottom:0;">
+        <label>角色編號</label>
+        <input type="text" class="minput" id="newCharNo" placeholder="No.1001">
+      </div>
+      <div class="mfield" style="margin-bottom:0;">
+        <label>角色名稱 *</label>
+        <input type="text" class="minput" id="newName" placeholder="請輸入角色名稱">
+      </div>
     </div>
 
     <div class="mfield">
@@ -262,6 +276,37 @@ const ATTR_EMOJI    = {'火':'🔥','水':'💧','木':'🌿','光':'⭐','暗':
 let characters = [], accounts = [{id:'a1',name:'帳號1'},{id:'a2',name:'帳號2'},{id:'a3',name:'帳號3'},{id:'a4',name:'帳號4'}];
 let collections = {}, activeAccount = 'a1';
 let hasUnsaved = false, editCharId = null, uploadedImg = null, modalAttr = '火';
+
+let sortMode = 'no';
+
+function setSort(mode, btn) {
+  sortMode = mode;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+
+function sortChars(arr) {
+  const attrOrder = {'火':0,'水':1,'木':2,'光':3,'暗':4};
+  return [...arr].sort((a, b) => {
+    if (sortMode === 'no') {
+      const na = parseInt((a.charNo||'').replace(/\D/g,'')) || 99999;
+      const nb = parseInt((b.charNo||'').replace(/\D/g,'')) || 99999;
+      return na - nb;
+    }
+    if (sortMode === 'name') {
+      return (a.name||'').localeCompare(b.name||'', 'zh-Hant');
+    }
+    if (sortMode === 'attr') {
+      const oa = attrOrder[a.attribute]??5, ob = attrOrder[b.attribute]??5;
+      if (oa !== ob) return oa - ob;
+      const na = parseInt((a.charNo||'').replace(/\D/g,'')) || 99999;
+      const nb = parseInt((b.charNo||'').replace(/\D/g,'')) || 99999;
+      return na - nb;
+    }
+    return 0;
+  });
+}
 
 const fSets = { skills:new Set(), superSkills:new Set(), strikeType:new Set(), battleType:new Set(), rarity:new Set(), races:new Set(), friendSkills:new Set(), heroFruits:new Set(), evo:new Set(), obtain:new Set(), collab:new Set(), owned:new Set() };
 let filterAttr = '';
@@ -468,7 +513,7 @@ function renderStats() {
 function renderList() {
   const grid=document.getElementById('charGrid'); grid.innerHTML='';
   ensureAcc(activeAccount); const d=collections[activeAccount];
-  const filtered=getFiltered();
+  const filtered=sortChars(getFiltered());
   if(!filtered.length) {
     grid.innerHTML=`<div class="empty-state"><div class="eicon">📦</div><div class="etxt">${characters.length===0?'尚未新增任何角色':'沒有符合條件的角色'}</div><div class="esub">${characters.length===0?'點下方 ＋ 新增第一隻角色':''}</div></div>`; return;
   }
@@ -483,7 +528,7 @@ function renderList() {
       <div class="card-attr attr-${c.attribute}"></div>
       <div class="card-edit" onclick="event.stopPropagation();openEditModal(${c.id})">✎</div>
       ${entry.owned?'<div class="card-check">✓</div>':''}
-      <div class="card-name-bar">${c.name}</div>`;
+      <div class="card-name-bar">${c.charNo?`<span class="card-no-tag">${c.charNo}</span>`:''}${c.name}</div>`;
     card.onclick=()=>toggleOwned(c.id);
     grid.appendChild(card);
   });
@@ -550,6 +595,7 @@ function clearModalForm(){
   uploadedImg=null; mRarity='6'; mStrike='反射型'; mBattle='平衡'; mEvo='';
   document.getElementById('imgPreviewEl').style.display='none';
   document.getElementById('imgHint').style.display='block';
+  document.getElementById('newCharNo').value='';
   document.getElementById('newName').value='';
   document.getElementById('newCollab').value='';
   document.getElementById('mFormsContainer').innerHTML='';
@@ -569,6 +615,7 @@ function prefillModal(c){
   const imgEl=document.getElementById('imgPreviewEl'), hint=document.getElementById('imgHint');
   if(c.imageData){imgEl.src=c.imageData;imgEl.style.display='block';hint.style.display='none';}
   else{imgEl.style.display='none';hint.style.display='block';}
+  document.getElementById('newCharNo').value=c.charNo||'';
   document.getElementById('newName').value=c.name||'';
   document.getElementById('newCollab').value=c.collab||'';
   mRarity=String(c.rarity||6); mStrike=c.strikeType||'反射型'; mBattle=c.battleType||'平衡'; mEvo=c.evolutionState||'';
@@ -617,7 +664,7 @@ function confirmChar(){
     const fn=row.querySelector('.fname').value.trim(), fa=row.querySelector('.factive').value.trim(), fp=row.querySelector('.fpassive').value.trim(), ff=row.querySelector('.ffriend').value.trim();
     if(fn||fa||fp||ff)forms.push({formName:fn||'型態',active:fa,passive:fp,friend:ff});
   });
-  const data={name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,evolutionState:mEvo,collab:document.getElementById('newCollab').value.trim(),races:[...mSets.races],friendSkills:[...mSets.friendSkills],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:uploadedImg,forms};
+  const data={charNo:document.getElementById('newCharNo').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,evolutionState:mEvo,collab:document.getElementById('newCollab').value.trim(),races:[...mSets.races],friendSkills:[...mSets.friendSkills],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:uploadedImg,forms};
   if(editCharId!==null){const idx=characters.findIndex(x=>x.id===editCharId);if(idx>=0)characters[idx]={id:editCharId,...data};}
   else{const maxId=characters.reduce((m,c)=>Math.max(m,c.id||0),0);characters.push({id:maxId+1,...data});}
   closeModal(); saveState(); renderAll();
