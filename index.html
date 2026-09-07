@@ -54,29 +54,42 @@
     <button class="gbtn" onclick="openFilter()">▼ 篩選</button>
     <div class="search-suggest" id="searchSuggest"></div>
   </div>
-  <div class="attr-row">
-    <div class="attr-circle all active" data-attr="" onclick="setAttr(this)">全</div>
-    <div class="attr-circle fire"  data-attr="火" onclick="setAttr(this)"></div>
-    <div class="attr-circle water" data-attr="水" onclick="setAttr(this)"></div>
-    <div class="attr-circle wood"  data-attr="木" onclick="setAttr(this)"></div>
-    <div class="attr-circle light" data-attr="光" onclick="setAttr(this)"></div>
-    <div class="attr-circle dark"  data-attr="暗" onclick="setAttr(this)"></div>
+  <div class="swipe-view" id="swipeView">
+    <div class="attr-row">
+      <div class="attr-circle all active" data-attr="" onclick="setAttr(this)">全</div>
+      <div class="attr-circle fire"  data-attr="火" onclick="setAttr(this)"></div>
+      <div class="attr-circle water" data-attr="水" onclick="setAttr(this)"></div>
+      <div class="attr-circle wood"  data-attr="木" onclick="setAttr(this)"></div>
+      <div class="attr-circle light" data-attr="光" onclick="setAttr(this)"></div>
+      <div class="attr-circle dark"  data-attr="暗" onclick="setAttr(this)"></div>
+    </div>
+    <div class="stats-toggle" id="statsToggle" onclick="toggleStats()">
+      <span>📊 收藏統計</span>
+      <span class="stats-arrow" id="statsArrow">▼</span>
+    </div>
+    <div class="stats" id="statsArea"></div>
+    <div class="sort-bar">
+      <span class="sort-lbl">排序：</span>
+      <div class="sort-btn active" onclick="setSort('no',this)">No.</div>
+      <div class="sort-btn" onclick="setSort('name',this)">名稱</div>
+      <div class="sort-btn" onclick="setSort('attr',this)">屬性</div>
+      <div class="sort-dir-btn" id="sortDirBtn" onclick="toggleSortDir()">↑ 正序</div>
+      <div class="multi-select-btn" id="multiSelectBtn" onclick="toggleMultiSelect()">☑ 多選</div>
+    </div>
+    <div class="char-grid" id="charGrid"></div>
+    <div id="gridSentinel" style="height:1px;"></div>
   </div>
-  <div class="stats-toggle" id="statsToggle" onclick="toggleStats()">
-    <span>📊 收藏統計</span>
-    <span class="stats-arrow" id="statsArrow">▼</span>
-  </div>
-  <div class="stats" id="statsArea"></div>
-  <div class="sort-bar">
-    <span class="sort-lbl">排序：</span>
-    <div class="sort-btn active" onclick="setSort('no',this)">No.</div>
-    <div class="sort-btn" onclick="setSort('name',this)">名稱</div>
-    <div class="sort-btn" onclick="setSort('attr',this)">屬性</div>
-    <div class="sort-dir-btn" id="sortDirBtn" onclick="toggleSortDir()">↑ 正序</div>
-  </div>
-  <div class="char-grid" id="charGrid"></div>
-  <div id="gridSentinel" style="height:1px;"></div>
 </main>
+
+<div class="batch-bar" id="batchBar">
+  <span id="batchCount">已選 0 隻</span>
+  <div class="batch-actions">
+    <button class="gbtn" onclick="batchAdjustQty(1)">持有 +1</button>
+    <button class="gbtn" onclick="batchAdjustQty(-1)">持有 -1</button>
+    <button class="gbtn red" onclick="batchDelete()">🗑 刪除</button>
+    <button class="gbtn" onclick="toggleMultiSelect()">取消</button>
+  </div>
+</div>
 
 <nav class="bottom-nav">
   <div class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-lbl">首頁</span></div>
@@ -543,6 +556,8 @@ let charactersByAccount = {}, accounts = [{id:'a1',name:'帳號1'},{id:'a2',name
 let activeAccount = '__ALL__';
 let hasUnsaved = false, editCharId = null, uploadedImg = null, uploadedImg2 = null, modalAttr = '火';
 let customBg = null, themeMode = 'auto', uploadedBgTemp = null;
+let multiSelectMode = false, selectedIds = new Set();
+let swipeJustHappened = false;
 
 function ensureAcc(id){ if(!charactersByAccount[id]) charactersByAccount[id]=[]; }
 function currentChars(){ ensureAcc(activeAccount); return charactersByAccount[activeAccount]; }
@@ -951,6 +966,37 @@ function resetFilter() {
   renderList();
 }
 
+// ── 多選批次操作 ─────────────────────────────────────
+function toggleMultiSelect() {
+  if(activeAccount==='__ALL__'){ alert('請先切換到單一帳號分頁再使用多選'); return; }
+  multiSelectMode=!multiSelectMode;
+  selectedIds.clear();
+  document.getElementById('multiSelectBtn').classList.toggle('active', multiSelectMode);
+  updateMultiSelectBar();
+  renderList();
+}
+function updateMultiSelectBar() {
+  const bar=document.getElementById('batchBar');
+  bar.classList.toggle('open', multiSelectMode);
+  document.getElementById('batchCount').textContent=`已選 ${selectedIds.size} 隻`;
+}
+function batchAdjustQty(delta) {
+  if(!selectedIds.size) return;
+  currentChars().forEach(c=>{ if(selectedIds.has(c.id)) c.quantity=Math.max(1,(c.quantity||1)+delta); });
+  saveState(); renderList(); renderStats();
+}
+function batchDelete() {
+  if(!selectedIds.size) return;
+  if(!confirm(`確定要刪除選取的 ${selectedIds.size} 隻角色嗎？此動作無法復原。`)) return;
+  charactersByAccount[activeAccount]=currentChars().filter(c=>!selectedIds.has(c.id));
+  selectedIds.clear();
+  saveState();
+  multiSelectMode=false;
+  document.getElementById('multiSelectBtn').classList.remove('active');
+  updateMultiSelectBar();
+  renderAll();
+}
+
 // ── Render ───────────────────────────────────────────
 function renderStats() {
   if(activeAccount==='__ALL__'){ renderStatsAll(); return; }
@@ -1034,8 +1080,9 @@ function appendCardBatch() {
   slice.forEach(c => {
     const qty=c.quantity||1;
     const hasImg2=!!c.imageData2;
+    const selected=multiSelectMode && selectedIds.has(c.id);
     const card=document.createElement('div');
-    card.className='char-card owned';
+    card.className='char-card owned'+(multiSelectMode?' selectable':'')+(selected?' selected':'');
     card.innerHTML=`
       <div class="card-img ${c.imageData?'':'bg-'+c.attribute}">
         ${c.imageData?`<img src="${c.imageData}" alt="${c.name}">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`}
@@ -1048,8 +1095,19 @@ function appendCardBatch() {
         <span class="card-dot active" onclick="switchCardImage(event, ${c.id}, 0)"></span>
         <span class="card-dot" onclick="switchCardImage(event, ${c.id}, 1)"></span>
       </div>`:''}
+      ${multiSelectMode?`<div class="card-select-mark">${selected?'✓':''}</div>`:''}
       <div class="card-name-bar">${c.hasGokuUn?`<img src="${GOKUUN_ICON_B64}" class="card-gokuun-icon" alt="極運">`:c.name}</div>`;
-    card.onclick=()=>openViewModal(c.id);
+    card.onclick=()=>{
+      if(swipeJustHappened) return;
+      if(multiSelectMode){
+        if(selectedIds.has(c.id)) selectedIds.delete(c.id); else selectedIds.add(c.id);
+        card.classList.toggle('selected', selectedIds.has(c.id));
+        const mark=card.querySelector('.card-select-mark'); if(mark) mark.textContent=selectedIds.has(c.id)?'✓':'';
+        updateMultiSelectBar();
+        return;
+      }
+      openViewModal(c.id);
+    };
     grid.appendChild(card);
   });
   renderedCount += slice.length;
@@ -1084,6 +1142,7 @@ function appendAllCardBatch() {
 // 從「全部」首頁點帳號標籤，跳到該帳號並打開該角色詳情
 function jumpToAccount(accId, name) {
   activeAccount=accId;
+  multiSelectMode=false; selectedIds.clear();
   document.getElementById('searchBox').value=name;
   renderAll();
   const c=(charactersByAccount[accId]||[]).find(x=>x.name===name);
@@ -1120,12 +1179,12 @@ function renderTabs() {
   const allTab=document.createElement('div');
   allTab.className='acc-tab all-tab'+(activeAccount==='__ALL__'?' active':'');
   allTab.textContent='🏠 全部';
-  allTab.onclick=()=>{activeAccount='__ALL__';renderAll();};
+  allTab.onclick=()=>{activeAccount='__ALL__';multiSelectMode=false;selectedIds.clear();renderAll();};
   wrap.appendChild(allTab);
   accounts.forEach(acc => {
     const tab=document.createElement('div'); tab.className='acc-tab'+(acc.id===activeAccount?' active':'');
     const ns=document.createElement('span'); ns.textContent=acc.name; ns.style.cursor='pointer';
-    ns.onclick=()=>{activeAccount=acc.id;renderAll();};
+    ns.onclick=()=>{activeAccount=acc.id;multiSelectMode=false;selectedIds.clear();renderAll();};
     const eb=document.createElement('span'); eb.className='acc-edit'; eb.textContent='✎';
     eb.onclick=e=>{e.stopPropagation(); const n=prompt('帳號名稱:',acc.name); if(n&&n.trim()){acc.name=n.trim();saveState();renderAll();}};
     tab.appendChild(ns); tab.appendChild(eb); wrap.appendChild(tab);
@@ -1635,6 +1694,104 @@ function backupThenRefresh(){
 }
 initPullToRefresh();
 setInterval(()=>{ if(themeMode==='auto') applyTheme(); }, 15*60*1000);
+
+// ── 帳號滑動切換（1:1跟隨、橡皮筋邊界、速度投擲、可中斷彈簧）───
+(function initAccountSwipe(){
+  const view = document.getElementById('swipeView');
+  if(!view) return;
+  let dragging=false, decided=null, startX=0, startY=0, baseX=0, liveX=0, hist=[];
+  let cancelSpring=null;
+
+  function tabOrder(){ return ['__ALL__', ...accounts.map(a=>a.id)]; }
+  function currentIndex(){ return tabOrder().indexOf(activeAccount); }
+  function setX(x){ liveX=x; view.style.transform = x ? `translateX(${x}px)` : ''; }
+
+  // 橡皮筋阻力：越拖越難再往前，模擬真實的邊界抵抗感
+  function rubberband(overshoot, dim, k=0.55){
+    return (overshoot*dim*k)/(dim+k*Math.abs(overshoot));
+  }
+  // 速度投擲：依放開時的速度推算最終會停在哪裡，而不是只看放開當下的位置
+  function project(v, decel=0.998){
+    return (v/1000)*decel/(1-decel);
+  }
+  // 臨界阻尼彈簧：用 damping/response 兩個參數描述動作，可隨時被下一次觸摸中斷並從當下位置重新出發
+  function springTo(from, to, v0, damping, response, onDone){
+    if(cancelSpring) cancelSpring();
+    const w=2*Math.PI/response, k=w*w, c=2*damping*w;
+    let pos=from, vel=v0, last=performance.now(), raf;
+    function step(now){
+      const dt=Math.min((now-last)/1000, 0.032); last=now;
+      const force=-k*(pos-to)-c*vel;
+      vel+=force*dt; pos+=vel*dt;
+      setX(pos);
+      if(Math.abs(pos-to)<0.5 && Math.abs(vel)<20){ setX(to); cancelSpring=null; if(onDone) onDone(); return; }
+      raf=requestAnimationFrame(step);
+    }
+    raf=requestAnimationFrame(step);
+    cancelSpring=()=>{ cancelAnimationFrame(raf); cancelSpring=null; };
+  }
+
+  view.addEventListener('touchstart', e=>{
+    if(e.target.closest('input,.cdd,.acc-tag,.card-edit,.card-dot,.card-select-mark')) return;
+    dragging=true; decided=null;
+    startX=e.touches[0].clientX; startY=e.touches[0].clientY;
+    if(cancelSpring) cancelSpring(); // 中斷：從目前畫面上的即時位置繼續，不是從目標值重新開始
+    baseX=liveX;
+    hist=[{x:startX,t:performance.now()}];
+  }, {passive:true});
+
+  view.addEventListener('touchmove', e=>{
+    if(!dragging) return;
+    const x=e.touches[0].clientX, y=e.touches[0].clientY;
+    const dx=x-startX, dy=y-startY;
+    if(decided===null){
+      if(Math.abs(dx)>10 || Math.abs(dy)>10){
+        decided = Math.abs(dx)>Math.abs(dy) ? 'h' : 'v';
+        if(decided==='v'){ dragging=false; return; } // 判定為垂直捲動，交還給瀏覽器原生捲動
+      } else return;
+    }
+    if(decided!=='h') return;
+    e.preventDefault();
+    swipeJustHappened = Math.abs(dx) > 15; // 拖動夠多就視為滑動，卡片點擊不觸發詳情
+    hist.push({x,t:performance.now()}); if(hist.length>5) hist.shift();
+    const w = view.getBoundingClientRect().width || window.innerWidth;
+    const order=tabOrder(); const idx=currentIndex();
+    let tx = baseX + dx;
+    if(idx<=0 && tx>0) tx = rubberband(tx, w);
+    if(idx>=order.length-1 && tx<0) tx = -rubberband(-tx, w);
+    setX(tx);
+  }, {passive:false});
+
+  function endDrag(){
+    if(!dragging) return; dragging=false;
+    if(decided!=='h'){ decided=null; return; }
+    decided=null;
+    const w = view.getBoundingClientRect().width || window.innerWidth;
+    const first=hist[0], last=hist[hist.length-1];
+    const dt=Math.max((last.t-first.t)/1000, 0.001);
+    const velocity=(last.x-first.x)/dt; // px/s
+    const projected = liveX + project(velocity);
+    const order=tabOrder(); const idx=currentIndex();
+    let dir=0;
+    if(projected <= -w*0.3) dir=1;
+    else if(projected >= w*0.3) dir=-1;
+    const newIdx=idx+dir;
+    if(dir!==0 && newIdx>=0 && newIdx<order.length){
+      const exitX = dir>0 ? -w : w;
+      springTo(liveX, exitX, velocity, 0.86, 0.32, ()=>{
+        activeAccount=order[newIdx];
+        multiSelectMode=false; selectedIds.clear();
+        renderAll();
+        setX(dir>0 ? w : -w);
+        springTo(dir>0 ? w : -w, 0, velocity, 1, 0.4);
+      });
+    } else {
+      springTo(liveX, 0, velocity, 1, 0.35);
+    }
+  }
+  view.addEventListener('touchend', endDrag, {passive:true});
+  view.addEventListener('touchcancel', endDrag, {passive:true});
+})();
 
 // ── 載入 ─────────────────────────────────────────────
 fetch('backup.json')
