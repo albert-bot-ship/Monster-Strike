@@ -39,7 +39,10 @@
 <header>
   <div class="title-row">
     <span class="app-title">Monster Strike Collect</span>
-    <span id="unsavedBadge">未備份</span>
+    <div class="header-right">
+      <span id="unsavedBadge">未備份</span>
+      <span class="header-icon-btn" onclick="openAppearanceModal()" title="外觀設定">🎨</span>
+    </div>
   </div>
   <div class="accounts" id="accountTabs"></div>
 </header>
@@ -78,7 +81,6 @@
   <div class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-lbl">首頁</span></div>
   <div class="nav-item" onclick="openFilter()"><span class="nav-icon">🔍</span><span class="nav-lbl">篩選</span></div>
   <div class="nav-add" onclick="openAddModal()"><span class="nav-icon">＋</span><span class="nav-lbl">新增</span></div>
-  <div class="nav-item" onclick="openAppearanceModal()"><span class="nav-icon">🎨</span><span class="nav-lbl">外觀</span></div>
   <div class="nav-item" onclick="exportBackup()"><span class="nav-icon">⬇</span><span class="nav-lbl">備份</span></div>
   <div class="nav-item" onclick="document.getElementById('importFile').click()"><span class="nav-icon">⬆</span><span class="nav-lbl">匯入</span></div>
   <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importBackup(event)">
@@ -1002,12 +1004,12 @@ function appendAllCardBatch() {
   const grid=document.getElementById('charGrid');
   const slice=filteredList.slice(renderedCount, renderedCount+CARD_BATCH);
   slice.forEach(c => {
-    const tagsHtml=accounts.map(acc=>{
+    const tagsHtml=accounts.map((acc,idx)=>{
       const o=c.owners.find(x=>x.accId===acc.id);
       const owned=!!o;
       const safeName=c.name.replace(/'/g,"\\'");
       const tip=owned?`${acc.name}${o.qty>1?' x'+o.qty:''}`:`${acc.name}（未持有）`;
-      return `<span class="acc-tag${owned?' owned':''}" title="${tip}"${owned?` onclick="event.stopPropagation();jumpToAccount('${acc.id}','${safeName}')"`:''}></span>`;
+      return `<span class="acc-tag${owned?' owned':''}" title="${tip}"${owned?` onclick="event.stopPropagation();jumpToAccount('${acc.id}','${safeName}')"`:''}>${idx+1}</span>`;
     }).join('');
     const card=document.createElement('div');
     card.className='char-card owned all-mode-card';
