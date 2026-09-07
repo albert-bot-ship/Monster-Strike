@@ -1,22 +1,31 @@
-[
-  {
-    "id": 101, "name": "サンプル・ファイア", "attribute": "火", "rarity": 3, "race": "魔人", "type": "速度型",
-    "forms": [
-      { "formName": "進化前", "active": "範例主動技說明(弱)", "passive": "", "friend": "爆發(小)" },
-      { "formName": "究極進化", "active": "範例主動技說明(強)", "passive": "範例被動", "friend": "爆發(大)" }
-    ]
-  },
-  {
-    "id": 765, "name": "サンプル・バハ", "attribute": "木", "rarity": 5, "race": "亜人族", "type": "反射型",
-    "forms": [
-      { "formName": "進化前", "active": "範例主動技說明", "passive": "", "friend": "光線" },
-      { "formName": "獸神化", "active": "範例主動技說明(獸神化版)", "passive": "範例被動", "friend": "光線(強化)" }
-    ]
-  },
-  {
-    "id": 1107, "name": "サンプル・ウンディーネ", "attribute": "水", "rarity": 6, "race": "妖精族", "type": "砲撃型",
-    "forms": [
-      { "formName": "進化前", "active": "範例主動技說明", "passive": "範例被動", "friend": "追蹤彈" }
-    ]
+{
+  "accounts": [
+    {
+      "id": "a1",
+      "name": "馬克1號"
+    },
+    {
+      "id": "a2",
+      "name": "馬克2號"
+    },
+    {
+      "id": "a3",
+      "name": "馬克3號"
+    },
+    {
+      "id": "a4",
+      "name": "馬克4號"
+    }
+  ],
+  "collections": {
+    "a1": {
+      "101": {
+        "owned": false,
+        "count": 0
+      }
+    },
+    "a2": {},
+    "a3": {},
+    "a4": {}
   }
-]
+}
