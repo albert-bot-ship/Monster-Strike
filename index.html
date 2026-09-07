@@ -47,6 +47,7 @@
 <main>
   <div class="searchbar">
     <input class="search-input" type="text" id="searchBox" placeholder="🔍 搜尋角色名稱...">
+    <button class="gbtn" onclick="resetAllFilters()">↺ 重置</button>
     <button class="gbtn" onclick="openFilter()">▼ 篩選</button>
   </div>
   <div class="attr-row">
@@ -57,6 +58,10 @@
     <div class="attr-circle light" data-attr="光" onclick="setAttr(this)"></div>
     <div class="attr-circle dark"  data-attr="暗" onclick="setAttr(this)"></div>
   </div>
+  <div class="stats-toggle" id="statsToggle" onclick="toggleStats()">
+    <span>📊 收藏統計</span>
+    <span class="stats-arrow" id="statsArrow">▼</span>
+  </div>
   <div class="stats" id="statsArea"></div>
   <div class="sort-bar">
     <span class="sort-lbl">排序：</span>
@@ -66,12 +71,14 @@
     <div class="sort-dir-btn" id="sortDirBtn" onclick="toggleSortDir()">↑ 正序</div>
   </div>
   <div class="char-grid" id="charGrid"></div>
+  <div id="gridSentinel" style="height:1px;"></div>
 </main>
 
 <nav class="bottom-nav">
   <div class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-lbl">首頁</span></div>
   <div class="nav-item" onclick="openFilter()"><span class="nav-icon">🔍</span><span class="nav-lbl">篩選</span></div>
   <div class="nav-add" onclick="openAddModal()"><span class="nav-icon">＋</span><span class="nav-lbl">新增</span></div>
+  <div class="nav-item" onclick="openAppearanceModal()"><span class="nav-icon">🎨</span><span class="nav-lbl">外觀</span></div>
   <div class="nav-item" onclick="exportBackup()"><span class="nav-icon">⬇</span><span class="nav-lbl">備份</span></div>
   <div class="nav-item" onclick="document.getElementById('importFile').click()"><span class="nav-icon">⬆</span><span class="nav-lbl">匯入</span></div>
   <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importBackup(event)">
@@ -132,7 +139,10 @@
   <div class="drawer-section">
     <div class="drawer-lbl">種族（可多選）</div>
     <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
-    <div class="cdd-body sg4" id="fRaceBody"></div></div>
+    <div class="cdd-body" id="fRaceBody">
+      <input type="text" class="minput cdd-search" placeholder="🔍 搜尋種族..." oninput="filterCddSearch(this)">
+      <div class="sg4" id="fRaceGrid"></div>
+    </div></div>
   </div>
 
   <div class="drawer-section filter-2col">
@@ -270,13 +280,19 @@
     <div class="mfield">
       <label>種族（可多選）</label>
       <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">選擇種族</span><span class="cdd-arr">▼</span></div>
-      <div class="cdd-body sg4" id="mRaceBody"></div></div>
+      <div class="cdd-body" id="mRaceBody">
+        <input type="text" class="minput cdd-search" placeholder="🔍 搜尋種族..." oninput="filterCddSearch(this)">
+        <div class="sg4" id="mRaceGrid"></div>
+      </div></div>
     </div>
 
     <div class="mfield">
       <label>英雄果實（可多選）</label>
       <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">選擇英雄果實</span><span class="cdd-arr">▼</span></div>
-      <div class="cdd-body" id="mHeroFruitBody"></div></div>
+      <div class="cdd-body" id="mHeroFruitBody">
+        <input type="text" class="minput cdd-search" placeholder="🔍 搜尋英雄果實..." oninput="filterGroupedSearch(this)">
+        <div id="mHeroFruitGrid"></div>
+      </div></div>
     </div>
 
     <div class="mfield">
@@ -441,6 +457,41 @@
 </div>
 
 <!-- 從其他帳號複製角色 -->
+<div class="modal-overlay" id="appearanceModal">
+  <div class="modal-box" style="max-width:400px;">
+    <h2>🎨 外觀設定</h2>
+
+    <div class="appear-section">
+      <div class="appear-label">背景圖片</div>
+      <div class="bg-preview" id="bgPreviewBox">
+        <span id="bgPreviewHint">尚未設定背景圖</span>
+        <img id="bgPreviewImg" style="display:none;">
+      </div>
+      <div class="appear-btn-row">
+        <label class="gbtn" style="cursor:pointer;">
+          上傳圖片
+          <input type="file" accept="image/*" style="display:none" onchange="handleBgUpload(event)">
+        </label>
+        <button class="gbtn" onclick="clearBg()">清除背景</button>
+      </div>
+    </div>
+
+    <div class="appear-section">
+      <div class="appear-label">主題模式</div>
+      <div class="theme-btn-row">
+        <div class="theme-opt" data-mode="auto" onclick="setThemeMode('auto')">🌓 自動</div>
+        <div class="theme-opt" data-mode="dark" onclick="setThemeMode('dark')">🌙 深色</div>
+        <div class="theme-opt" data-mode="light" onclick="setThemeMode('light')">☀️ 淺色</div>
+      </div>
+      <div class="appear-hint">自動模式會依照現在時間（早上6點-晚上6點淺色，其餘深色）切換</div>
+    </div>
+
+    <div class="mbtnrow" style="margin-top:16px;">
+      <button class="mconfirm" style="width:100%;" onclick="closeAppearanceModal()">完成</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="copyPickerModal">
   <div class="modal-box" style="max-width:400px;">
     <h2>從其他帳號複製角色</h2>
@@ -488,6 +539,7 @@ const EGG_ICON_B64  = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAB6CAY
 let charactersByAccount = {}, accounts = [{id:'a1',name:'帳號1'},{id:'a2',name:'帳號2'},{id:'a3',name:'帳號3'},{id:'a4',name:'帳號4'}];
 let activeAccount = 'a1';
 let hasUnsaved = false, editCharId = null, uploadedImg = null, uploadedImg2 = null, modalAttr = '火';
+let customBg = null, themeMode = 'auto', uploadedBgTemp = null;
 
 function ensureAcc(id){ if(!charactersByAccount[id]) charactersByAccount[id]=[]; }
 function currentChars(){ ensureAcc(activeAccount); return charactersByAccount[activeAccount]; }
@@ -557,7 +609,7 @@ function init() {
   // 下拉內容（篩選）
   buildCddBody('fBattleBody', BATTLE_TYPES, 'battleType', true);
   buildCddBody('fRarityBody', RARITIES,     'rarity',     true);
-  buildCddBody('fRaceBody',   RACES,        'races',      true);
+  buildCddBody('fRaceGrid',   RACES,        'races',      true);
   buildCddBody('fEvoBody',    EVO_STATES,   'evo',        true);
   buildCddBody('fObtainBody', OBTAIN,       'obtain',     true);
   // 友情技（主單選／副可複選，皆可搜尋）
@@ -565,10 +617,10 @@ function init() {
   buildFriendGrid('fFriendSubGrid',  'friendSkillsSub', true, false);
   // 下拉內容（表單）
   buildCddBody('mEvoBody',      EVO_STATES,    'evo',         false, true);
-  buildCddBody('mRaceBody',     RACES,         'races',       false);
+  buildCddBody('mRaceGrid',     RACES,         'races',       false);
   buildFriendGrid('mFriendMainGrid', null,             false, true);
   buildFriendGrid('mFriendSubGrid',  'friendSkillsSub', false, false);
-  buildHFCdd('mHeroFruitBody', false);
+  buildHFCdd('mHeroFruitGrid', false);
   buildKillerCdd('fKillerGrid', true);
   buildKillerCdd('mKillerGrid', false);
   buildCddBody('fOtherSkillGrid', OTHER_SKILLS, 'skills', true);
@@ -739,7 +791,8 @@ function buildHFCdd(bodyId, isFilter) {
 
 function buildCollabFilter() {
   const grid = document.getElementById('fCollabGrid'); if(!grid) return;
-  const collabs = [...new Set(currentChars().map(c => c.collab).filter(Boolean))].sort();
+  const source = activeAccount==='__ALL__' ? accounts.flatMap(a=>charactersByAccount[a.id]||[]) : currentChars();
+  const collabs = [...new Set(source.map(c => c.collab).filter(Boolean))].sort();
   const cdd = grid.closest('.cdd');
   grid.innerHTML = '';
   grid.className = collabs.length > 6 ? 'sg3' : 'sg2';
@@ -781,6 +834,14 @@ function updateCntBadge(id1, key1, id2, key2) {
   if(e2) e2.textContent = mSets[key2].size>0 ? `已選 ${mSets[key2].size}` : '';
 }
 
+// ── 統計卡片收合 ─────────────────────────────────────
+let statsExpanded = false;
+function toggleStats() {
+  statsExpanded = !statsExpanded;
+  document.getElementById('statsArea').classList.toggle('open', statsExpanded);
+  document.getElementById('statsArrow').classList.toggle('open', statsExpanded);
+}
+
 // ── 屬性篩選 ─────────────────────────────────────────
 function setAttr(btn) {
   document.querySelectorAll('.attr-row .attr-circle').forEach(b=>b.classList.remove('active'));
@@ -788,30 +849,50 @@ function setAttr(btn) {
 }
 
 // ── 篩選邏輯 ─────────────────────────────────────────
+function matchesFilters(c, q) {
+  if(q && !c.name.includes(q)) return false;
+  if(filterAttr && c.attribute!==filterAttr) return false;
+  if(fSets.rarity.size>0  && !fSets.rarity.has(`★${c.rarity}`)) return false;
+  if(fSets.strikeType.size>0 && !fSets.strikeType.has(c.strikeType)) return false;
+  if(fSets.battleType.size>0 && !fSets.battleType.has(c.battleType)) return false;
+  if(fSets.evo.size>0     && !fSets.evo.has(c.evolutionState)) return false;
+  if(fSets.collab.size>0  && !fSets.collab.has(c.collab||'')) return false;
+  if(fSets.heroFruits.size>0) {
+    const hf = c.heroFruits||[];
+    const wantHas = fSets.heroFruits.has('有英雄果實'), wantNo = fSets.heroFruits.has('無英雄果實');
+    if(wantHas && !wantNo && hf.length===0) return false;
+    if(wantNo  && !wantHas && hf.length>0)  return false;
+  }
+  for(const s of fSets.skills)       if(!(c.skills||[]).includes(s))       return false;
+  for(const s of fSets.superSkills)  if(!(c.superSkills||[]).includes(s))  return false;
+  for(const s of fSets.races)        if(!(c.races||[]).includes(s))        return false;
+  if(filterFriendMain && c.friendSkillMain !== filterFriendMain) return false;
+  for(const s of fSets.friendSkillsSub) if(!(c.friendSkillsSub||[]).includes(s)) return false;
+  for(const s of fSets.obtain)       if(!(c.obtainMethods||[]).includes(s)) return false;
+  return true;
+}
 function getFiltered() {
   const q = document.getElementById('searchBox').value.trim();
-  return currentChars().filter(c => {
-    if(q && !c.name.includes(q)) return false;
-    if(filterAttr && c.attribute!==filterAttr) return false;
-    if(fSets.rarity.size>0  && !fSets.rarity.has(`★${c.rarity}`)) return false;
-    if(fSets.strikeType.size>0 && !fSets.strikeType.has(c.strikeType)) return false;
-    if(fSets.battleType.size>0 && !fSets.battleType.has(c.battleType)) return false;
-    if(fSets.evo.size>0     && !fSets.evo.has(c.evolutionState)) return false;
-    if(fSets.collab.size>0  && !fSets.collab.has(c.collab||'')) return false;
-    if(fSets.heroFruits.size>0) {
-      const hf = c.heroFruits||[];
-      const wantHas = fSets.heroFruits.has('有英雄果實'), wantNo = fSets.heroFruits.has('無英雄果實');
-      if(wantHas && !wantNo && hf.length===0) return false;
-      if(wantNo  && !wantHas && hf.length>0)  return false;
-    }
-    for(const s of fSets.skills)       if(!(c.skills||[]).includes(s))       return false;
-    for(const s of fSets.superSkills)  if(!(c.superSkills||[]).includes(s))  return false;
-    for(const s of fSets.races)        if(!(c.races||[]).includes(s))        return false;
-    if(filterFriendMain && c.friendSkillMain !== filterFriendMain) return false;
-    for(const s of fSets.friendSkillsSub) if(!(c.friendSkillsSub||[]).includes(s)) return false;
-    for(const s of fSets.obtain)       if(!(c.obtainMethods||[]).includes(s)) return false;
-    return true;
+  return currentChars().filter(c => matchesFilters(c, q));
+}
+
+// ── 全帳號搜尋（首頁「全部」）─────────────────────────
+function getAllAccountsMatches() {
+  const q = document.getElementById('searchBox').value.trim();
+  const map = new Map(); // name -> { ...repChar, owners:[{accId,accName,qty}] }
+  accounts.forEach(acc => {
+    (charactersByAccount[acc.id]||[]).forEach(c => {
+      if(!matchesFilters(c, q)) return;
+      if(!map.has(c.name)) map.set(c.name, {...c, owners:[]});
+      map.get(c.name).owners.push({accId:acc.id, accName:acc.name, qty:c.quantity||1});
+    });
   });
+  return [...map.values()];
+}
+
+function resetAllFilters() {
+  document.getElementById('searchBox').value = '';
+  resetFilter();
 }
 
 function resetFilter() {
@@ -825,6 +906,7 @@ function resetFilter() {
 
 // ── Render ───────────────────────────────────────────
 function renderStats() {
+  if(activeAccount==='__ALL__'){ renderStatsAll(); return; }
   const list=currentChars();
   const tot=list.length;
   const totalQty=list.reduce((s,c)=>s+(c.quantity||1),0);
@@ -838,14 +920,60 @@ function renderStats() {
     <div class="stat-card"><div class="stat-num">${dr}<span class="stat-total">%</span></div><div class="stat-lbl">重複率</div></div>`;
 }
 
+function renderStatsAll() {
+  const nameMap=new Map();
+  accounts.forEach(acc=>{
+    (charactersByAccount[acc.id]||[]).forEach(c=>{
+      if(!nameMap.has(c.name)) nameMap.set(c.name,{count:0,totalQty:0});
+      const e=nameMap.get(c.name); e.count++; e.totalQty+=(c.quantity||1);
+    });
+  });
+  const uniqueCount=nameMap.size;
+  const totalQtyAll=[...nameMap.values()].reduce((s,e)=>s+e.totalQty,0);
+  const fullSetCount=[...nameMap.values()].filter(e=>e.count===accounts.length).length;
+  document.getElementById('statsArea').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${uniqueCount}</div><div class="stat-lbl">角色種類數（全帳號）</div></div>
+    <div class="stat-card"><div class="stat-num">${totalQtyAll}</div><div class="stat-lbl">總持有數量（全帳號）</div></div>
+    <div class="stat-card"><div class="stat-num">${accounts.length}</div><div class="stat-lbl">帳號數</div></div>
+    <div class="stat-card"><div class="stat-num">${fullSetCount}</div><div class="stat-lbl">全帳號都持有</div></div>`;
+}
+
+// ── 清單渲染（分批載入，角色多時避免一次塞爆DOM卡頓）───
+const CARD_BATCH = 40;
+let filteredList = [];
+let renderedCount = 0;
+let gridObserver = null;
+
 function renderList() {
+  if(activeAccount==='__ALL__'){ renderAllList(); return; }
   const grid=document.getElementById('charGrid'); grid.innerHTML='';
   const total=currentChars().length;
-  const filtered=sortChars(getFiltered());
-  if(!filtered.length) {
+  filteredList=sortChars(getFiltered());
+  renderedCount=0;
+  if(!filteredList.length) {
     grid.innerHTML=`<div class="empty-state"><div class="eicon">📦</div><div class="etxt">${total===0?'尚未新增任何角色':'沒有符合條件的角色'}</div><div class="esub">${total===0?'點下方 ＋ 新增第一隻角色':''}</div></div>`; return;
   }
-  filtered.forEach(c => {
+  appendCardBatch();
+  setupGridObserver();
+}
+
+// 「全部」首頁：跨帳號搜尋結果清單
+function renderAllList() {
+  const grid=document.getElementById('charGrid'); grid.innerHTML='';
+  const q=document.getElementById('searchBox').value.trim();
+  filteredList=sortChars(getAllAccountsMatches());
+  renderedCount=0;
+  if(!filteredList.length) {
+    grid.innerHTML=`<div class="empty-state"><div class="eicon">🔍</div><div class="etxt">${q?'沒有符合條件的角色':'搜尋角色名稱，一次查全部帳號'}</div><div class="esub">${q?'':'輸入名稱後，會顯示各帳號的持有狀況'}</div></div>`; return;
+  }
+  appendAllCardBatch();
+  setupGridObserver();
+}
+
+function appendCardBatch() {
+  const grid=document.getElementById('charGrid');
+  const slice=filteredList.slice(renderedCount, renderedCount+CARD_BATCH);
+  slice.forEach(c => {
     const qty=c.quantity||1;
     const hasImg2=!!c.imageData2;
     const card=document.createElement('div');
@@ -866,6 +994,52 @@ function renderList() {
     card.onclick=()=>openViewModal(c.id);
     grid.appendChild(card);
   });
+  renderedCount += slice.length;
+}
+
+// 「全部」首頁卡片：不可編輯，改顯示各帳號持有標籤，點標籤可跳到該帳號查看
+function appendAllCardBatch() {
+  const grid=document.getElementById('charGrid');
+  const slice=filteredList.slice(renderedCount, renderedCount+CARD_BATCH);
+  slice.forEach(c => {
+    const tagsHtml=accounts.map(acc=>{
+      const o=c.owners.find(x=>x.accId===acc.id);
+      const owned=!!o;
+      const safeName=c.name.replace(/'/g,"\\'");
+      const tip=owned?`${acc.name}${o.qty>1?' x'+o.qty:''}`:`${acc.name}（未持有）`;
+      return `<span class="acc-tag${owned?' owned':''}" title="${tip}"${owned?` onclick="event.stopPropagation();jumpToAccount('${acc.id}','${safeName}')"`:''}></span>`;
+    }).join('');
+    const card=document.createElement('div');
+    card.className='char-card owned all-mode-card';
+    card.innerHTML=`
+      <div class="card-img ${c.imageData?'':'bg-'+c.attribute}">
+        ${c.imageData?`<img src="${c.imageData}" alt="${c.name}">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`}
+      </div>
+      <div class="card-attr attr-${c.attribute}"></div>
+      <div class="card-acc-tags">${tagsHtml}</div>
+      <div class="card-name-bar">${c.hasGokuUn?`<img src="${GOKUUN_ICON_B64}" class="card-gokuun-icon" alt="極運">`:c.name}</div>`;
+    grid.appendChild(card);
+  });
+  renderedCount += slice.length;
+}
+
+// 從「全部」首頁點帳號標籤，跳到該帳號並打開該角色詳情
+function jumpToAccount(accId, name) {
+  activeAccount=accId;
+  document.getElementById('searchBox').value=name;
+  renderAll();
+  const c=(charactersByAccount[accId]||[]).find(x=>x.name===name);
+  if(c) openViewModal(c.id);
+}
+
+function setupGridObserver() {
+  if(gridObserver) gridObserver.disconnect();
+  const sentinel=document.getElementById('gridSentinel');
+  const batchFn = activeAccount==='__ALL__' ? appendAllCardBatch : appendCardBatch;
+  gridObserver=new IntersectionObserver(entries=>{
+    if(entries[0].isIntersecting && renderedCount<filteredList.length) batchFn();
+  }, {rootMargin:'500px'});
+  gridObserver.observe(sentinel);
 }
 
 // 切換卡片顯示第一/第二張圖片與編號
@@ -885,6 +1059,11 @@ function switchCardImage(e, id, idx){
 
 function renderTabs() {
   const wrap=document.getElementById('accountTabs'); wrap.innerHTML='';
+  const allTab=document.createElement('div');
+  allTab.className='acc-tab all-tab'+(activeAccount==='__ALL__'?' active':'');
+  allTab.textContent='🏠 全部';
+  allTab.onclick=()=>{activeAccount='__ALL__';renderAll();};
+  wrap.appendChild(allTab);
   accounts.forEach(acc => {
     const tab=document.createElement('div'); tab.className='acc-tab'+(acc.id===activeAccount?' active':'');
     const ns=document.createElement('span'); ns.textContent=acc.name; ns.style.cursor='pointer';
@@ -1029,7 +1208,7 @@ function prefillModal(c){
   updateCntBadge('cntSkill','skills','cntSuper','superSkills');
 }
 
-function openAddModal(){editCharId=null;document.getElementById('modalTitle').textContent='新增角色';clearModalForm();document.getElementById('copyFromAccBtn').style.display='block';const m=document.getElementById('addCharModal');m.classList.add('open');m.scrollTop=0;}
+function openAddModal(){if(activeAccount==='__ALL__'){alert('請先切換到單一帳號分頁再新增角色');return;}editCharId=null;document.getElementById('modalTitle').textContent='新增角色';clearModalForm();document.getElementById('copyFromAccBtn').style.display='block';const m=document.getElementById('addCharModal');m.classList.add('open');m.scrollTop=0;}
 function openEditModal(id){
   editCharId=id; const c=currentChars().find(x=>x.id===id); if(!c)return;
   document.getElementById('modalTitle').textContent='編輯角色';clearModalForm();prefillModal(c);
@@ -1170,31 +1349,105 @@ function hideCollabSuggestions(){
   setTimeout(()=>{ const list=document.getElementById('collabSuggestList'); if(list) list.classList.remove('show'); }, 120);
 }
 
+// ── 圖片壓縮共用工具（上傳時自動縮圖＋轉JPEG，降低 backup.json 檔案大小）──
+function compressImage(file, maxDim=1200, quality=0.85){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width >= height) { height = Math.round(height * maxDim / width); width = maxDim; }
+          else { width = Math.round(width * maxDim / height); height = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => reject(new Error('圖片載入失敗'));
+      img.src = reader.result;
+    };
+    reader.onerror = () => reject(new Error('檔案讀取失敗'));
+    reader.readAsDataURL(file);
+  });
+}
+
 function handleImgUpload(e){
   const file=e.target.files[0]; if(!file)return;
-  const reader=new FileReader();
-  reader.onload=()=>{
-    uploadedImg=reader.result;
+  compressImage(file).then(dataUrl=>{
+    uploadedImg=dataUrl;
     const imgEl=document.getElementById('imgPreviewEl'); imgEl.src=uploadedImg; imgEl.style.display='block';
     document.getElementById('imgHint').style.display='none';
-  };
-  reader.readAsDataURL(file);
+  }).catch(()=>alert('圖片處理失敗，請換一張圖片'));
 }
 
 function handleImgUpload2(e){
   const file=e.target.files[0]; if(!file)return;
-  const reader=new FileReader();
-  reader.onload=()=>{
-    uploadedImg2=reader.result;
+  compressImage(file).then(dataUrl=>{
+    uploadedImg2=dataUrl;
     const imgEl=document.getElementById('imgPreviewEl2'); imgEl.src=uploadedImg2; imgEl.style.display='block';
     document.getElementById('imgHint2').style.display='none';
-  };
-  reader.readAsDataURL(file);
+  }).catch(()=>alert('圖片處理失敗，請換一張圖片'));
 }
 
-// ── 備份（單一檔案）─────────────────────────────────
+// ── 外觀設定：背景圖片 ────────────────────────────────
+function openAppearanceModal(){
+  const box=document.getElementById('bgPreviewBox');
+  const img=document.getElementById('bgPreviewImg');
+  const hint=document.getElementById('bgPreviewHint');
+  if(customBg){ img.src=customBg; img.style.display='block'; hint.style.display='none'; }
+  else { img.style.display='none'; hint.style.display='block'; }
+  document.querySelectorAll('.theme-opt').forEach(el=>el.classList.toggle('active', el.dataset.mode===themeMode));
+  document.getElementById('appearanceModal').classList.add('open');
+}
+function closeAppearanceModal(){
+  document.getElementById('appearanceModal').classList.remove('open');
+}
+function handleBgUpload(e){
+  const file=e.target.files[0]; if(!file)return;
+  compressImage(file, 1920, 0.82).then(dataUrl=>{
+    customBg=dataUrl; applyBackground(); saveState();
+    const img=document.getElementById('bgPreviewImg'); const hint=document.getElementById('bgPreviewHint');
+    img.src=customBg; img.style.display='block'; hint.style.display='none';
+  }).catch(()=>alert('圖片處理失敗，請換一張圖片'));
+}
+function clearBg(){
+  customBg=null; applyBackground(); saveState();
+  document.getElementById('bgPreviewImg').style.display='none';
+  document.getElementById('bgPreviewHint').style.display='block';
+}
+function applyBackground(){
+  if(customBg){
+    document.body.style.backgroundImage = `linear-gradient(rgba(12,14,34,.72), rgba(12,14,34,.72)), url(${customBg})`;
+    document.body.style.backgroundSize='cover';
+    document.body.style.backgroundPosition='center';
+    document.body.style.backgroundAttachment='fixed';
+  } else {
+    document.body.style.backgroundImage='';
+  }
+}
+
+// ── 外觀設定：深淺色主題 ──────────────────────────────
+function setThemeMode(mode){
+  themeMode=mode; saveState();
+  document.querySelectorAll('.theme-opt').forEach(el=>el.classList.toggle('active', el.dataset.mode===mode));
+  applyTheme();
+}
+function applyTheme(){
+  let effective = themeMode;
+  if(themeMode==='auto'){
+    const h = new Date().getHours();
+    effective = (h>=6 && h<18) ? 'light' : 'dark';
+  }
+  document.documentElement.setAttribute('data-theme', effective);
+}
+
+
 function exportBackup(){
-  dl(JSON.stringify({version:2,accounts,charactersByAccount},null,2),'backup.json');
+  dl(JSON.stringify({version:3,accounts,charactersByAccount,customBg,themeMode},null,2),'backup.json');
   hasUnsaved=false; document.getElementById('unsavedBadge').style.display='none';
 }
 function importBackup(e){
@@ -1206,6 +1459,9 @@ function importBackup(e){
       if(data.accounts)accounts=data.accounts;
       charactersByAccount=migrateToPerAccount(data);
       activeAccount=accounts[0]?.id||'a1';
+      customBg = data.customBg !== undefined ? data.customBg : null;
+      themeMode = data.themeMode || 'auto';
+      applyBackground(); applyTheme();
       hasUnsaved=false; document.getElementById('unsavedBadge').style.display='none';
       renderAll(); alert('匯入完成');
     }catch{alert('匯入失敗，檔案格式錯誤');}
@@ -1320,6 +1576,7 @@ function backupThenRefresh(){
   setTimeout(()=>location.reload(), 400);
 }
 initPullToRefresh();
+setInterval(()=>{ if(themeMode==='auto') applyTheme(); }, 15*60*1000);
 
 // ── 載入 ─────────────────────────────────────────────
 fetch('backup.json')
@@ -1328,9 +1585,12 @@ fetch('backup.json')
     if(data.accounts)accounts=data.accounts;
     charactersByAccount=migrateToPerAccount(data);
     activeAccount=accounts[0]?.id||'a1';
+    customBg = data.customBg || null;
+    themeMode = data.themeMode || 'auto';
+    applyBackground(); applyTheme();
     init(); renderAll();
   })
-  .catch(()=>{init();renderAll();});
+  .catch(()=>{applyBackground();applyTheme();init();renderAll();});
 </script>
 </body>
 </html>
