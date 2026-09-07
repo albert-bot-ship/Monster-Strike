@@ -185,6 +185,8 @@
   <div class="modal-box">
     <h2 id="modalTitle">新增角色</h2>
 
+    <button class="gbtn" id="copyFromAccBtn" style="width:100%;margin-bottom:12px;display:none;" onclick="openCopyPicker()">📋 從其他帳號複製</button>
+
     <div class="mfield">
       <label>角色圖片</label>
       <div class="img-upload-area" onclick="document.getElementById('imgInput').click()">
@@ -202,6 +204,26 @@
       <div class="mfield" style="margin-bottom:0;">
         <label>角色名稱 *</label>
         <input type="text" class="minput" id="newName" placeholder="請輸入角色名稱">
+      </div>
+    </div>
+
+    <div class="accordion-section">
+      <div class="accordion-header" onclick="toggleAcc(this)">
+        第二張圖片／編號（選填，例如進化前後切換）<span class="acc-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <div class="mfield">
+          <label>第二張圖片</label>
+          <div class="img-upload-area" onclick="document.getElementById('imgInput2').click()">
+            <input type="file" id="imgInput2" accept="image/*" style="display:none" onchange="handleImgUpload2(event)">
+            <div class="img-upload-hint" id="imgHint2">點此上傳圖片</div>
+            <img id="imgPreviewEl2" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+          </div>
+        </div>
+        <div class="mfield" style="margin-bottom:0;">
+          <label>第二組編號</label>
+          <input type="text" class="minput" id="newCharNo2" placeholder="No.1001">
+        </div>
       </div>
     </div>
 
@@ -387,6 +409,7 @@
     </div>
     <div class="view-name" id="vName"></div>
     <div class="view-img-wrap" id="vImgWrap"></div>
+    <div class="view-dots" id="vDotsWrap"></div>
     <div class="view-info-row" id="vInfoRow"></div>
 
     <div class="view-section">
@@ -433,6 +456,18 @@
   </div>
 </div>
 
+<!-- 從其他帳號複製角色 -->
+<div class="modal-overlay" id="copyPickerModal">
+  <div class="modal-box" style="max-width:400px;">
+    <h2>從其他帳號複製角色</h2>
+    <input type="text" class="minput" id="copyPickerSearch" placeholder="🔍 搜尋角色名稱..." oninput="renderCopyPickerList()" style="margin-bottom:10px;">
+    <div id="copyPickerList" style="max-height:360px;overflow-y:auto;"></div>
+    <div class="mbtnrow" style="margin-top:14px;">
+      <button class="mcancel" onclick="closeCopyPicker()" style="flex:1;">取消</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── 常數 ─────────────────────────────────────────────
 const SKILLS        = ['反重力護罩','反傷害壁','反傳送','掃雷者/飛行','掃雷者','飛行','反板塊','反風','反魔法陣/魔法陣增幅','反減速壁','反移轉壁','反減速板','反多層','耐性','破壞者','SS回合','回復','異常狀態回復','護罩','阻停雷射'];
@@ -445,6 +480,7 @@ const HERO_FRUITS   = {'數值強化':['同族','擊種','戰型','加攻','加�
 const EVO_STATES    = ['進化前','進化/神化前','進化/神化','獸神化解禁','獸神化','獸神化·改解禁','獸神化·改','真獸神化解禁','真獸神化'];
 const OBTAIN        = ['幸運轉蛋','幸運轉蛋🥚','其他'];
 const RARITIES      = ['★6','★5','★4','★3'];
+const RARITY_NUMS    = ['6','5','4','3'];
 const STRIKE_TYPES  = ['反射型','貫通型'];
 const BATTLE_TYPES  = ['平衡','力量','速度','砲擊','超平衡','超力量','超速度','超砲擊'];
 const ATTR_EMOJI    = {'火':'🔥','水':'💧','木':'🌿','光':'⭐','暗':'🌑'};
@@ -453,7 +489,7 @@ const EGG_ICON_B64  = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAB6CAY
 // ── 狀態 ─────────────────────────────────────────────
 let charactersByAccount = {}, accounts = [{id:'a1',name:'帳號1'},{id:'a2',name:'帳號2'},{id:'a3',name:'帳號3'},{id:'a4',name:'帳號4'}];
 let activeAccount = 'a1';
-let hasUnsaved = false, editCharId = null, uploadedImg = null, modalAttr = '火';
+let hasUnsaved = false, editCharId = null, uploadedImg = null, uploadedImg2 = null, modalAttr = '火';
 
 function ensureAcc(id){ if(!charactersByAccount[id]) charactersByAccount[id]=[]; }
 function currentChars(){ ensureAcc(activeAccount); return charactersByAccount[activeAccount]; }
@@ -516,7 +552,7 @@ function init() {
   buildGrid('mSuperGrid',  SUPER_SKILLS, 'superSkills',  'sg3', false);
   buildGrid('mObtainGrid', OBTAIN,       'obtain',       'sg3', false);
   // 表單單選按鈕格
-  buildSingleGrid('mRarityGrid', RARITIES, v => { mRarity = v.replace('★',''); }, () => mRarity, r => '★'+r);
+  buildSingleGrid('mRarityGrid', RARITY_NUMS, v => { mRarity = v; }, () => mRarity, r => '★'+r);
   buildSingleGrid('mStrikeGrid', STRIKE_TYPES, v => { mStrike = v; }, () => mStrike);
   buildSingleGrid('mBattleGrid', BATTLE_TYPES, v => { mBattle = v; }, () => mBattle);
   // 下拉內容（篩選）
@@ -795,20 +831,40 @@ function renderList() {
   }
   filtered.forEach(c => {
     const qty=c.quantity||1;
+    const hasImg2=!!c.imageData2;
     const card=document.createElement('div');
     card.className='char-card owned';
     card.innerHTML=`
       <div class="card-img ${c.imageData?'':'bg-'+c.attribute}">
         ${c.imageData?`<img src="${c.imageData}" alt="${c.name}">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`}
       </div>
-      ${c.charNo?`<div class="card-no-top">${c.charNo}</div>`:''}
+      ${(c.charNo||c.charNo2)?`<div class="card-no-top">${c.charNo||''}</div>`:''}
       <div class="card-attr attr-${c.attribute}"></div>
       <div class="card-edit" onclick="event.stopPropagation();openEditModal(${c.id})">✎</div>
       ${qty>1?`<div class="card-qty">x${qty}</div>`:''}
+      ${hasImg2?`<div class="card-dots">
+        <span class="card-dot active" onclick="switchCardImage(event, ${c.id}, 0)"></span>
+        <span class="card-dot" onclick="switchCardImage(event, ${c.id}, 1)"></span>
+      </div>`:''}
       <div class="card-name-bar">${c.name}</div>`;
     card.onclick=()=>openViewModal(c.id);
     grid.appendChild(card);
   });
+}
+
+// 切換卡片顯示第一/第二張圖片與編號
+function switchCardImage(e, id, idx){
+  e.stopPropagation();
+  const c=currentChars().find(x=>x.id===id); if(!c) return;
+  const card=e.target.closest('.char-card'); if(!card) return;
+  const img=idx===0?c.imageData:(c.imageData2||c.imageData);
+  const no=idx===0?c.charNo:(c.charNo2||c.charNo);
+  const imgWrap=card.querySelector('.card-img');
+  imgWrap.className='card-img'+(img?'':' bg-'+c.attribute);
+  imgWrap.innerHTML=img?`<img src="${img}" alt="${c.name}">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`;
+  const noEl=card.querySelector('.card-no-top');
+  if(noEl) noEl.textContent=no||'';
+  card.querySelectorAll('.card-dot').forEach((d,i)=>d.classList.toggle('active', i===idx));
 }
 
 function renderTabs() {
@@ -862,10 +918,13 @@ function resetModalSets(){
 }
 
 function clearModalForm(){
-  uploadedImg=null; mRarity='6'; mStrike='反射型'; mBattle='平衡'; mEvo=''; mFriendMain='';
+  uploadedImg=null; uploadedImg2=null; mRarity='6'; mStrike='反射型'; mBattle='平衡'; mEvo=''; mFriendMain='';
   document.getElementById('imgPreviewEl').style.display='none';
   document.getElementById('imgHint').style.display='block';
+  document.getElementById('imgPreviewEl2').style.display='none';
+  document.getElementById('imgHint2').style.display='block';
   document.getElementById('newCharNo').value='';
+  document.getElementById('newCharNo2').value='';
   document.getElementById('newName').value='';
   document.getElementById('newCollab').value='';
   document.getElementById('newQty').value='1';
@@ -881,7 +940,7 @@ function clearModalForm(){
   // refresh single-select grids
   ['mRarityGrid','mStrikeGrid','mBattleGrid'].forEach(id=>{
     const c=document.getElementById(id); if(c) c.querySelectorAll('.skill-btn').forEach(b=>{
-      if(id==='mRarityGrid') b.classList.toggle('active',b.dataset.val==='★6');
+      if(id==='mRarityGrid') b.classList.toggle('active',b.dataset.val==='6');
       if(id==='mStrikeGrid') b.classList.toggle('active',b.dataset.val==='反射型');
       if(id==='mBattleGrid') b.classList.toggle('active',b.dataset.val==='平衡');
     });
@@ -893,7 +952,12 @@ function prefillModal(c){
   const imgEl=document.getElementById('imgPreviewEl'), hint=document.getElementById('imgHint');
   if(c.imageData){imgEl.src=c.imageData;imgEl.style.display='block';hint.style.display='none';}
   else{imgEl.style.display='none';hint.style.display='block';}
+  uploadedImg2=c.imageData2||null;
+  const imgEl2=document.getElementById('imgPreviewEl2'), hint2=document.getElementById('imgHint2');
+  if(c.imageData2){imgEl2.src=c.imageData2;imgEl2.style.display='block';hint2.style.display='none';}
+  else{imgEl2.style.display='none';hint2.style.display='block';}
   document.getElementById('newCharNo').value=c.charNo||'';
+  document.getElementById('newCharNo2').value=c.charNo2||'';
   document.getElementById('newName').value=c.name||'';
   document.getElementById('newCollab').value=c.collab||'';
   document.getElementById('newQty').value=c.quantity||1;
@@ -944,7 +1008,7 @@ function prefillModal(c){
   ['mRarityGrid','mStrikeGrid','mBattleGrid','mEvoBody'].forEach(id=>{
     const cont=document.getElementById(id); if(!cont) return;
     cont.querySelectorAll('.skill-btn').forEach(b=>{
-      if(id==='mRarityGrid')b.classList.toggle('active',b.dataset.val===`★${mRarity}`);
+      if(id==='mRarityGrid')b.classList.toggle('active',b.dataset.val===mRarity);
       if(id==='mStrikeGrid')b.classList.toggle('active',b.dataset.val===mStrike);
       if(id==='mBattleGrid')b.classList.toggle('active',b.dataset.val===mBattle);
       if(id==='mEvoBody'){b.classList.toggle('active',b.dataset.val===mEvo); if(b.dataset.val===mEvo)updateCddLabel(b.closest('.cdd'));}
@@ -955,12 +1019,45 @@ function prefillModal(c){
   updateCntBadge('cntSkill','skills','cntSuper','superSkills');
 }
 
-function openAddModal(){editCharId=null;document.getElementById('modalTitle').textContent='新增角色';clearModalForm();addFormRow({formName:'進化前'});document.getElementById('addCharModal').classList.add('open');}
+function openAddModal(){editCharId=null;document.getElementById('modalTitle').textContent='新增角色';clearModalForm();addFormRow({formName:'進化前'});document.getElementById('copyFromAccBtn').style.display='block';const m=document.getElementById('addCharModal');m.classList.add('open');m.scrollTop=0;}
 function openEditModal(id){
   editCharId=id; const c=currentChars().find(x=>x.id===id); if(!c)return;
-  document.getElementById('modalTitle').textContent='編輯角色';clearModalForm();prefillModal(c);document.getElementById('addCharModal').classList.add('open');
+  document.getElementById('modalTitle').textContent='編輯角色';clearModalForm();prefillModal(c);
+  document.getElementById('copyFromAccBtn').style.display='none';
+  const m=document.getElementById('addCharModal');m.classList.add('open');m.scrollTop=0;
 }
 function closeModal(){document.getElementById('addCharModal').classList.remove('open');}
+
+// ── 從其他帳號複製角色 ───────────────────────────────
+function openCopyPicker(){
+  document.getElementById('copyPickerSearch').value='';
+  renderCopyPickerList();
+  document.getElementById('copyPickerModal').classList.add('open');
+}
+function closeCopyPicker(){ document.getElementById('copyPickerModal').classList.remove('open'); }
+function renderCopyPickerList(){
+  const term=document.getElementById('copyPickerSearch').value.trim();
+  const list=document.getElementById('copyPickerList');
+  const rows=[];
+  accounts.forEach(acc=>{
+    (charactersByAccount[acc.id]||[]).forEach(c=>{
+      if(!term || c.name.includes(term)) rows.push({accId:acc.id, accName:acc.name, c});
+    });
+  });
+  if(!rows.length){ list.innerHTML='<div style="font-size:12px;color:var(--muted);padding:10px;">沒有可複製的角色</div>'; return; }
+  list.innerHTML = rows.map(r=>`
+    <div class="copy-picker-item" onclick='pickCopyChar(${JSON.stringify(r.accId)}, ${r.c.id})'>
+      <span class="card-attr attr-${r.c.attribute}" style="position:static;display:inline-block;margin-right:7px;flex-shrink:0;"></span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.c.name}</span>
+      <span style="color:var(--muted);font-size:11px;margin-left:8px;flex-shrink:0;">${r.accName}</span>
+    </div>`).join('');
+}
+function pickCopyChar(accId, charId){
+  const c=(charactersByAccount[accId]||[]).find(x=>x.id===charId); if(!c) return;
+  prefillModal(c);
+  document.getElementById('newQty').value='1';
+  closeCopyPicker();
+}
 
 // ── 角色簡表（檢視）───────────────────────────────────
 let viewCharId = null;
@@ -977,6 +1074,16 @@ function openViewModal(id){
   imgWrap.innerHTML = c.imageData
     ? `<img src="${c.imageData}" alt="${c.name}">`
     : `<span class="card-placeholder" style="font-size:44px;">${ATTR_EMOJI[c.attribute]||'？'}</span>`;
+
+  const dotsWrap = document.getElementById('vDotsWrap');
+  if (c.imageData2) {
+    dotsWrap.innerHTML = `
+      <span class="view-dot active" onclick="switchViewImage(0)"></span>
+      <span class="view-dot" onclick="switchViewImage(1)"></span>`;
+    dotsWrap.style.display = 'flex';
+  } else {
+    dotsWrap.innerHTML = ''; dotsWrap.style.display = 'none';
+  }
 
   document.getElementById('vInfoRow').innerHTML = `
     <span class="view-info-chip"><span class="card-attr attr-${c.attribute}" style="position:static;display:inline-block;margin-right:4px;"></span>${c.attribute||'—'}</span>
@@ -1025,6 +1132,16 @@ function openViewModal(id){
   document.getElementById('viewCharModal').classList.add('open');
 }
 function closeViewModal(){ document.getElementById('viewCharModal').classList.remove('open'); viewCharId=null; }
+function switchViewImage(idx){
+  const c = currentChars().find(x=>x.id===viewCharId); if(!c) return;
+  const img = idx===0 ? c.imageData : (c.imageData2||c.imageData);
+  const no = idx===0 ? c.charNo : (c.charNo2||c.charNo);
+  const imgWrap = document.getElementById('vImgWrap');
+  imgWrap.className = 'view-img-wrap' + (img?'':' bg-'+c.attribute);
+  imgWrap.innerHTML = img ? `<img src="${img}" alt="${c.name}">` : `<span class="card-placeholder" style="font-size:44px;">${ATTR_EMOJI[c.attribute]||'？'}</span>`;
+  document.getElementById('vNo').textContent = no || '';
+  document.querySelectorAll('#vDotsWrap .view-dot').forEach((d,i)=>d.classList.toggle('active', i===idx));
+}
 function editFromView(){
   const id=viewCharId; closeViewModal();
   if(id!=null) openEditModal(id);
@@ -1038,7 +1155,7 @@ function confirmChar(){
     const fn=row.querySelector('.fname').value.trim(), fa=row.querySelector('.factive').value.trim(), fp=row.querySelector('.fpassive').value.trim(), ff=row.querySelector('.ffriend').value.trim();
     if(fn||fa||fp||ff)forms.push({formName:fn||'型態',active:fa,passive:fp,friend:ff});
   });
-  const data={charNo:document.getElementById('newCharNo').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,evolutionState:mEvo,collab:document.getElementById('newCollab').value.trim(),quantity:qty,passiveSkill:document.getElementById('newPassiveSkill').value.trim(),shootingSkill:document.getElementById('newShootingSkill').value.trim(),supportSkill:document.getElementById('newSupportSkill').value.trim(),linkCondition:document.getElementById('newLinkCondition').value.trim(),ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:uploadedImg,forms};
+  const data={charNo:document.getElementById('newCharNo').value.trim(),charNo2:document.getElementById('newCharNo2').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,evolutionState:mEvo,collab:document.getElementById('newCollab').value.trim(),quantity:qty,passiveSkill:document.getElementById('newPassiveSkill').value.trim(),shootingSkill:document.getElementById('newShootingSkill').value.trim(),supportSkill:document.getElementById('newSupportSkill').value.trim(),linkCondition:document.getElementById('newLinkCondition').value.trim(),ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:uploadedImg,imageData2:uploadedImg2,forms};
   const list=currentChars();
   if(editCharId!==null){const idx=list.findIndex(x=>x.id===editCharId);if(idx>=0)list[idx]={id:editCharId,...data};}
   else{const maxId=list.reduce((m,c)=>Math.max(m,c.id||0),0);list.push({id:maxId+1,...data});}
@@ -1082,6 +1199,17 @@ function handleImgUpload(e){
   reader.readAsDataURL(file);
 }
 
+function handleImgUpload2(e){
+  const file=e.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    uploadedImg2=reader.result;
+    const imgEl=document.getElementById('imgPreviewEl2'); imgEl.src=uploadedImg2; imgEl.style.display='block';
+    document.getElementById('imgHint2').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
 // ── 備份（單一檔案）─────────────────────────────────
 function exportBackup(){
   dl(JSON.stringify({version:2,accounts,charactersByAccount},null,2),'backup.json');
@@ -1117,6 +1245,8 @@ function migrateCharacterFields(c){
   if(c.ssRounds === undefined) c.ssRounds = '';
   if(c.ssName === undefined) c.ssName = '';
   if(c.ssDesc === undefined) c.ssDesc = '';
+  if(c.charNo2 === undefined) c.charNo2 = '';
+  if(c.imageData2 === undefined) c.imageData2 = null;
   return c;
 }
 
