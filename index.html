@@ -1452,7 +1452,8 @@ function showCollabSuggestions(){
   const input=document.getElementById('newCollab'), list=document.getElementById('collabSuggestList');
   if(!input||!list) return;
   const term=input.value.trim();
-  const collabs=[...new Set(currentChars().map(c=>c.collab).filter(Boolean))].sort();
+  const source=accounts.flatMap(a=>charactersByAccount[a.id]||[]);
+  const collabs=[...new Set(source.map(c=>c.collab).filter(Boolean))].sort();
   const matches = term ? collabs.filter(c=>c.includes(term) && c!==term) : collabs;
   if(!matches.length){ list.classList.remove('show'); list.innerHTML=''; return; }
   list.innerHTML = matches.slice(0,8).map(c=>`<div class="collab-suggest-item" onmousedown="selectCollabSuggestion('${c.replace(/'/g,"\\'")}')">${c}</div>`).join('');
