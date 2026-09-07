@@ -3,799 +3,279 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>怪物彈珠 角色收藏管理</title>
-<style>
-:root{
-  --bg:#0a0e1a; --panel:#141828; --panel2:#1c2238;
-  --btn:#252d48; --btn-act:#3a5a9a; --btn-bdr:#3a4568; --btn-act-bdr:#6a9add;
-  --text:#c8d0e0; --sub:#7888aa; --accent:#4a7fc1;
-  --good:#3ddc84; --warn:#f5a623; --bad:#e0524f; --lbl:#8898bb;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{background:var(--bg);color:var(--text);font-family:"Microsoft JhengHei","PingFang TC",sans-serif;margin:0;padding:0;}
-
-/* Header */
-header{padding:10px 14px;border-bottom:1px solid #2a3458;position:sticky;top:0;background:var(--bg);z-index:10;}
-.title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-header h1{font-size:16px;margin:0;}
-#unsavedBadge{font-size:11px;background:var(--warn);color:#000;padding:3px 8px;border-radius:6px;display:none;}
-.accounts{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.account-tab{display:flex;align-items:center;gap:4px;flex-shrink:0;padding:8px 10px;border-radius:8px;border:1px solid var(--btn-bdr);background:var(--btn);font-size:13px;min-height:40px;}
-.account-tab.active{background:var(--btn-act);border-color:var(--btn-act-bdr);}
-.acc-name{cursor:pointer;white-space:nowrap;}
-.edit-btn{width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:5px;background:rgba(255,255,255,0.1);cursor:pointer;font-size:12px;}
-
-main{padding:12px 14px 90px;max-width:900px;margin:0 auto;}
-
-/* Filter panel */
-.filter-panel{background:var(--panel);border:1px solid #2a3458;border-radius:12px;margin-bottom:10px;overflow:hidden;}
-.filter-header{display:flex;gap:8px;padding:10px 12px;}
-.fhbtn{flex:1;padding:10px;border-radius:8px;border:1px solid var(--btn-act-bdr);background:var(--btn-act);color:var(--text);font-size:14px;cursor:pointer;min-height:44px;}
-.fhbtn.sec{background:var(--btn);border-color:var(--btn-bdr);}
-.filter-body{padding:12px;display:none;}
-.filter-body.open{display:block;}
-
-/* Attribute row */
-.attr-row{display:flex;gap:8px;justify-content:center;margin-bottom:14px;}
-.attr-btn{width:46px;height:46px;border-radius:50%;border:2px solid var(--btn-bdr);background:var(--btn);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;transition:border-color .15s;}
-.attr-btn.active{border-color:var(--btn-act-bdr);box-shadow:0 0 8px rgba(74,127,193,.5);}
-.attr-btn.all{font-size:14px;font-weight:bold;}
-
-/* Section label */
-.slbl{font-size:12px;color:var(--lbl);margin:10px 0 6px;}
-
-/* Skill button grids */
-.sg3{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:4px;}
-.sg2{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:4px;}
-.sg4{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:4px;}
-.sbtn{padding:8px 4px;border-radius:6px;border:1px solid var(--btn-bdr);background:var(--btn);color:var(--text);font-size:12px;cursor:pointer;text-align:center;min-height:36px;display:flex;align-items:center;justify-content:center;line-height:1.2;}
-.sbtn.active{background:var(--btn-act);border-color:var(--btn-act-bdr);}
-
-/* Filter dropdowns */
-.frow{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px;}
-.fsel{padding:8px 10px;border-radius:8px;border:1px solid var(--btn-bdr);background:var(--btn);color:var(--text);font-size:13px;min-height:40px;width:100%;}
-
-/* Stats */
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:12px;}
-.stat-card{background:var(--panel);border:1px solid #2a3458;border-radius:10px;padding:10px 12px;}
-.stat-card .num{font-size:20px;font-weight:bold;}
-.stat-card .label{font-size:11px;color:var(--sub);margin-top:2px;}
-
-/* Toolbar */
-.toolbar{display:flex;gap:6px;margin-bottom:10px;}
-.search-input{flex:1;padding:9px 12px;border-radius:8px;border:1px solid var(--btn-bdr);background:var(--btn);color:var(--text);font-size:14px;min-height:40px;}
-.add-btn{padding:9px 14px;border-radius:8px;border:1px solid var(--btn-act-bdr);background:var(--btn-act);color:var(--text);font-size:13px;cursor:pointer;white-space:nowrap;min-height:40px;}
-
-/* Character cards */
-.char-list{display:flex;flex-direction:column;gap:6px;}
-.char-card{background:var(--panel);border:1px solid #2a3458;border-radius:10px;overflow:hidden;}
-.char-card.owned{border-color:rgba(61,220,132,.4);}
-.char-card-header{display:flex;align-items:center;gap:10px;padding:10px 12px;}
-.char-info{flex:1;min-width:0;}
-.char-name{font-size:14px;font-weight:bold;cursor:pointer;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.char-name::after{content:' ▾';font-size:10px;color:var(--sub);}
-.char-meta{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
-.badge{display:inline-block;padding:2px 7px;border-radius:5px;font-size:11px;}
-.b-火{background:#4a1b0c;color:#f0997b;}.b-水{background:#042c53;color:#85b7eb;}
-.b-木{background:#173404;color:#97c459;}.b-光{background:#412402;color:#ef9f27;}
-.b-闇{background:#26215c;color:#7f77dd;}
-.bsk{background:var(--btn);border:1px solid var(--btn-bdr);color:var(--sub);font-size:10px;padding:1px 5px;border-radius:4px;}
-.stars{color:var(--warn);font-size:12px;}
-
-.char-controls{display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.owned-toggle{width:44px;height:44px;border-radius:10px;border:2px solid var(--btn-bdr);background:var(--btn);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;}
-.owned-toggle.on{background:var(--good);border-color:var(--good);color:#06291a;}
-.cstepper{display:flex;align-items:center;gap:3px;}
-.cstepper button{width:32px;height:32px;border-radius:6px;border:1px solid var(--btn-bdr);background:var(--btn);color:var(--text);font-size:16px;cursor:pointer;padding:0;}
-.cval{min-width:20px;text-align:center;font-size:14px;}
-
-/* Detail expand */
-.char-detail{display:none;padding:0 12px 10px;border-top:1px solid #2a3458;}
-.char-detail.show{display:block;}
-.dsec{margin-top:8px;}
-.dlbl{font-size:11px;color:var(--sub);margin-bottom:3px;}
-.dskills{display:flex;flex-wrap:wrap;gap:3px;}
-.dform{margin-top:6px;padding:8px;background:var(--panel2);border-radius:6px;font-size:12px;line-height:1.6;}
-.dform b{color:var(--text);}
-.fname-tag{font-size:12px;font-weight:bold;color:var(--accent);margin-bottom:4px;}
-
-/* Bottom actions */
-.actions{position:fixed;bottom:0;left:0;right:0;padding:10px 14px;background:var(--bg);border-top:1px solid #2a3458;display:flex;gap:6px;z-index:10;}
-.actions button{flex:1;min-height:46px;font-size:12px;border-radius:10px;border:1px solid var(--btn-act-bdr);background:var(--btn-act);color:var(--text);cursor:pointer;}
-.actions .bsec{background:var(--btn);border-color:var(--btn-bdr);}
-
-/* Modal */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:50;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
-.modal-overlay.open{display:flex;}
-.modal-box{background:var(--panel);border:1px solid #3a4568;border-radius:14px;padding:16px;width:100%;max-width:400px;margin:auto;}
-.modal-box h2{margin:0 0 12px;font-size:16px;}
-.mfield{margin-bottom:8px;}
-.mfield label{font-size:12px;color:var(--sub);display:block;margin-bottom:3px;}
-.minput{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--btn-bdr);background:var(--btn);color:var(--text);font-size:14px;}
-.mtarea{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--btn-bdr);background:var(--btn);color:var(--text);font-size:13px;resize:vertical;font-family:inherit;min-height:56px;margin-top:4px;}
-.msel{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--btn-bdr);background:var(--btn);color:var(--text);font-size:14px;}
-.msg3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
-.msg2{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;}
-.msbtn{padding:7px 4px;border-radius:6px;border:1px solid var(--btn-bdr);background:var(--btn);color:var(--text);font-size:11px;cursor:pointer;text-align:center;min-height:34px;display:flex;align-items:center;justify-content:center;line-height:1.2;}
-.msbtn.active{background:var(--btn-act);border-color:var(--btn-act-bdr);}
-.mbtnrow{display:flex;gap:8px;margin-top:14px;}
-.mbtnrow button{flex:1;padding:11px;border-radius:8px;font-size:14px;cursor:pointer;border:1px solid var(--btn-bdr);background:var(--btn);color:var(--text);}
-.mbtnrow .mconfirm{background:var(--btn-act);border-color:var(--btn-act-bdr);}
-.mdiv{border:none;border-top:1px solid #2a3458;margin:10px 0;}
-.frmbox{background:var(--panel2);border:1px solid #2a3458;border-radius:8px;padding:10px;margin-bottom:6px;}
-.frmhead{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
-.rmfrm{color:var(--bad);cursor:pointer;font-size:16px;margin-left:auto;}
-.addfrm{font-size:13px;color:var(--accent);cursor:pointer;display:inline-block;margin-top:4px;}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.empty-hint{color:var(--sub);font-size:12px;margin-top:8px;}
-
-@media(min-width:600px){
-  .stats{grid-template-columns:repeat(4,1fr);}
-}
-</style>
+<title>怪物彈珠 收藏管理</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- ── Header ── -->
 <header>
   <div class="title-row">
-    <h1>怪物彈珠 角色收藏管理</h1>
-    <span id="unsavedBadge">未匯出</span>
+    <span class="app-title">怪物彈珠 角色收藏管理</span>
+    <span class="unsaved-badge" id="unsavedBadge" style="display:none">未匯出</span>
   </div>
-  <div class="accounts" id="accountTabs"></div>
+  <div class="accounts" id="accountTabs">
+    <div class="acc-tab active">帳號1 <span class="acc-edit">✎</span></div>
+    <div class="acc-tab">帳號2 <span class="acc-edit">✎</span></div>
+    <div class="acc-tab">帳號3 <span class="acc-edit">✎</span></div>
+    <div class="acc-tab">帳號4 <span class="acc-edit">✎</span></div>
+  </div>
 </header>
 
+<!-- ── Main ── -->
 <main>
-  <!-- Filter Panel -->
-  <div class="filter-panel">
-    <div class="filter-header">
-      <button class="fhbtn" id="filterToggleBtn" onclick="toggleFilter()">▼ 篩選</button>
-      <button class="fhbtn sec" onclick="resetFilter()">重置</button>
+
+  <!-- 搜尋 -->
+  <div class="searchbar">
+    <input class="search-input" type="text" placeholder="🔍 搜尋角色名稱...">
+    <button class="filter-btn" onclick="openFilter()">▼ 篩選</button>
+  </div>
+
+  <!-- 屬性選擇 -->
+  <div class="attr-row">
+    <div class="attr-circle all active" data-attr="" onclick="setAttr(this)">全</div>
+    <div class="attr-circle fire active" data-attr="火" onclick="setAttr(this)"></div>
+    <div class="attr-circle water" data-attr="水" onclick="setAttr(this)"></div>
+    <div class="attr-circle wood" data-attr="木" onclick="setAttr(this)"></div>
+    <div class="attr-circle light" data-attr="光" onclick="setAttr(this)"></div>
+    <div class="attr-circle dark" data-attr="暗" onclick="setAttr(this)"></div>
+  </div>
+
+  <!-- 統計 -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num">24<span class="stat-total">/120</span></div>
+      <div class="stat-lbl">已收集角色數</div>
     </div>
-    <div class="filter-body" id="filterBody">
-
-      <!-- Attribute -->
-      <div class="attr-row">
-        <div class="attr-btn all active" data-attr="" onclick="setFilterAttr(this)">全</div>
-        <div class="attr-btn" data-attr="火" onclick="setFilterAttr(this)">🔥</div>
-        <div class="attr-btn" data-attr="水" onclick="setFilterAttr(this)">💧</div>
-        <div class="attr-btn" data-attr="木" onclick="setFilterAttr(this)">🌿</div>
-        <div class="attr-btn" data-attr="光" onclick="setFilterAttr(this)">⭐</div>
-        <div class="attr-btn" data-attr="闇" onclick="setFilterAttr(this)">🌑</div>
-      </div>
-
-      <!-- 技能 -->
-      <div class="slbl">技能</div>
-      <div class="sg3" id="fSkillGrid"></div>
-
-      <!-- 超反技能 -->
-      <div class="slbl">超反技能</div>
-      <div class="sg3" id="fSuperGrid"></div>
-
-      <!-- 擊種 -->
-      <div class="slbl">擊種</div>
-      <div class="sg2" id="fStrikeGrid"></div>
-
-      <!-- 戰型 -->
-      <div class="slbl">戰型</div>
-      <div class="sg4" id="fBattleGrid"></div>
-
-      <!-- 稀有度 + 種族 -->
-      <div class="slbl">其他條件</div>
-      <div class="frow">
-        <select class="fsel" id="fRarity">
-          <option value="">全稀有度</option>
-          <option value="6">★6</option><option value="5">★5</option>
-          <option value="4">★4</option><option value="3">★3</option>
-        </select>
-        <select class="fsel" id="fRace"><option value="">全種族</option></select>
-      </div>
-
-      <!-- 友情技 + 擁有 -->
-      <div class="frow">
-        <select class="fsel" id="fFriend"><option value="">全友情技</option></select>
-        <select class="fsel" id="fOwned">
-          <option value="">全部</option>
-          <option value="owned">已擁有</option>
-          <option value="missing">未擁有</option>
-        </select>
-      </div>
-
-      <!-- 進化狀態 + 入手方式 -->
-      <div class="frow">
-        <select class="fsel" id="fEvo">
-          <option value="">全進化狀態</option>
-          <option value="進化前">進化前</option>
-          <option value="進化/神化前">進化/神化前</option>
-          <option value="進化/神化">進化/神化</option>
-          <option value="獸神化解禁">獸神化解禁</option>
-          <option value="獸神化">獸神化</option>
-          <option value="獸神化·改解禁">獸神化·改解禁</option>
-          <option value="獸神化·改">獸神化·改</option>
-          <option value="真獸神化解禁">真獸神化解禁</option>
-          <option value="真獸神化">真獸神化</option>
-        </select>
-        <select class="fsel" id="fObtain">
-          <option value="">全入手方式</option>
-          <option value="幸運轉蛋">幸運轉蛋</option>
-          <option value="其他">其他</option>
-        </select>
-      </div>
-
-      <!-- 合作活動 + 英雄果實 -->
-      <div class="frow">
-        <select class="fsel" id="fCollab"><option value="">全合作活動</option></select>
-        <select class="fsel" id="fHeroFruit">
-          <option value="">全部(英雄果實)</option>
-          <option value="yes">有英雄果實</option>
-          <option value="no">無英雄果實</option>
-        </select>
-      </div>
-
+    <div class="stat-card">
+      <div class="stat-num">20.0<span class="stat-total">%</span></div>
+      <div class="stat-lbl">收集率</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">3</div>
+      <div class="stat-lbl">重複角色數</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">12.5<span class="stat-total">%</span></div>
+      <div class="stat-lbl">重複率</div>
     </div>
   </div>
 
-  <!-- Toolbar -->
-  <div class="toolbar">
-    <input type="text" class="search-input" id="searchBox" placeholder="🔍 搜尋角色名稱...">
-    <button class="add-btn" onclick="openAddModal()">＋ 新增角色</button>
-  </div>
+  <!-- 角色格狀列表 -->
+  <div class="char-grid" id="charGrid"></div>
 
-  <!-- Stats -->
-  <div class="stats" id="statsArea"></div>
-
-  <!-- Character List -->
-  <div class="char-list" id="charList"></div>
-  <div class="empty-hint" id="emptyHint"></div>
 </main>
 
-<!-- Bottom actions -->
-<div class="actions">
-  <button onclick="exportData()">⬇ 匯出收藏</button>
-  <button class="bsec" onclick="exportCharacters()">⬇ 角色清單</button>
-  <button class="bsec" onclick="document.getElementById('importFile').click()">⬆ 匯入收藏</button>
-  <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)">
-</div>
+<!-- ── 底部導覽列 ── -->
+<nav class="bottom-nav">
+  <div class="nav-item active" onclick="setNav(this)">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-lbl">首頁</span>
+  </div>
+  <div class="nav-item" onclick="openFilter()">
+    <span class="nav-icon">🔍</span>
+    <span class="nav-lbl">篩選</span>
+  </div>
+  <div class="nav-add" onclick="alert('設計稿：點此開啟新增角色表單')">
+    <span class="nav-icon">＋</span>
+    <span class="nav-lbl">新增</span>
+  </div>
+  <div class="nav-item" onclick="alert('設計稿：匯出收藏')">
+    <span class="nav-icon">⬇</span>
+    <span class="nav-lbl">匯出</span>
+  </div>
+  <div class="nav-item" onclick="alert('設計稿：匯入收藏')">
+    <span class="nav-icon">⬆</span>
+    <span class="nav-lbl">匯入</span>
+  </div>
+</nav>
 
-<!-- Add Character Modal -->
-<div class="modal-overlay" id="addCharModal">
-  <div class="modal-box">
-    <h2>新增角色</h2>
+<!-- ── 篩選抽屜（從底部滑上） ── -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeFilter()"></div>
+<div class="filter-drawer" id="filterDrawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-title">篩選條件</div>
 
-    <div class="mfield">
-      <label>角色名稱 *</label>
-      <input type="text" class="minput" id="newName" placeholder="請輸入角色名稱">
+  <div class="drawer-section">
+    <div class="drawer-lbl">技能</div>
+    <div class="skill-grid">
+      <div class="skill-btn" onclick="this.classList.toggle('active')">反重力護罩</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">反傷害壁</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">反傳送</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">掃雷者/飛行</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">掃雷者</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">飛行</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">反板塊</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">反風</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">反魔法陣</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">反減速壁</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">反移轉壁</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">反減速板</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">反多層</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">殺手</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">耐性</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">破壞者</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">SS回合</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">回復</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">護罩</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">阻停雷射</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">異常回復</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">其他</div>
     </div>
+  </div>
 
-    <!-- 屬性 -->
-    <div class="mfield">
-      <label>屬性</label>
-      <div class="attr-row" style="justify-content:flex-start;gap:6px;">
-        <div class="attr-btn active" data-attr="火" id="mAttr火" onclick="selectAttr('火')">🔥</div>
-        <div class="attr-btn" data-attr="水" id="mAttr水" onclick="selectAttr('水')">💧</div>
-        <div class="attr-btn" data-attr="木" id="mAttr木" onclick="selectAttr('木')">🌿</div>
-        <div class="attr-btn" data-attr="光" id="mAttr光" onclick="selectAttr('光')">⭐</div>
-        <div class="attr-btn" data-attr="闇" id="mAttr闇" onclick="selectAttr('闇')">🌑</div>
-      </div>
+  <div class="drawer-section">
+    <div class="drawer-lbl">超反技能</div>
+    <div class="skill-grid">
+      <div class="skill-btn" onclick="this.classList.toggle('active')">超反重力護罩</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">超反傷害壁</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">超反傳送</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">超掃雷者</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">超反風</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">超反減速壁</div>
+      <div class="skill-btn" onclick="this.classList.toggle('active')">超反移轉壁</div>
     </div>
+  </div>
 
-    <!-- 稀有度 + 擊種 -->
-    <div class="g2">
-      <div class="mfield">
-        <label>稀有度</label>
-        <select class="msel" id="newRarity">
-          <option value="6" selected>★6</option><option value="5">★5</option>
-          <option value="4">★4</option><option value="3">★3</option>
+  <div class="drawer-section">
+    <div class="drawer-lbl">擊種</div>
+    <div class="skill-grid-2">
+      <div class="skill-btn" onclick="toggleSingle(this,'strike')">反射型</div>
+      <div class="skill-btn" onclick="toggleSingle(this,'strike')">貫通型</div>
+    </div>
+  </div>
+
+  <div class="drawer-section">
+    <div class="drawer-lbl">戰型</div>
+    <div class="skill-grid-4">
+      <div class="skill-btn" onclick="toggleSingle(this,'battle')">平衡</div>
+      <div class="skill-btn" onclick="toggleSingle(this,'battle')">力量</div>
+      <div class="skill-btn" onclick="toggleSingle(this,'battle')">速度</div>
+      <div class="skill-btn" onclick="toggleSingle(this,'battle')">砲擊</div>
+    </div>
+  </div>
+
+  <div class="drawer-section">
+    <div class="drawer-row-2">
+      <div>
+        <div class="drawer-lbl">稀有度</div>
+        <select class="drawer-select">
+          <option value="">全稀有度</option>
+          <option>★6</option><option>★5</option><option>★4</option><option>★3</option>
         </select>
       </div>
-      <div class="mfield">
-        <label>擊種</label>
-        <select class="msel" id="newStrike">
-          <option value="反射型">反射型</option><option value="貫通型">貫通型</option>
+      <div>
+        <div class="drawer-lbl">進化狀態</div>
+        <select class="drawer-select">
+          <option value="">全部</option>
+          <option>進化前</option><option>獸神化</option><option>獸神化·改</option><option>真獸神化</option>
         </select>
       </div>
     </div>
+  </div>
 
-    <!-- 戰型 + 種族 -->
-    <div class="g2">
-      <div class="mfield">
-        <label>戰型</label>
-        <select class="msel" id="newBattle">
-          <option value="平衡">平衡</option><option value="力量">力量</option>
-          <option value="速度">速度</option><option value="砲擊">砲擊</option>
+  <div class="drawer-section">
+    <div class="drawer-row-2">
+      <div>
+        <div class="drawer-lbl">英雄果實</div>
+        <select class="drawer-select">
+          <option value="">全部</option>
+          <option>有英雄果實</option><option>無英雄果實</option>
         </select>
       </div>
-      <div class="mfield">
-        <label>種族</label>
-        <input type="text" class="minput" id="newRace" placeholder="例:神族">
-      </div>
-    </div>
-
-    <!-- 進化狀態 + 入手方式 -->
-    <div class="g2">
-      <div class="mfield">
-        <label>進化狀態</label>
-        <select class="msel" id="newEvo">
-          <option value="">未指定</option>
-          <option value="進化前">進化前</option>
-          <option value="進化/神化前">進化/神化前</option>
-          <option value="進化/神化">進化/神化</option>
-          <option value="獸神化解禁">獸神化解禁</option>
-          <option value="獸神化">獸神化</option>
-          <option value="獸神化·改解禁">獸神化·改解禁</option>
-          <option value="獸神化·改">獸神化·改</option>
-          <option value="真獸神化解禁">真獸神化解禁</option>
-          <option value="真獸神化">真獸神化</option>
-        </select>
-      </div>
-      <div class="mfield">
-        <label>入手方式</label>
-        <select class="msel" id="newObtain">
-          <option value="幸運轉蛋">幸運轉蛋</option>
-          <option value="其他">其他</option>
+      <div>
+        <div class="drawer-lbl">擁有狀態</div>
+        <select class="drawer-select">
+          <option value="">全部</option>
+          <option>已擁有</option><option>未擁有</option>
         </select>
       </div>
     </div>
+  </div>
 
-    <!-- 英雄果實 + 合作活動 -->
-    <div class="g2">
-      <div class="mfield">
-        <label>英雄果實</label>
-        <select class="msel" id="newHeroFruit">
-          <option value="">未指定</option>
-          <option value="yes">有英雄果實</option>
-          <option value="no">無英雄果實</option>
-        </select>
-      </div>
-      <div class="mfield">
-        <label>合作活動(選填)</label>
-        <input type="text" class="minput" id="newCollab" placeholder="例:火影忍者">
-      </div>
-    </div>
-
-    <!-- 友情技能 -->
-    <div class="mfield">
-      <label>友情技能</label>
-      <input type="text" class="minput" id="newFriend" placeholder="例:追蹤爆發彈">
-    </div>
-
-    <!-- 技能 多選 -->
-    <hr class="mdiv">
-    <div class="slbl">技能（可多選）</div>
-    <div class="msg3" id="mSkillGrid"></div>
-
-    <!-- 超反技能 多選 -->
-    <hr class="mdiv">
-    <div class="slbl">超反技能（可多選）</div>
-    <div class="msg3" id="mSuperGrid"></div>
-
-    <!-- 型態技能 -->
-    <hr class="mdiv">
-    <div class="slbl">型態技能（進化前／獸神化等）</div>
-    <div id="mFormsContainer"></div>
-    <span class="addfrm" onclick="addFormRow()">＋ 新增型態</span>
-
-    <div class="mbtnrow">
-      <button onclick="closeAddModal()">取消</button>
-      <button class="mconfirm" onclick="confirmAddChar()">新增</button>
-    </div>
+  <div class="drawer-actions">
+    <button class="drawer-reset" onclick="closeFilter()">重置</button>
+    <button class="drawer-confirm" onclick="closeFilter()">決定</button>
   </div>
 </div>
 
 <script>
-// ── Constants ────────────────────────────────────────────────────────
-const SKILLS = [
-  '反重力護罩','反傷害壁','反傳送',
-  '掃雷者/飛行','掃雷者','飛行',
-  '反板塊','反風','反魔法陣/魔法陣增幅',
-  '反減速壁','反移轉壁','反減速板',
-  '反多層','殺手','耐性',
-  '破壞者','SS回合','回復',
-  '異常狀態回復','護罩','阻停雷射','其他'
+// ── 假資料 ──────────────────────────────────────────────────────
+const SAMPLE = [
+  { name:'獸神化・雷神王', attr:'火', rarity:6, owned:true,  count:1 },
+  { name:'超絕・水精靈',   attr:'水', rarity:6, owned:true,  count:2 },
+  { name:'木之守護神',     attr:'木', rarity:5, owned:false, count:0 },
+  { name:'光明天使・莉亞', attr:'光', rarity:6, owned:true,  count:1 },
+  { name:'暗黑魔王・路克', attr:'暗', rarity:6, owned:false, count:0 },
+  { name:'炎帝・火龍王',   attr:'火', rarity:6, owned:false, count:0 },
+  { name:'深海女神・波',   attr:'水', rarity:5, owned:true,  count:1 },
+  { name:'森林仙子・葉',   attr:'木', rarity:6, owned:false, count:0 },
 ];
-const SUPER_SKILLS = [
-  '超反重力護罩','超反傷害壁','超反傳送',
-  '超掃雷者','超反風','超反減速壁','超反移轉壁'
-];
-const STRIKE_TYPES = ['反射型','貫通型'];
-const BATTLE_TYPES = ['平衡','力量','速度','砲擊'];
 
-// ── State ────────────────────────────────────────────────────────────
-let characters = [];
-let accounts = [{id:'a1',name:'帳號1'},{id:'a2',name:'帳號2'},{id:'a3',name:'帳號3'},{id:'a4',name:'帳號4'}];
-let collections = {};
-let activeAccount = 'a1';
-let hasUnsavedChanges = false;
-let charactersChanged = false;
+const ATTR_EMOJI = { 火:'🔥', 水:'💧', 木:'🌿', 光:'⭐', 暗:'🌑' };
 
-let filterState = {
-  attr:'', skills:new Set(), superSkills:new Set(),
-  strikeType:'', battleType:'',
-  rarity:'', race:'', friend:'', owned:'', evo:'', obtain:'', collab:'', heroFruit:''
-};
-
-let modalAttr = '火';
-let modalSkills = new Set();
-let modalSuperSkills = new Set();
-
-// ── Build grids ──────────────────────────────────────────────────────
-function buildFilterGrid(containerId, items, type, cols) {
-  const c = document.getElementById(containerId);
-  if (cols === 2) c.className = 'sg2';
-  else if (cols === 4) c.className = 'sg4';
-  c.innerHTML = '';
-  items.forEach(item => {
-    const b = document.createElement('div');
-    b.className = 'sbtn'; b.textContent = item; b.dataset.val = item;
-    b.onclick = () => toggleFilterSkill(b, type, item);
-    c.appendChild(b);
-  });
-}
-
-function buildModalGrid(containerId, items, selectedSet) {
-  const c = document.getElementById(containerId);
-  c.innerHTML = '';
-  items.forEach(item => {
-    const b = document.createElement('div');
-    b.className = 'msbtn'; b.textContent = item;
-    b.onclick = () => {
-      if (selectedSet.has(item)) { selectedSet.delete(item); b.classList.remove('active'); }
-      else { selectedSet.add(item); b.classList.add('active'); }
-    };
-    c.appendChild(b);
-  });
-}
-
-// ── Filter ───────────────────────────────────────────────────────────
-function toggleFilter() {
-  const body = document.getElementById('filterBody');
-  body.classList.toggle('open');
-  document.getElementById('filterToggleBtn').textContent = body.classList.contains('open') ? '▲ 篩選' : '▼ 篩選';
-}
-
-function setFilterAttr(btn) {
-  document.querySelectorAll('.filter-body .attr-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  filterState.attr = btn.dataset.attr;
-  renderList();
-}
-
-function toggleFilterSkill(btn, type, value) {
-  if (type === 'skill') {
-    filterState.skills.has(value) ? filterState.skills.delete(value) : filterState.skills.add(value);
-    btn.classList.toggle('active');
-  } else if (type === 'superSkill') {
-    filterState.superSkills.has(value) ? filterState.superSkills.delete(value) : filterState.superSkills.add(value);
-    btn.classList.toggle('active');
-  } else if (type === 'strikeType') {
-    const was = btn.classList.contains('active');
-    document.querySelectorAll('#fStrikeGrid .sbtn').forEach(b => b.classList.remove('active'));
-    filterState.strikeType = was ? '' : value;
-    if (!was) btn.classList.add('active');
-  } else if (type === 'battleType') {
-    const was = btn.classList.contains('active');
-    document.querySelectorAll('#fBattleGrid .sbtn').forEach(b => b.classList.remove('active'));
-    filterState.battleType = was ? '' : value;
-    if (!was) btn.classList.add('active');
-  }
-  renderList();
-}
-
-function resetFilter() {
-  filterState = { attr:'', skills:new Set(), superSkills:new Set(), strikeType:'', battleType:'', rarity:'', race:'', friend:'', owned:'', evo:'', obtain:'', collab:'', heroFruit:'' };
-  document.querySelectorAll('.filter-body .sbtn.active').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.filter-body .attr-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector('.filter-body .attr-btn[data-attr=""]').classList.add('active');
-  ['fRarity','fRace','fFriend','fOwned','fEvo','fObtain','fCollab','fHeroFruit'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.value = '';
-  });
-  renderList();
-}
-
-function getFiltered() {
-  const q = document.getElementById('searchBox').value.trim();
-  const fR = document.getElementById('fRarity').value;
-  const fO = document.getElementById('fOwned').value;
-  const fE = document.getElementById('fEvo').value;
-  const fOb = document.getElementById('fObtain').value;
-  const fC = document.getElementById('fCollab').value;
-  const fHF = document.getElementById('fHeroFruit').value;
-  ensureAcc(activeAccount);
-  const accData = collections[activeAccount];
-  return characters.filter(c => {
-    if (q && !c.name.includes(q)) return false;
-    if (filterState.attr && c.attribute !== filterState.attr) return false;
-    if (fR && String(c.rarity) !== fR) return false;
-    if (filterState.strikeType && c.strikeType !== filterState.strikeType) return false;
-    if (filterState.battleType && c.battleType !== filterState.battleType) return false;
-    if (fE && c.evolutionState !== fE) return false;
-    if (fOb && c.obtainMethod !== fOb) return false;
-    if (fC && c.collab !== fC) return false;
-    if (fHF && c.heroFruit !== fHF) return false;
-    if (filterState.skills.size > 0) {
-      const cs = c.skills||[];
-      for (const s of filterState.skills) if (!cs.includes(s)) return false;
-    }
-    if (filterState.superSkills.size > 0) {
-      const cs = c.superSkills||[];
-      for (const s of filterState.superSkills) if (!cs.includes(s)) return false;
-    }
-    const owned = !!(accData[c.id] && accData[c.id].owned);
-    if (fO === 'owned' && !owned) return false;
-    if (fO === 'missing' && owned) return false;
-    return true;
-  });
-}
-
-// ── Render ───────────────────────────────────────────────────────────
-function renderStats() {
-  ensureAcc(activeAccount);
-  const d = collections[activeAccount];
-  const tot = characters.length;
-  const owned = characters.filter(c => d[c.id] && d[c.id].owned);
-  const oc = owned.length;
-  const dc = owned.filter(c => d[c.id].count > 1).length;
-  const rate = tot ? ((oc/tot)*100).toFixed(1) : '0.0';
-  const dr = oc ? ((dc/oc)*100).toFixed(1) : '0.0';
-  document.getElementById('statsArea').innerHTML = `
-    <div class="stat-card"><div class="num">${oc}/${tot}</div><div class="label">已收集角色數</div></div>
-    <div class="stat-card"><div class="num">${rate}%</div><div class="label">收集率</div></div>
-    <div class="stat-card"><div class="num">${dc}</div><div class="label">重複角色數</div></div>
-    <div class="stat-card"><div class="num">${dr}%</div><div class="label">重複率</div></div>
-  `;
-}
-
-function renderList() {
-  const list = document.getElementById('charList');
-  list.innerHTML = '';
-  ensureAcc(activeAccount);
-  const d = collections[activeAccount];
-  const filtered = getFiltered();
-  document.getElementById('emptyHint').textContent =
-    filtered.length === 0 ? (characters.length === 0 ? '尚未新增任何角色' : '沒有符合篩選條件的角色') : '';
-  filtered.forEach(c => {
-    const entry = d[c.id] || {owned:false, count:0};
-    const card = document.createElement('div');
-    card.className = 'char-card' + (entry.owned ? ' owned' : '');
-    const skillTags = (c.skills||[]).slice(0,3).map(s=>`<span class="bsk">${s}</span>`).join('');
-    card.innerHTML = `
-      <div class="char-card-header">
-        <div class="char-info">
-          <div class="char-name" data-id="${c.id}">${c.name}</div>
-          <div class="char-meta">
-            <span class="badge b-${c.attribute}">${c.attribute||''}</span>
-            <span class="stars">${'★'.repeat(c.rarity||0)}</span>
-            ${c.strikeType?`<span class="bsk">${c.strikeType}</span>`:''}
-            ${c.battleType?`<span class="bsk">${c.battleType}</span>`:''}
-            ${skillTags}
-          </div>
-        </div>
-        <div class="char-controls">
-          <div class="cstepper">
-            <button class="dec" data-id="${c.id}">－</button>
-            <span class="cval">${entry.count||0}</span>
-            <button class="inc" data-id="${c.id}">＋</button>
-          </div>
-          <div class="owned-toggle ${entry.owned?'on':''}" data-id="${c.id}">${entry.owned?'✓':''}</div>
-        </div>
+function renderGrid(data) {
+  const grid = document.getElementById('charGrid');
+  grid.innerHTML = '';
+  data.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'char-card' + (c.owned ? ' owned' : '');
+    el.innerHTML = `
+      <div class="card-img bg-${c.attr}">
+        <span class="card-placeholder-icon">${ATTR_EMOJI[c.attr]||'？'}</span>
+        <div class="card-attr-dot attr-dot-${c.attr}"></div>
+        ${c.owned ? '<div class="card-check">✓</div>' : ''}
+        <div class="card-overlay-gradient"></div>
       </div>
-      <div class="char-detail" id="det-${c.id}">
-        ${c.skills&&c.skills.length?`<div class="dsec"><div class="dlbl">技能</div><div class="dskills">${c.skills.map(s=>`<span class="bsk">${s}</span>`).join('')}</div></div>`:''}
-        ${c.superSkills&&c.superSkills.length?`<div class="dsec"><div class="dlbl">超反技能</div><div class="dskills">${c.superSkills.map(s=>`<span class="bsk">${s}</span>`).join('')}</div></div>`:''}
-        ${c.friendSkill?`<div class="dsec"><div class="dlbl">友情技能</div><div style="font-size:12px;">${c.friendSkill}</div></div>`:''}
-        ${c.race?`<div class="dsec"><div class="dlbl">種族</div><div style="font-size:12px;">${c.race}</div></div>`:''}
-        ${c.evolutionState?`<div class="dsec"><div class="dlbl">進化狀態</div><div style="font-size:12px;">${c.evolutionState}</div></div>`:''}
-        ${c.collab?`<div class="dsec"><div class="dlbl">合作活動</div><div style="font-size:12px;">${c.collab}</div></div>`:''}
-        ${(c.forms&&c.forms.length)?c.forms.map(f=>`
-          <div class="dform">
-            <div class="fname-tag">【${f.formName}】</div>
-            ${f.active?`<div><b>主動技:</b> ${f.active}</div>`:''}
-            ${f.passive?`<div><b>被動:</b> ${f.passive}</div>`:''}
-            ${f.friend?`<div><b>友情技:</b> ${f.friend}</div>`:''}
-          </div>
-        `).join(''):''}
+      <div class="card-info">
+        <div class="card-name">${c.name}</div>
+        <div class="card-foot">
+          <span class="card-stars">${'★'.repeat(c.rarity)}</span>
+          <span class="card-cnt ${c.owned ? 'has' : ''}">${c.count > 0 ? '持有 x'+c.count : '未持有'}</span>
+        </div>
       </div>
     `;
-    list.appendChild(card);
-  });
-  list.querySelectorAll('.char-name').forEach(el => {
-    el.onclick = () => document.getElementById('det-'+el.dataset.id).classList.toggle('show');
-  });
-  list.querySelectorAll('.owned-toggle').forEach(el => {
-    el.onclick = () => setOwned(el.dataset.id, !el.classList.contains('on'));
-  });
-  list.querySelectorAll('.inc').forEach(el => { el.onclick = () => changeCount(el.dataset.id, 1); });
-  list.querySelectorAll('.dec').forEach(el => { el.onclick = () => changeCount(el.dataset.id, -1); });
-}
-
-function renderTabs() {
-  const wrap = document.getElementById('accountTabs');
-  wrap.innerHTML = '';
-  accounts.forEach(acc => {
-    const tab = document.createElement('div');
-    tab.className = 'account-tab' + (acc.id===activeAccount?' active':'');
-    const ns = document.createElement('span'); ns.className='acc-name'; ns.textContent=acc.name;
-    ns.onclick = () => { activeAccount=acc.id; renderAll(); };
-    const eb = document.createElement('span'); eb.className='edit-btn'; eb.textContent='✎';
-    eb.onclick = e => {
-      e.stopPropagation();
-      const n = prompt('帳號名稱:', acc.name);
-      if (n&&n.trim()) { acc.name=n.trim(); saveState(); renderAll(); }
+    el.onclick = () => {
+      const isOwned = el.classList.toggle('owned');
     };
-    tab.appendChild(ns); tab.appendChild(eb); wrap.appendChild(tab);
+    grid.appendChild(el);
   });
 }
 
-function renderAll() { renderTabs(); renderStats(); renderList(); updateDynamicFilters(); }
-
-// ── Dynamic filter options ───────────────────────────────────────────
-function updateDynamicFilters() {
-  const races = [...new Set(characters.map(c=>c.race).filter(Boolean))];
-  const friends = [...new Set(characters.map(c=>c.friendSkill).filter(Boolean))];
-  const collabs = [...new Set(characters.map(c=>c.collab).filter(Boolean))];
-  setOptions('fRace', races, '全種族');
-  setOptions('fFriend', friends, '全友情技');
-  setOptions('fCollab', collabs, '全合作活動');
-}
-function setOptions(id, items, placeholder) {
-  const sel = document.getElementById(id);
-  const cur = sel.value;
-  sel.innerHTML = `<option value="">${placeholder}</option>` + items.map(i=>`<option value="${i}">${i}</option>`).join('');
-  sel.value = cur;
+function setAttr(btn) {
+  document.querySelectorAll('.attr-row .attr-circle').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const attr = btn.dataset.attr;
+  renderGrid(attr ? SAMPLE.filter(c => c.attr === attr) : SAMPLE);
 }
 
-// ── Collection ops ───────────────────────────────────────────────────
-function ensureAcc(id) { if (!collections[id]) collections[id] = {}; }
-function setOwned(id, owned) {
-  ensureAcc(activeAccount);
-  const d = collections[activeAccount];
-  if (!d[id]) d[id] = {owned:false,count:0};
-  d[id].owned=owned; d[id].count=owned?Math.max(1,d[id].count||0):0;
-  saveState(); renderAll();
+function setNav(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
 }
-function changeCount(id, delta) {
-  ensureAcc(activeAccount);
-  const d = collections[activeAccount];
-  if (!d[id]) d[id] = {owned:false,count:0};
-  const v = Math.max(0, (d[id].count||0)+delta);
-  d[id].count=v; d[id].owned=v>0;
-  saveState(); renderAll();
-}
-function saveState() { hasUnsavedChanges=true; updateBadge(); }
-function updateBadge() {
-  document.getElementById('unsavedBadge').style.display = (hasUnsavedChanges||charactersChanged)?'inline-block':'none';
-}
-window.addEventListener('beforeunload', e => {
-  if (hasUnsavedChanges||charactersChanged) { e.preventDefault(); e.returnValue=''; }
+
+document.querySelectorAll('.acc-tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.acc-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  };
 });
 
-// ── Modal ────────────────────────────────────────────────────────────
-function selectAttr(attr) {
-  modalAttr = attr;
-  ['火','水','木','光','闇'].forEach(a => {
-    document.getElementById('mAttr'+a)?.classList.toggle('active', a===attr);
-  });
+function openFilter() {
+  document.getElementById('filterDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+function closeFilter() {
+  document.getElementById('filterDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+function toggleSingle(btn, group) {
+  const was = btn.classList.contains('active');
+  document.querySelectorAll(`[onclick*="${group}"]`).forEach(b => b.classList.remove('active'));
+  if (!was) btn.classList.add('active');
 }
 
-let formRowCount = 0;
-function addFormRow(prefill) {
-  formRowCount++;
-  const c = document.getElementById('mFormsContainer');
-  const row = document.createElement('div'); row.className='frmbox';
-  row.innerHTML = `
-    <div class="frmhead">
-      <input type="text" class="minput fname" placeholder="型態名稱(進化前/獸神化...)" style="flex:1;" value="${prefill?.formName||''}">
-      <span class="rmfrm" onclick="this.closest('.frmbox').remove()">✕</span>
-    </div>
-    <textarea class="mtarea factive" placeholder="主動技">${prefill?.active||''}</textarea>
-    <textarea class="mtarea fpassive" placeholder="被動技能(選填)">${prefill?.passive||''}</textarea>
-    <textarea class="mtarea ffriend" placeholder="型態友情技(選填)">${prefill?.friend||''}</textarea>
-  `;
-  c.appendChild(row);
-}
-
-function openAddModal() {
-  ['newName','newRace','newFriend','newCollab'].forEach(id => document.getElementById(id).value='');
-  document.getElementById('mFormsContainer').innerHTML='';
-  modalSkills.clear(); modalSuperSkills.clear();
-  document.querySelectorAll('#mSkillGrid .msbtn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('#mSuperGrid .msbtn').forEach(b=>b.classList.remove('active'));
-  selectAttr('火');
-  addFormRow({formName:'進化前'});
-  document.getElementById('addCharModal').classList.add('open');
-}
-function closeAddModal() { document.getElementById('addCharModal').classList.remove('open'); }
-
-function confirmAddChar() {
-  const name = document.getElementById('newName').value.trim();
-  if (!name) { alert('請輸入角色名稱'); return; }
-  const forms = [];
-  document.querySelectorAll('.frmbox').forEach(row => {
-    const fn=row.querySelector('.fname').value.trim();
-    const fa=row.querySelector('.factive').value.trim();
-    const fp=row.querySelector('.fpassive').value.trim();
-    const ff=row.querySelector('.ffriend').value.trim();
-    if (fn||fa||fp||ff) forms.push({formName:fn||'型態',active:fa,passive:fp,friend:ff});
-  });
-  const maxId = characters.reduce((m,c)=>Math.max(m,c.id||0),0);
-  characters.push({
-    id: maxId+1, name,
-    attribute: modalAttr,
-    rarity: parseInt(document.getElementById('newRarity').value),
-    strikeType: document.getElementById('newStrike').value,
-    battleType: document.getElementById('newBattle').value,
-    race: document.getElementById('newRace').value.trim(),
-    evolutionState: document.getElementById('newEvo').value,
-    obtainMethod: document.getElementById('newObtain').value,
-    heroFruit: document.getElementById('newHeroFruit').value,
-    collab: document.getElementById('newCollab').value.trim(),
-    friendSkill: document.getElementById('newFriend').value.trim(),
-    skills: [...modalSkills],
-    superSkills: [...modalSuperSkills],
-    forms
-  });
-  charactersChanged=true; closeAddModal(); saveState(); renderAll();
-}
-
-// ── Export / Import ──────────────────────────────────────────────────
-function exportData() {
-  dl(JSON.stringify({accounts,collections},null,2), 'collections.json');
-  hasUnsavedChanges=false; updateBadge();
-}
-function exportCharacters() {
-  dl(JSON.stringify(characters,null,2), 'characters.json');
-  charactersChanged=false; updateBadge();
-}
-function dl(content, filename) {
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([content],{type:'application/json'}));
-  a.download=filename; a.click();
-}
-function importData(e) {
-  const file=e.target.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=()=>{
-    try {
-      const data=JSON.parse(reader.result);
-      if(data.accounts) accounts=data.accounts;
-      if(data.collections) collections=data.collections;
-      hasUnsavedChanges=false; updateBadge(); renderAll(); alert('匯入完成');
-    } catch { alert('匯入失敗，格式錯誤'); }
-  };
-  reader.readAsText(file);
-}
-
-// ── Init & Load ──────────────────────────────────────────────────────
-function init() {
-  buildFilterGrid('fSkillGrid', SKILLS, 'skill');
-  buildFilterGrid('fSuperGrid', SUPER_SKILLS, 'superSkill');
-  buildFilterGrid('fStrikeGrid', STRIKE_TYPES, 'strikeType', 2);
-  buildFilterGrid('fBattleGrid', BATTLE_TYPES, 'battleType', 4);
-  buildModalGrid('mSkillGrid', SKILLS, modalSkills);
-  buildModalGrid('mSuperGrid', SUPER_SKILLS, modalSuperSkills);
-  document.getElementById('searchBox').addEventListener('input', renderList);
-  ['fRarity','fRace','fFriend','fOwned','fEvo','fObtain','fCollab','fHeroFruit'].forEach(id => {
-    document.getElementById(id).addEventListener('change', renderList);
-  });
-}
-
-fetch('characters.json')
-  .then(r=>r.json())
-  .then(data=>{
-    characters=data;
-    return fetch('collections.json').then(r=>r.ok?r.json():null).catch(()=>null);
-  })
-  .then(saved=>{
-    if(saved){
-      if(saved.accounts) accounts=saved.accounts;
-      if(saved.collections) collections=saved.collections;
-      activeAccount=accounts[0].id;
-    }
-    init(); renderAll();
-  })
-  .catch(()=>{
-    document.getElementById('emptyHint').textContent='⚠ 無法讀取 characters.json，請部署到 GitHub Pages 後使用';
-    init(); renderAll();
-  });
+renderGrid(SAMPLE);
 </script>
 </body>
 </html>
