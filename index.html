@@ -540,7 +540,7 @@ const EGG_ICON_B64  = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
 
 // ── 狀態 ─────────────────────────────────────────────
 let charactersByAccount = {}, accounts = [{id:'a1',name:'帳號1'},{id:'a2',name:'帳號2'},{id:'a3',name:'帳號3'},{id:'a4',name:'帳號4'}];
-let activeAccount = 'a1';
+let activeAccount = '__ALL__';
 let hasUnsaved = false, editCharId = null, uploadedImg = null, uploadedImg2 = null, modalAttr = '火';
 let customBg = null, themeMode = 'auto', uploadedBgTemp = null;
 
@@ -1505,7 +1505,7 @@ function importBackup(e){
       const data=JSON.parse(reader.result);
       if(data.accounts)accounts=data.accounts;
       charactersByAccount=migrateToPerAccount(data);
-      activeAccount=accounts[0]?.id||'a1';
+      activeAccount='__ALL__';
       customBg = data.customBg !== undefined ? data.customBg : null;
       themeMode = data.themeMode || 'auto';
       applyBackground(); applyTheme();
@@ -1631,7 +1631,7 @@ fetch('backup.json')
   .then(data=>{
     if(data.accounts)accounts=data.accounts;
     charactersByAccount=migrateToPerAccount(data);
-    activeAccount=accounts[0]?.id||'a1';
+    activeAccount='__ALL__';
     customBg = data.customBg || null;
     themeMode = data.themeMode || 'auto';
     applyBackground(); applyTheme();
