@@ -862,7 +862,7 @@ function renderList() {
         <span class="card-dot active" onclick="switchCardImage(event, ${c.id}, 0)"></span>
         <span class="card-dot" onclick="switchCardImage(event, ${c.id}, 1)"></span>
       </div>`:''}
-      <div class="card-name-bar">${c.hasGokuUn?`<img src="${GOKUUN_ICON_B64}" class="card-gokuun-icon" alt="極運">`:''}${c.name}</div>`;
+      <div class="card-name-bar">${c.hasGokuUn?`<img src="${GOKUUN_ICON_B64}" class="card-gokuun-icon" alt="極運">`:c.name}</div>`;
     card.onclick=()=>openViewModal(c.id);
     grid.appendChild(card);
   });
