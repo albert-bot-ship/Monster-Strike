@@ -4,15 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Monster Strike Collect</title>
-<!-- PWA -->
+
+<!-- ── Favicon（瀏覽器分頁圖示）──────────────────── -->
+<link rel="icon" type="image/png" href="./appicon.png">
+<link rel="shortcut icon" href="./appicon.png">
+
+<!-- ── iOS 加到主畫面圖示（三種尺寸）────────────── -->
+<link rel="apple-touch-icon" sizes="120x120" href="./appicon.png">
+<link rel="apple-touch-icon" sizes="152x152" href="./appicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./appicon.png">
+
+<!-- ── iOS 全螢幕 App 模式設定 ──────────────────── -->
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Monster Strike Collect">
-<link rel="apple-touch-icon" href="icon.jpg">
-<link rel="apple-touch-icon" href="icon.jpeg">
-<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- ── Android Chrome PWA 設定 ──────────────────── -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#181c38">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- ── Open Graph（分享連結預覽圖）─────────────── -->
+<meta property="og:title" content="Monster Strike Collect">
+<meta property="og:description" content="怪物彈珠角色收藏管理工具">
+<meta property="og:image" content="./appicon.png">
+<meta property="og:type" content="website">
+
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
