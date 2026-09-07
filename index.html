@@ -1005,13 +1005,24 @@ function renderList() {
 }
 
 // 「全部」首頁：跨帳號搜尋結果清單
+function hasActiveFilters() {
+  if(filterAttr || filterFriendMain) return true;
+  for(const k in fSets) if(fSets[k].size>0) return true;
+  return false;
+}
+
 function renderAllList() {
   const grid=document.getElementById('charGrid'); grid.innerHTML='';
   const q=document.getElementById('searchBox').value.trim();
-  filteredList=sortChars(getAllAccountsMatches());
   renderedCount=0;
+  if(!q && !hasActiveFilters()) {
+    filteredList=[];
+    grid.innerHTML=`<div class="empty-state"><div class="eicon">🔍</div><div class="etxt">搜尋角色名稱，一次查全部帳號</div><div class="esub">輸入名稱後，會顯示各帳號的持有狀況</div></div>`;
+    return;
+  }
+  filteredList=sortChars(getAllAccountsMatches());
   if(!filteredList.length) {
-    grid.innerHTML=`<div class="empty-state"><div class="eicon">🔍</div><div class="etxt">${q?'沒有符合條件的角色':'搜尋角色名稱，一次查全部帳號'}</div><div class="esub">${q?'':'輸入名稱後，會顯示各帳號的持有狀況'}</div></div>`; return;
+    grid.innerHTML=`<div class="empty-state"><div class="eicon">🔍</div><div class="etxt">沒有符合條件的角色</div></div>`; return;
   }
   appendAllCardBatch();
   setupGridObserver();
