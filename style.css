@@ -621,3 +621,31 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 .view-form-name { font-size: 12px; font-weight: 700; color: var(--gold2); margin-bottom: 5px; }
 .view-form-block .view-text { margin-bottom: 3px; }
 .view-form-block .view-text b { color: var(--sub); font-weight: 600; }
+
+/* 卡片雙圖片切換點 */
+.card-dots {
+  position: absolute; bottom: 15px; left: 0; right: 0; z-index: 3;
+  display: flex; justify-content: center; gap: 4px;
+}
+.card-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(255,255,255,.35); cursor: pointer;
+}
+.card-dot.active { background: var(--gold); box-shadow: 0 0 3px var(--gold-glow); }
+
+/* 簡表雙圖片切換點 */
+.view-dots {
+  display: none; justify-content: center; gap: 6px; margin: -6px 0 12px;
+}
+.view-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--border2); cursor: pointer;
+}
+.view-dot.active { background: var(--gold); box-shadow: 0 0 4px var(--gold-glow); }
+
+/* 從其他帳號複製 — 選單項目 */
+.copy-picker-item {
+  display: flex; align-items: center; padding: 9px 8px; border-radius: 6px;
+  cursor: pointer; font-size: 13px; color: var(--text);
+}
+.copy-picker-item:hover { background: rgba(80,112,200,.28); }
