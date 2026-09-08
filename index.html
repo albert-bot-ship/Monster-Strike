@@ -41,6 +41,7 @@
     <span class="app-title">Monster Strike Collect</span>
     <div class="header-right">
       <span id="unsavedBadge">未備份</span>
+      <span class="header-icon-btn" onclick="openInfoModal()" title="收藏統計／活動情報">📊</span>
       <span class="header-icon-btn" onclick="openAppearanceModal()" title="外觀設定">🎨</span>
     </div>
   </div>
@@ -63,11 +64,30 @@
       <div class="attr-circle light" data-attr="光" onclick="setAttr(this)"></div>
       <div class="attr-circle dark"  data-attr="暗" onclick="setAttr(this)"></div>
     </div>
+    <div class="sort-bar">
+      <span class="sort-lbl">排序：</span>
+      <div class="sort-btn active" onclick="setSort('no',this)">No.</div>
+      <div class="sort-btn" onclick="setSort('name',this)">名稱</div>
+      <div class="sort-btn" onclick="setSort('attr',this)">屬性</div>
+      <div class="sort-dir-btn" id="sortDirBtn" onclick="toggleSortDir()">↑ 正序</div>
+      <div class="multi-select-btn" id="multiSelectBtn" onclick="toggleMultiSelect()">☑ 多選</div>
+    </div>
+    <div class="char-grid" id="charGrid"></div>
+    <div id="gridSentinel" style="height:1px;"></div>
+  </div>
+</main>
+
+<!-- 資訊看板彈窗：收藏統計／每月活動情報／活動月曆 -->
+<div class="modal-overlay" id="infoModal">
+  <div class="modal-box" style="max-width:420px;max-height:82vh;overflow-y:auto;">
+    <h2>📊 資訊看板</h2>
+
     <div class="stats-toggle" id="statsToggle" onclick="toggleStats()">
       <span>📊 收藏統計</span>
       <span class="stats-arrow" id="statsArrow">▼</span>
     </div>
     <div class="stats" id="statsArea"></div>
+
     <div class="stats-toggle" id="eventToggle" onclick="toggleEventInfo()">
       <span>📅 每月活動情報</span>
       <span class="stats-arrow" id="eventArrow">▼</span>
@@ -183,11 +203,11 @@
     </div>
     <div class="event-info" id="calArea">
       <div class="cal-legend">
-        <span class="cal-legend-item"><span class="cal-dot" style="background:var(--ev1);border-color:rgba(0,0,0,.25)"></span>霸者之塔</span>
-        <span class="cal-legend-item"><span class="cal-dot" style="background:var(--ev2);border-color:rgba(0,0,0,.25)"></span>絕級淘汰賽</span>
-        <span class="cal-legend-item"><span class="cal-dot" style="background:var(--ev3);border-color:rgba(0,0,0,.25)"></span>禁忌之獄</span>
-        <span class="cal-legend-item"><span class="cal-dot" style="background:var(--ev4);border-color:rgba(0,0,0,.25)"></span>未開之沙宮</span>
-        <span class="cal-legend-item"><span class="cal-dot" style="background:var(--ev5);border-color:rgba(0,0,0,.25)"></span>天魔的孤城</span>
+        <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev1)"></span>霸者之塔</span>
+        <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev2)"></span>絕級淘汰賽</span>
+        <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev3)"></span>禁忌之獄</span>
+        <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev4)"></span>未開之沙宮</span>
+        <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev5)"></span>天魔的孤城</span>
       </div>
       <div class="cal-nav">
         <div class="cal-nav-btn" onclick="changeCalMonth(-1)">◀</div>
@@ -199,18 +219,12 @@
       </div>
       <div class="cal-grid" id="calGrid"></div>
     </div>
-    <div class="sort-bar">
-      <span class="sort-lbl">排序：</span>
-      <div class="sort-btn active" onclick="setSort('no',this)">No.</div>
-      <div class="sort-btn" onclick="setSort('name',this)">名稱</div>
-      <div class="sort-btn" onclick="setSort('attr',this)">屬性</div>
-      <div class="sort-dir-btn" id="sortDirBtn" onclick="toggleSortDir()">↑ 正序</div>
-      <div class="multi-select-btn" id="multiSelectBtn" onclick="toggleMultiSelect()">☑ 多選</div>
+
+    <div class="mbtnrow" style="margin-top:16px;">
+      <button class="mconfirm" style="width:100%;" onclick="closeInfoModal()">關閉</button>
     </div>
-    <div class="char-grid" id="charGrid"></div>
-    <div id="gridSentinel" style="height:1px;"></div>
   </div>
-</main>
+</div>
 
 <div class="batch-bar" id="batchBar">
   <span id="batchCount">已選 0 隻</span>
@@ -1072,7 +1086,7 @@ function renderEventCalendar(){
     const isToday = cellDate.toDateString() === todayStr;
     const dots = MS_EVENTS.map(ev=>{
       const active = eventActiveOnDay(ev, dayNum);
-      return `<span class="cal-dot" style="background:${active?ev.color:'transparent'};border-color:${active?'rgba(0,0,0,.25)':'transparent'}"></span>`;
+      return `<span class="cal-dot" style="background:${active?ev.color:'transparent'}"></span>`;
     }).join('');
     html += `<div class="cal-cell${otherMonth?' other-month':''}${isToday?' today':''}">
       <div class="cal-daynum">${dayNum}</div>
@@ -1777,6 +1791,12 @@ function removeUploadedImg(which){
 }
 
 // ── 外觀設定：背景圖片 ────────────────────────────────
+function openInfoModal(){
+  document.getElementById('infoModal').classList.add('open');
+}
+function closeInfoModal(){
+  document.getElementById('infoModal').classList.remove('open');
+}
 function openAppearanceModal(){
   const img=document.getElementById('bgPreviewImg');
   const hint=document.getElementById('bgPreviewHint');
