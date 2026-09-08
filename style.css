@@ -330,8 +330,9 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 .cal-cell.other-month { opacity:.35; }
 .cal-cell.today { border-color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset; }
 .cal-daynum { font-size:10.5px; color:var(--text); line-height:1; }
-.cal-dots { display:flex; gap:1.5px; flex-wrap:wrap; justify-content:center; max-width:100%; }
-.cal-dot { width:4px; height:4px; border-radius:50%; border:1px solid transparent; flex-shrink:0; }
+.cal-dots { display:flex; flex-direction:column; gap:1.5px; width:100%; padding:0 3px; }
+.cal-dot { width:100%; height:3px; border-radius:1.5px; border:none; flex-shrink:0; }
+.cal-legend-dot { width:8px; height:8px; border-radius:50%; border:1px solid rgba(0,0,0,.25); flex-shrink:0; display:inline-block; }
 
 /* ── 角色格狀（5欄小圖示）──────────────────────────── */
 .char-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:4px; }
@@ -611,6 +612,13 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
   background:rgba(20,24,48,.5);
 }
 .accordion-body.open { display:block; }
+
+/* 每月活動情報：手風琴標題文字對比加強（只影響此區塊，不影響表單手風琴） */
+#eventInfoArea .accordion-header {
+  color:#ffffff; font-weight:700;
+  background: linear-gradient(180deg, #363c78, #262c60);
+}
+#eventInfoArea .accordion-header .acc-arrow { color:rgba(255,255,255,.7); }
 
 /* 英雄果實分類標籤 */
 .hf-group { margin-bottom:8px; }
