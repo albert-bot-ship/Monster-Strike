@@ -1680,19 +1680,31 @@ function closeCopyPicker(){ document.getElementById('copyPickerModal').classList
 function renderCopyPickerList(){
   const term=document.getElementById('copyPickerSearch').value.trim();
   const list=document.getElementById('copyPickerList');
-  const rows=[];
+  // 依角色名稱分組：同名角色合併成一行，行內用帳號標籤區分來源
+  const groups = {}; // name -> {attribute, entries:[{accId, accName, charId}]}
   accounts.forEach(acc=>{
     (charactersByAccount[acc.id]||[]).forEach(c=>{
-      if(!term || c.name.includes(term)) rows.push({accId:acc.id, accName:acc.name, c});
+      if(term && !c.name.includes(term)) return;
+      if(!groups[c.name]) groups[c.name] = {attribute:c.attribute, entries:[]};
+      groups[c.name].entries.push({accId:acc.id, accName:acc.name, charId:c.id});
     });
   });
-  if(!rows.length){ list.innerHTML='<div style="font-size:12px;color:var(--muted);padding:10px;">沒有可複製的角色</div>'; return; }
-  list.innerHTML = rows.map(r=>`
-    <div class="copy-picker-item" onclick='pickCopyChar(${JSON.stringify(r.accId)}, ${r.c.id})'>
-      <span class="card-attr attr-${r.c.attribute}" style="position:static;display:inline-block;margin-right:7px;flex-shrink:0;"></span>
-      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.c.name}</span>
-      <span style="color:var(--muted);font-size:11px;margin-left:8px;flex-shrink:0;">${r.accName}</span>
-    </div>`).join('');
+  const names = Object.keys(groups).sort((a,b)=>a.localeCompare(b,'zh-Hant'));
+  if(!names.length){ list.innerHTML='<div style="font-size:12px;color:var(--muted);padding:10px;">沒有可複製的角色</div>'; return; }
+  list.innerHTML = names.map(name=>{
+    const g = groups[name];
+    const tags = g.entries.map(e=>
+      `<span class="cpg-acc-tag" onclick='pickCopyChar(${JSON.stringify(e.accId)}, ${e.charId})'>${e.accName}</span>`
+    ).join('');
+    return `
+    <div class="copy-picker-group">
+      <div class="cpg-name-row">
+        <span class="card-attr attr-${g.attribute}" style="position:static;display:inline-block;margin-right:7px;flex-shrink:0;"></span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</span>
+      </div>
+      <div class="cpg-acc-tags">${tags}</div>
+    </div>`;
+  }).join('');
 }
 function pickCopyChar(accId, charId){
   const c=(charactersByAccount[accId]||[]).find(x=>x.id===charId); if(!c) return;
