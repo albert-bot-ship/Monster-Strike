@@ -1972,9 +1972,8 @@ function applyBackground(){
   const bg=currentBg();
   if(bg){
     document.body.style.backgroundImage = `linear-gradient(rgba(12,14,34,.72), rgba(12,14,34,.72)), url(${bg})`;
-    document.body.style.backgroundSize='contain';
+    document.body.style.backgroundSize='cover';
     document.body.style.backgroundPosition='center';
-    document.body.style.backgroundRepeat='no-repeat';
     document.body.style.backgroundAttachment='fixed';
   } else {
     document.body.style.backgroundImage='';
