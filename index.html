@@ -1574,6 +1574,12 @@ function clearModalForm(){
   document.getElementById('newGokuUn').checked=false;
   resetModalSets(); selectAttr('火');
   updateGokuUnVisibility();
+  // 重設角色編輯視窗內所有下拉搜尋欄（技能／種族／合作活動等），避免上一次搜尋文字殘留、清單維持被篩選狀態
+  document.querySelectorAll('#addCharModal .cdd-search').forEach(input=>{
+    input.value = '';
+    if(input.getAttribute('oninput')?.includes('filterGroupedSearch')) filterGroupedSearch(input);
+    else filterCddSearch(input);
+  });
   // refresh single-select grids
   ['mRarityGrid','mStrikeGrid','mBattleGrid'].forEach(id=>{
     const c=document.getElementById(id); if(c) c.querySelectorAll('.skill-btn').forEach(b=>{
