@@ -135,7 +135,7 @@ header {
   border-bottom: 1px solid var(--border);
 }
 html[data-theme="light"] header {
-  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(244,245,248,.95));
+  background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(244,245,248,.45));
 }
 header::after {
   content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px;
