@@ -197,31 +197,40 @@
       <div class="event-source">資料來源：怪物彈珠官方公告 2025.03.05</div>
     </div>
 
-    <div class="stats-toggle" id="calToggle" onclick="toggleEventCalendar()">
-      <span>📅 活動月曆</span>
-      <span class="stats-arrow" id="calArrow">▼</span>
-    </div>
-    <div class="event-info" id="calArea">
-      <div class="cal-legend">
-        <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev1)"></span>霸者之塔</span>
-        <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev2)"></span>絕級淘汰賽</span>
-        <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev3)"></span>禁忌之獄</span>
-        <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev4)"></span>未開之沙宮</span>
-        <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev5)"></span>天魔的孤城</span>
-      </div>
-      <div class="cal-nav">
-        <div class="cal-nav-btn" onclick="changeCalMonth(-1)">◀</div>
-        <div class="cal-title" id="calTitle"></div>
-        <div class="cal-nav-btn" onclick="changeCalMonth(1)">▶</div>
-      </div>
-      <div class="cal-weekday-row">
-        <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
-      </div>
-      <div class="cal-grid" id="calGrid"></div>
+    <div class="stats-toggle" onclick="closeInfoModal();openEventCalendarModal();">
+      <span>📅 活動月曆（另開大圖檢視）</span>
+      <span class="stats-arrow">▶</span>
     </div>
 
     <div class="mbtnrow" style="margin-top:16px;">
       <button class="mconfirm" style="width:100%;" onclick="closeInfoModal()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- 活動月曆彈窗（獨立、較大版面） -->
+<div class="modal-overlay" id="calModal">
+  <div class="modal-box cal-modal-box">
+    <h2>📅 活動月曆</h2>
+    <div class="cal-legend">
+      <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev1)"></span>霸者之塔</span>
+      <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev2)"></span>絕級淘汰賽</span>
+      <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev3)"></span>禁忌之獄</span>
+      <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev4)"></span>未開之沙宮</span>
+      <span class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ev5)"></span>天魔的孤城</span>
+    </div>
+    <div class="cal-nav">
+      <div class="cal-nav-btn" onclick="changeCalMonth(-1)">◀</div>
+      <div class="cal-title" id="calTitle"></div>
+      <div class="cal-nav-btn" onclick="changeCalMonth(1)">▶</div>
+    </div>
+    <div class="cal-weekday-row">
+      <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+
+    <div class="mbtnrow" style="margin-top:16px;">
+      <button class="mconfirm" style="width:100%;" onclick="closeEventCalendarModal()">關閉</button>
     </div>
   </div>
 </div>
@@ -1034,11 +1043,11 @@ function toggleEventInfo() {
 
 // ── 每月活動月曆 ──────────────────────────────────────
 const MS_EVENTS = [
-  {name:'霸者之塔／賽季', startDay:7,  endDay:25, color:'var(--ev1)'},
-  {name:'絕級淘汰賽',     startDay:26, endDay:6,  color:'var(--ev2)'},
-  {name:'禁忌之獄／深淵', startDay:21, endDay:8,  color:'var(--ev3)'},
-  {name:'未開之沙宮',     startDay:14, endDay:29, color:'var(--ev4)'},
-  {name:'天魔的孤城',     startDay:1,  endDay:21, color:'var(--ev5)'},
+  {name:'霸者之塔／賽季', short:'霸者', startDay:7,  endDay:25, color:'var(--ev1)'},
+  {name:'絕級淘汰賽',     short:'絕級', startDay:26, endDay:6,  color:'var(--ev2)'},
+  {name:'禁忌之獄／深淵', short:'禁忌', startDay:21, endDay:8,  color:'var(--ev3)'},
+  {name:'未開之沙宮',     short:'沙宮', startDay:14, endDay:29, color:'var(--ev4)'},
+  {name:'天魔的孤城',     short:'天魔', startDay:1,  endDay:21, color:'var(--ev5)'},
 ];
 function eventActiveOnDay(ev, day){
   if(ev.startDay <= ev.endDay) return day>=ev.startDay && day<=ev.endDay;
@@ -1047,10 +1056,12 @@ function eventActiveOnDay(ev, day){
 let calViewYear = new Date().getFullYear();
 let calViewMonth = new Date().getMonth(); // 0-indexed
 let calExpanded = false;
-function toggleEventCalendar(){
-  calExpanded = !calExpanded;
-  document.getElementById('calArea').classList.toggle('open', calExpanded);
-  document.getElementById('calArrow').classList.toggle('open', calExpanded);
+function openEventCalendarModal(){
+  document.getElementById('calModal').classList.add('open');
+  renderEventCalendar();
+}
+function closeEventCalendarModal(){
+  document.getElementById('calModal').classList.remove('open');
 }
 function changeCalMonth(delta){
   calViewMonth += delta;
@@ -1086,7 +1097,7 @@ function renderEventCalendar(){
     const isToday = cellDate.toDateString() === todayStr;
     const dots = MS_EVENTS.map(ev=>{
       const active = eventActiveOnDay(ev, dayNum);
-      return `<span class="cal-dot" style="background:${active?ev.color:'transparent'}"></span>`;
+      return `<span class="cal-dot" style="background:${active?ev.color:'transparent'}">${active?ev.short:''}</span>`;
     }).join('');
     html += `<div class="cal-cell${otherMonth?' other-month':''}${isToday?' today':''}">
       <div class="cal-daynum">${dayNum}</div>
