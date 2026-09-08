@@ -68,6 +68,137 @@
       <span class="stats-arrow" id="statsArrow">▼</span>
     </div>
     <div class="stats" id="statsArea"></div>
+    <div class="stats-toggle" id="eventToggle" onclick="toggleEventInfo()">
+      <span>📅 每月活動情報</span>
+      <span class="stats-arrow" id="eventArrow">▼</span>
+    </div>
+    <div class="event-info" id="eventInfoArea">
+
+      <div class="accordion-section">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          霸者之塔／霸者之塔賽季（每月7日～25日）<span class="acc-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">挑戰條件</div>
+            <div class="event-detail-txt">霸者之塔：無門檻。<br>霸者之塔賽季：需在上一次「絕級淘汰賽」正式比賽的決賽獲勝；未達成時僅會顯示一般的霸者之塔內容。</div>
+          </div>
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">難易度</div>
+            <div class="event-detail-txt">初學者</div>
+          </div>
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">特色與獎勵</div>
+            <div class="event-detail-txt">樓層越高關卡越難，戰力不足可用「小幫手隊伍」協助過關。每月制霸可拿到合計68個寶珠。賽季模式在31階以上分流,可左右滑動切換「經典」「1st賽季」「2nd賽季」。每月「以物易物」交換清單與獎勵都會更新。打完「2nd賽季」全部關卡可獲得「勝者徽印 x5」（該賽季最多累積10個徽印，可交換獎勵）；若兩個賽季的徽印都還沒集滿10個,兩邊都制霸的話會各自獲得徽印。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-section">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          絕級淘汰賽（每月26日～隔月6日）<span class="acc-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">挑戰條件</div>
+            <div class="event-detail-txt">持有5體以上「運極」角色。</div>
+          </div>
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">難易度</div>
+            <div class="event-detail-txt">初學者・中階者</div>
+          </div>
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">特色與獎勵</div>
+            <div class="event-detail-txt">關卡會出現爆絕/轟絕難度的敵人；若過去曾在決賽獲勝過,對手組合也會依優勝次數調整。獲勝後合計可拿到30個寶珠與「英雄之書」等稀有道具,並可在下次「霸者之塔」直接跳關到指定樓層。若整個賽事（含正式賽決賽）全程無敗,可獲得專屬特別勳章。在此活動正式賽決賽獲勝,同時也達成「霸者之塔賽季」的挑戰門檻。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-section">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          禁忌之獄／深淵（每月21日～隔月8日）<span class="acc-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">挑戰條件</div>
+            <div class="event-detail-txt">禁忌之獄（滿足任一項）：轟絕突破1種以上／爆絕突破5種以上／超絕(迴)突破15種以上。<br>禁忌之獄〜深淵〜：需先制霸禁忌之獄本體。</div>
+          </div>
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">難易度</div>
+            <div class="event-detail-txt">中階者・高階者</div>
+          </div>
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">特色與獎勵</div>
+            <div class="event-detail-txt">全長30關的高難度冒險,特定關卡會遇到王「奈落」。每過一關都有首次通關獎勵,全部制霸合計可拿55個寶珠。已制霸過的玩家之後可用「跳關」與「PASS」略過部分關卡。制霸本體後才能挑戰「深淵」,深淵共5種屬性關卡,每次開放僅會出現其中3種；挑戰過深淵任一關,下次禁忌之獄本體開放時可跳過25層。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-section">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          未開之沙宮（每月14日～29日）<span class="acc-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">挑戰條件</div>
+            <div class="event-detail-txt">運極角色達成數5體以上。</div>
+          </div>
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">難易度</div>
+            <div class="event-detail-txt">中階者・高階者</div>
+          </div>
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">特色與獎勵</div>
+            <div class="event-detail-txt">共10關,每次過完第10關,下個月會再開放1個新樓層。獎勵分三種：過關獎勵、據點突破獎勵、制霸獎勵。若目前能挑戰的第10關還不是最新據點,過關獎勵可從「戰型之書」或「據點跳關券」擇一。突破特定據點可取得解放第3個「魂之紋章」用的「魂力鑰匙」（共5把,分批開放）；制霸全部樓層還可獲得保底★6角色轉蛋券。注意：所有關卡皆不能接關,也不能使用「增增餅」「奇蹟罐」。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-section">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          天魔的孤城（每月1日～21日）<span class="acc-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">挑戰條件</div>
+            <div class="event-detail-txt">滿足任一項：轟絕突破1種以上／爆絕突破5種以上／超絕(迴)突破15種以上。</div>
+          </div>
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">難易度</div>
+            <div class="event-detail-txt">高階者</div>
+          </div>
+          <div class="event-detail-block">
+            <div class="event-detail-lbl">特色與獎勵</div>
+            <div class="event-detail-txt">樓層開放進度依通關次數累積,「試煉之間」與「空中花園」兩區合併計算。累積突破可換「戰型之書」「黃金神殿入場券」「連攜之書」等稀有道具。每次活動最多可拿10個「天魔徽印」,可在交換所換限定角色。累積突破獎勵有機會抽中保底★6角色（部分獎池含限定角色,但僅限2023/1/1後推出的角色）。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-source">資料來源：怪物彈珠官方公告 2025.03.05</div>
+    </div>
+
+    <div class="stats-toggle" id="calToggle" onclick="toggleEventCalendar()">
+      <span>📅 活動月曆</span>
+      <span class="stats-arrow" id="calArrow">▼</span>
+    </div>
+    <div class="event-info" id="calArea">
+      <div class="cal-legend">
+        <span class="cal-legend-item"><span class="cal-dot" style="background:var(--ev1);border-color:rgba(0,0,0,.25)"></span>霸者之塔</span>
+        <span class="cal-legend-item"><span class="cal-dot" style="background:var(--ev2);border-color:rgba(0,0,0,.25)"></span>絕級淘汰賽</span>
+        <span class="cal-legend-item"><span class="cal-dot" style="background:var(--ev3);border-color:rgba(0,0,0,.25)"></span>禁忌之獄</span>
+        <span class="cal-legend-item"><span class="cal-dot" style="background:var(--ev4);border-color:rgba(0,0,0,.25)"></span>未開之沙宮</span>
+        <span class="cal-legend-item"><span class="cal-dot" style="background:var(--ev5);border-color:rgba(0,0,0,.25)"></span>天魔的孤城</span>
+      </div>
+      <div class="cal-nav">
+        <div class="cal-nav-btn" onclick="changeCalMonth(-1)">◀</div>
+        <div class="cal-title" id="calTitle"></div>
+        <div class="cal-nav-btn" onclick="changeCalMonth(1)">▶</div>
+      </div>
+      <div class="cal-weekday-row">
+        <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
     <div class="sort-bar">
       <span class="sort-lbl">排序：</span>
       <div class="sort-btn active" onclick="setSort('no',this)">No.</div>
@@ -629,6 +760,7 @@ let mRarity = '6', mStrike = '反射型', mBattle = '平衡', mEvo = '', mFriend
 
 // ── 初始化 ───────────────────────────────────────────
 function init() {
+  renderEventCalendar();
   // 按鈕格（不是下拉的）
   buildGrid('fSkillGrid',  SKILLS,       'skills',       'sg3', true);
   buildGrid('fSuperGrid',  SUPER_SKILLS, 'superSkills',  'sg3', true);
@@ -878,6 +1010,76 @@ function toggleStats() {
   statsExpanded = !statsExpanded;
   document.getElementById('statsArea').classList.toggle('open', statsExpanded);
   document.getElementById('statsArrow').classList.toggle('open', statsExpanded);
+}
+let eventInfoExpanded = false;
+function toggleEventInfo() {
+  eventInfoExpanded = !eventInfoExpanded;
+  document.getElementById('eventInfoArea').classList.toggle('open', eventInfoExpanded);
+  document.getElementById('eventArrow').classList.toggle('open', eventInfoExpanded);
+}
+
+// ── 每月活動月曆 ──────────────────────────────────────
+const MS_EVENTS = [
+  {name:'霸者之塔／賽季', startDay:7,  endDay:25, color:'var(--ev1)'},
+  {name:'絕級淘汰賽',     startDay:26, endDay:6,  color:'var(--ev2)'},
+  {name:'禁忌之獄／深淵', startDay:21, endDay:8,  color:'var(--ev3)'},
+  {name:'未開之沙宮',     startDay:14, endDay:29, color:'var(--ev4)'},
+  {name:'天魔的孤城',     startDay:1,  endDay:21, color:'var(--ev5)'},
+];
+function eventActiveOnDay(ev, day){
+  if(ev.startDay <= ev.endDay) return day>=ev.startDay && day<=ev.endDay;
+  return day>=ev.startDay || day<=ev.endDay; // 跨月活動（例如 26日～隔月6日）
+}
+let calViewYear = new Date().getFullYear();
+let calViewMonth = new Date().getMonth(); // 0-indexed
+let calExpanded = false;
+function toggleEventCalendar(){
+  calExpanded = !calExpanded;
+  document.getElementById('calArea').classList.toggle('open', calExpanded);
+  document.getElementById('calArrow').classList.toggle('open', calExpanded);
+}
+function changeCalMonth(delta){
+  calViewMonth += delta;
+  if(calViewMonth < 0){ calViewMonth = 11; calViewYear--; }
+  if(calViewMonth > 11){ calViewMonth = 0; calViewYear++; }
+  renderEventCalendar();
+}
+function renderEventCalendar(){
+  document.getElementById('calTitle').textContent = `${calViewYear}年${calViewMonth+1}月`;
+  const grid = document.getElementById('calGrid');
+  const firstWeekday = new Date(calViewYear, calViewMonth, 1).getDay();
+  const daysInMonth = new Date(calViewYear, calViewMonth+1, 0).getDate();
+  const daysInPrevMonth = new Date(calViewYear, calViewMonth, 0).getDate();
+  const todayStr = new Date().toDateString();
+  const totalCells = Math.ceil((firstWeekday + daysInMonth) / 7) * 7;
+  let html = '';
+  for(let i=0; i<totalCells; i++){
+    let dayNum, cellDate, otherMonth=false;
+    if(i < firstWeekday){
+      dayNum = daysInPrevMonth - firstWeekday + 1 + i;
+      const m = calViewMonth===0 ? 11 : calViewMonth-1;
+      const y = calViewMonth===0 ? calViewYear-1 : calViewYear;
+      cellDate = new Date(y, m, dayNum); otherMonth = true;
+    } else if(i >= firstWeekday + daysInMonth){
+      dayNum = i - (firstWeekday + daysInMonth) + 1;
+      const m = calViewMonth===11 ? 0 : calViewMonth+1;
+      const y = calViewMonth===11 ? calViewYear+1 : calViewYear;
+      cellDate = new Date(y, m, dayNum); otherMonth = true;
+    } else {
+      dayNum = i - firstWeekday + 1;
+      cellDate = new Date(calViewYear, calViewMonth, dayNum);
+    }
+    const isToday = cellDate.toDateString() === todayStr;
+    const dots = MS_EVENTS.map(ev=>{
+      const active = eventActiveOnDay(ev, dayNum);
+      return `<span class="cal-dot" style="background:${active?ev.color:'transparent'};border-color:${active?'rgba(0,0,0,.25)':'transparent'}"></span>`;
+    }).join('');
+    html += `<div class="cal-cell${otherMonth?' other-month':''}${isToday?' today':''}">
+      <div class="cal-daynum">${dayNum}</div>
+      <div class="cal-dots">${dots}</div>
+    </div>`;
+  }
+  grid.innerHTML = html;
 }
 
 // ── 屬性篩選 ─────────────────────────────────────────
