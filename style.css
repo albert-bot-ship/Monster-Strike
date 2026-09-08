@@ -56,8 +56,8 @@ html[data-theme="light"] {
   --border2: #c4cae0;
 
   --text:  #1b1e2b;
-  --sub:   #6b7180;
-  --muted: #9096a8;
+  --sub:   #565d70;
+  --muted: #838aa0;
 
   --body-radial: rgba(28,105,212,.06);
 }
@@ -143,7 +143,8 @@ header::after {
   opacity:.85;
 }
 html:not([data-theme="light"]) header::after {
-  animation: mStripeGlow 3s ease-in-out infinite;
+  animation: mStripeGlow 6s ease-in-out 1;
+  box-shadow: 0 0 6px var(--m-blue), 0 0 10px var(--m-violet);
 }
 html[data-theme="light"] header::after { opacity:.55; }
 @keyframes mStripeGlow {
@@ -325,7 +326,7 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
   position:absolute; top:0; left:0; right:0; z-index:1;
   padding: 3px 14px 8px;
   background: linear-gradient(180deg, rgba(5,5,20,.88) 0%, transparent 100%);
-  font-size: 7px; font-weight:700; color: var(--gold);
+  font-size: 9px; font-weight:700; color: var(--gold);
   text-align:center; line-height:1.2; letter-spacing:0.3px;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
@@ -345,9 +346,9 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 /* 編輯按鈕（右上角） */
 .card-edit {
   position:absolute; top:3px; right:3px; z-index:3;
-  width:18px; height:18px; border-radius:4px;
+  width:24px; height:24px; border-radius:5px;
   background:rgba(0,0,0,.65); color:rgba(255,255,255,.85);
-  font-size:10px; display:flex; align-items:center; justify-content:center;
+  font-size:12px; display:flex; align-items:center; justify-content:center;
   cursor:pointer; border:1px solid rgba(255,255,255,.15);
   transition: background .15s;
 }
@@ -377,14 +378,14 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 
 /* 全帳號搜尋卡片：帳號持有小圓點列 */
 .card-acc-tags {
-  position:absolute; left:0; right:0; bottom:19px; z-index:2;
+  position:absolute; left:0; right:0; bottom:20px; z-index:2;
   display:flex; justify-content:center; gap:3px;
 }
 .acc-tag {
-  width:12px; height:12px; border-radius:50%;
+  width:15px; height:15px; border-radius:50%;
   background: rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.3);
   display:flex; align-items:center; justify-content:center;
-  font-size:7px; font-weight:700; color:rgba(255,255,255,.55); line-height:1;
+  font-size:8px; font-weight:700; color:rgba(255,255,255,.55); line-height:1;
 }
 .acc-tag.owned {
   background: var(--good); border-color: rgba(255,255,255,.6); color:#003a18;
@@ -397,7 +398,7 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
   position:absolute; bottom:0; left:0; right:0; z-index:2;
   padding: 8px 3px 2px;
   background: linear-gradient(0deg, rgba(5,5,20,.9) 0%, transparent 100%);
-  font-size: 8px; color: rgba(255,255,255,.9);
+  font-size: 10px; color: rgba(255,255,255,.9);
   text-align: center;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
@@ -848,6 +849,11 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 @keyframes gokuunGlowPulse {
   0%, 100% { filter: drop-shadow(0 0 4px var(--gold)) drop-shadow(0 0 8px var(--gold-glow)); }
   50%      { filter: drop-shadow(0 0 7px var(--gold2)) drop-shadow(0 0 14px var(--gold-glow)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-theme="light"]) header::after,
+  .card-gokuun-icon { animation: none; }
+  * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
 .view-gokuun-icon {
   width: 16px; height: 16px; object-fit: contain;
