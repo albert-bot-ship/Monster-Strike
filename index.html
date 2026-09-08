@@ -42,10 +42,12 @@
     <div class="header-right">
       <span id="unsavedBadge">未備份</span>
       <span class="header-icon-btn" onclick="openInfoModal()" title="收藏統計／活動情報">📊</span>
+      <span class="header-icon-btn" onclick="openCompareModal()" title="多帳號收藏比對">⚖️</span>
       <span class="header-icon-btn" onclick="openAppearanceModal()" title="外觀設定">🎨</span>
     </div>
   </div>
   <div class="accounts" id="accountTabs"></div>
+  <div class="event-ticker" id="eventTicker"></div>
 </header>
 
 <main>
@@ -94,9 +96,9 @@
     </div>
     <div class="event-info" id="eventInfoArea">
 
-      <div class="accordion-section">
+      <div class="accordion-section" data-event-name="霸者之塔／賽季">
         <div class="accordion-header" onclick="toggleAcc(this)">
-          霸者之塔／霸者之塔賽季（每月7日～25日）<span class="acc-arrow">▼</span>
+          霸者之塔／霸者之塔賽季（每月7日～25日）<span class="acc-header-right"><span class="acc-countdown"></span><span class="acc-arrow">▼</span></span>
         </div>
         <div class="accordion-body">
           <div class="event-detail-block">
@@ -114,9 +116,9 @@
         </div>
       </div>
 
-      <div class="accordion-section">
+      <div class="accordion-section" data-event-name="絕級淘汰賽">
         <div class="accordion-header" onclick="toggleAcc(this)">
-          絕級淘汰賽（每月26日～隔月6日）<span class="acc-arrow">▼</span>
+          絕級淘汰賽（每月26日～隔月6日）<span class="acc-header-right"><span class="acc-countdown"></span><span class="acc-arrow">▼</span></span>
         </div>
         <div class="accordion-body">
           <div class="event-detail-block">
@@ -134,9 +136,9 @@
         </div>
       </div>
 
-      <div class="accordion-section">
+      <div class="accordion-section" data-event-name="禁忌之獄／深淵">
         <div class="accordion-header" onclick="toggleAcc(this)">
-          禁忌之獄／深淵（每月21日～隔月8日）<span class="acc-arrow">▼</span>
+          禁忌之獄／深淵（每月21日～隔月8日）<span class="acc-header-right"><span class="acc-countdown"></span><span class="acc-arrow">▼</span></span>
         </div>
         <div class="accordion-body">
           <div class="event-detail-block">
@@ -154,9 +156,9 @@
         </div>
       </div>
 
-      <div class="accordion-section">
+      <div class="accordion-section" data-event-name="未開之沙宮">
         <div class="accordion-header" onclick="toggleAcc(this)">
-          未開之沙宮（每月14日～29日）<span class="acc-arrow">▼</span>
+          未開之沙宮（每月14日～29日）<span class="acc-header-right"><span class="acc-countdown"></span><span class="acc-arrow">▼</span></span>
         </div>
         <div class="accordion-body">
           <div class="event-detail-block">
@@ -174,9 +176,9 @@
         </div>
       </div>
 
-      <div class="accordion-section">
+      <div class="accordion-section" data-event-name="天魔的孤城">
         <div class="accordion-header" onclick="toggleAcc(this)">
-          天魔的孤城（每月1日～21日）<span class="acc-arrow">▼</span>
+          天魔的孤城（每月1日～21日）<span class="acc-header-right"><span class="acc-countdown"></span><span class="acc-arrow">▼</span></span>
         </div>
         <div class="accordion-body">
           <div class="event-detail-block">
@@ -688,6 +690,18 @@
   </div>
 </div>
 
+<!-- 多帳號收藏比對 -->
+<div class="modal-overlay" id="compareModal">
+  <div class="modal-box" style="max-width:480px;max-height:86vh;overflow-y:auto;">
+    <h2>⚖️ 收藏比對</h2>
+    <input type="text" class="minput" id="compareSearch" placeholder="🔍 搜尋角色名稱..." oninput="renderCompareTable()" style="margin-bottom:10px;">
+    <div class="compare-table-wrap" id="compareTableWrap"></div>
+    <div class="mbtnrow" style="margin-top:14px;">
+      <button class="mcancel" onclick="closeCompareModal()" style="flex:1;">關閉</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── 常數 ─────────────────────────────────────────────
 const SKILLS        = ['反重力護罩','反傷害壁','反傳送','掃雷者/飛行','掃雷者','飛行','反板塊','反風','反魔法陣/魔法陣增幅','反減速壁','反移轉壁','反減速板','反多層','耐性','破壞者','SS回合','回復','異常狀態回復','護罩','阻停雷射'];
@@ -784,6 +798,7 @@ let mRarity = '6', mStrike = '反射型', mBattle = '平衡', mEvo = '', mFriend
 // ── 初始化 ───────────────────────────────────────────
 function init() {
   renderEventCalendar();
+  refreshEventCountdownUI();
   // 按鈕格（不是下拉的）
   buildGrid('fSkillGrid',  SKILLS,       'skills',       'sg3', true);
   buildGrid('fSuperGrid',  SUPER_SKILLS, 'superSkills',  'sg3', true);
@@ -1053,6 +1068,55 @@ function eventActiveOnDay(ev, day){
   if(ev.startDay <= ev.endDay) return day>=ev.startDay && day<=ev.endDay;
   return day>=ev.startDay || day<=ev.endDay; // 跨月活動（例如 26日～隔月6日）
 }
+// 計算單一活動目前的倒數狀態：進行中回傳「剩幾天結束」，未開放回傳「幾天後開放」
+function getEventCountdown(ev, now){
+  const y=now.getFullYear(), m=now.getMonth(), day=now.getDate();
+  const today = new Date(y,m,day);
+  const active = eventActiveOnDay(ev, day);
+  if(active){
+    let endDate;
+    if(ev.startDay <= ev.endDay){
+      endDate = new Date(y,m,ev.endDay);
+    } else {
+      endDate = (day>=ev.startDay) ? new Date(y,m+1,ev.endDay) : new Date(y,m,ev.endDay);
+    }
+    return {active:true, days:Math.round((endDate-today)/86400000)};
+  } else {
+    const nextStart = (day<ev.startDay) ? new Date(y,m,ev.startDay) : new Date(y,m+1,ev.startDay);
+    return {active:false, days:Math.round((nextStart-today)/86400000)};
+  }
+}
+// 更新資訊看板裡每個活動標題旁的倒數文字
+function renderEventCountdowns(now){
+  now = now || new Date();
+  MS_EVENTS.forEach(ev=>{
+    const sec = document.querySelector(`.accordion-section[data-event-name="${ev.name}"]`);
+    if(!sec) return;
+    const badge = sec.querySelector('.acc-countdown');
+    if(!badge) return;
+    const info = getEventCountdown(ev, now);
+    if(info.active){
+      badge.textContent = info.days<=0 ? '今天結束' : `剩${info.days}天`;
+      badge.classList.remove('upcoming'); badge.classList.add('active');
+    } else {
+      badge.textContent = `${info.days}天後開放`;
+      badge.classList.remove('active'); badge.classList.add('upcoming');
+    }
+  });
+}
+// 更新 header 常駐的活動倒數 chip 列（只顯示目前進行中的活動，可多個橫向捲動）
+function renderEventTicker(now){
+  now = now || new Date();
+  const ticker = document.getElementById('eventTicker');
+  if(!ticker) return;
+  const active = MS_EVENTS.map(ev=>({ev, info:getEventCountdown(ev, now)})).filter(x=>x.info.active);
+  if(!active.length){ ticker.innerHTML=''; ticker.style.display='none'; return; }
+  ticker.style.display='flex';
+  ticker.innerHTML = active.map(({ev,info})=>
+    `<div class="event-chip" onclick="jumpToEventDetail('${ev.name}')">${ev.short} 剩${info.days<=0?'<1':info.days}天</div>`
+  ).join('');
+}
+function refreshEventCountdownUI(){ renderEventCountdowns(); renderEventTicker(); }
 let calViewYear = new Date().getFullYear();
 let calViewMonth = new Date().getMonth(); // 0-indexed
 let calExpanded = false;
@@ -1808,6 +1872,55 @@ function openInfoModal(){
 function closeInfoModal(){
   document.getElementById('infoModal').classList.remove('open');
 }
+// 從活動倒數 chip 點擊跳轉：打開資訊看板、展開活動情報、捲到該活動並攤開
+function jumpToEventDetail(eventName){
+  openInfoModal();
+  if(!eventInfoExpanded){
+    eventInfoExpanded = true;
+    document.getElementById('eventInfoArea').classList.add('open');
+    document.getElementById('eventArrow').classList.add('open');
+  }
+  const sec = document.querySelector(`.accordion-section[data-event-name="${eventName}"]`);
+  if(!sec) return;
+  const hdr = sec.querySelector('.accordion-header');
+  if(hdr && !hdr.classList.contains('open')) toggleAcc(hdr);
+  setTimeout(()=> sec.scrollIntoView({behavior:'smooth', block:'center'}), 80);
+}
+
+// ── 多帳號收藏比對 ────────────────────────────────────
+function openCompareModal(){
+  document.getElementById('compareSearch').value='';
+  renderCompareTable();
+  document.getElementById('compareModal').classList.add('open');
+}
+function closeCompareModal(){
+  document.getElementById('compareModal').classList.remove('open');
+}
+function renderCompareTable(){
+  const term = document.getElementById('compareSearch').value.trim();
+  const wrap = document.getElementById('compareTableWrap');
+  const byName = {};
+  accounts.forEach(acc=>{
+    (charactersByAccount[acc.id]||[]).forEach(c=>{
+      if(!byName[c.name]) byName[c.name] = {attribute:c.attribute, owned:new Set()};
+      byName[c.name].owned.add(acc.id);
+    });
+  });
+  let names = Object.keys(byName);
+  if(term) names = names.filter(n=>n.includes(term));
+  names.sort((a,b)=>a.localeCompare(b,'zh-Hant'));
+  if(!names.length){
+    wrap.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:14px 0;text-align:center;">沒有符合的角色</div>';
+    return;
+  }
+  const head = `<tr><th class="ct-name-th">角色</th>${accounts.map(a=>`<th>${a.name}</th>`).join('')}</tr>`;
+  const rows = names.map(name=>{
+    const info = byName[name];
+    const cells = accounts.map(a=>`<td>${info.owned.has(a.id) ? '<span class="ct-check">✓</span>' : '<span class="ct-dash">－</span>'}</td>`).join('');
+    return `<tr><td class="ct-name-td"><span class="card-attr attr-${info.attribute}" style="position:static;display:inline-block;margin-right:6px;flex-shrink:0;vertical-align:middle;"></span>${name}</td>${cells}</tr>`;
+  }).join('');
+  wrap.innerHTML = `<table class="compare-table"><thead>${head}</thead><tbody>${rows}</tbody></table>`;
+}
 function openAppearanceModal(){
   const img=document.getElementById('bgPreviewImg');
   const hint=document.getElementById('bgPreviewHint');
@@ -1996,7 +2109,7 @@ function backupThenRefresh(){
   setTimeout(()=>location.reload(), 400);
 }
 initPullToRefresh();
-setInterval(()=>{ if(themeMode==='auto') applyTheme(); }, 15*60*1000);
+setInterval(()=>{ if(themeMode==='auto') applyTheme(); refreshEventCountdownUI(); }, 15*60*1000);
 
 // ── 帳號滑動切換（1:1跟隨、橡皮筋邊界、速度投擲、可中斷彈簧）───
 (function initAccountSwipe(){
