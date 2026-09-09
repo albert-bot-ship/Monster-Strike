@@ -365,7 +365,7 @@
 </div>
 
 <!-- 新增/編輯角色 Modal -->
-<div class="modal-overlay" id="addCharModal">
+<div class="modal-overlay" id="addCharModal" onclick="handleAddModalOverlayClick(event)">
   <div class="modal-box">
     <h2 id="modalTitle">新增角色</h2>
 
@@ -1035,6 +1035,17 @@ function toggleCdd(hdr) {
   hdr.nextElementSibling?.classList.toggle('open');
 }
 
+// 點下拉選單（殺手／種族／友情技…）以外的地方，自動收合已展開的選單
+document.addEventListener('click', function(e){
+  document.querySelectorAll('.cdd-body.open').forEach(body=>{
+    const cdd = body.closest('.cdd');
+    if(cdd && !cdd.contains(e.target)){
+      body.classList.remove('open');
+      cdd.querySelector('.cdd-hdr')?.classList.remove('open');
+    }
+  });
+});
+
 function updateCddLabel(cdd) {
   if(!cdd) return;
   const lbl = cdd.querySelector('.cdd-lbl'); if(!lbl) return;
@@ -1696,6 +1707,24 @@ function openEditModal(id){
   const m=document.getElementById('addCharModal');m.classList.add('open');m.scrollTop=0;
 }
 function closeModal(){document.getElementById('addCharModal').classList.remove('open');}
+// 點編輯視窗外側遮罩：若表單已經有填資料，先詢問確認才關閉，避免誤觸資料不見
+function handleAddModalOverlayClick(e){
+  if(e.target !== e.currentTarget) return; // 點到的是視窗內容本身，不處理
+  if(isModalFormDirty()){
+    if(!confirm('目前編輯的內容尚未儲存，確定要放棄並關閉嗎？')) return;
+  }
+  closeModal();
+}
+function isModalFormDirty(){
+  const textFields=['newName','newCharNo','newCharNo2','newCollab','newSSRounds','newSSName','newSSDesc'];
+  if(textFields.some(id=>document.getElementById(id)?.value.trim())) return true;
+  if(document.getElementById('newGokuUn')?.checked) return true;
+  if(uploadedImg || uploadedImg2) return true;
+  if(mFriendMain) return true;
+  if(mEvo) return true;
+  if(Object.values(mSets).some(s=>s && s.size>0)) return true;
+  return false;
+}
 function deleteCharFromModal(){
   if(editCharId===null) return;
   const c=currentChars().find(x=>x.id===editCharId); if(!c) return;
