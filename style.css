@@ -176,13 +176,13 @@ html[data-theme="light"] header::after { opacity:.55; }
   font-size: 15px; font-weight: 800; letter-spacing: .6px;
   background: linear-gradient(90deg, var(--water), var(--dark) 55%, var(--fire));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  filter: drop-shadow(0 0 6px var(--dark-glow)) drop-shadow(0 0 10px var(--water-glow));
+  text-shadow: 0 0 4px rgba(255,255,255,.55), 0 0 10px var(--water-glow), 0 0 18px var(--dark-glow), 0 0 26px var(--fire-glow);
 }
 html:not([data-theme="light"]) .app-title { animation: titlePowerOn 2.4s ease-out 1; }
 @keyframes titlePowerOn {
-  0%   { filter: drop-shadow(0 0 0px transparent); opacity:.4; }
-  45%  { filter: drop-shadow(0 0 12px var(--dark-glow)) drop-shadow(0 0 16px var(--water-glow)); opacity:1; }
-  100% { filter: drop-shadow(0 0 6px var(--dark-glow)) drop-shadow(0 0 10px var(--water-glow)); opacity:1; }
+  0%   { text-shadow: none; opacity:.4; }
+  45%  { text-shadow: 0 0 6px rgba(255,255,255,.85), 0 0 16px var(--water-glow), 0 0 28px var(--dark-glow), 0 0 38px var(--fire-glow); opacity:1; }
+  100% { text-shadow: 0 0 4px rgba(255,255,255,.55), 0 0 10px var(--water-glow), 0 0 18px var(--dark-glow), 0 0 26px var(--fire-glow); opacity:1; }
 }
 #unsavedBadge {
   font-size: 11px; font-weight: 600; background: var(--warn);
