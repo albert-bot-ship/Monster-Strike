@@ -336,17 +336,10 @@
     </div>
   </div>
 
-  <div class="drawer-section filter-2col">
-    <div>
-      <div class="drawer-lbl">進化狀態</div>
-      <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
-      <div class="cdd-body sg2" id="fEvoBody"></div></div>
-    </div>
-    <div>
-      <div class="drawer-lbl">入手方式</div>
-      <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
-      <div class="cdd-body sg3" id="fObtainBody"></div></div>
-    </div>
+  <div class="drawer-section">
+    <div class="drawer-lbl">入手方式</div>
+    <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
+    <div class="cdd-body sg3" id="fObtainBody"></div></div>
   </div>
 
   <div class="drawer-section">
@@ -450,10 +443,19 @@
       <div class="sg4" id="mBattleGrid"></div>
     </div>
 
-    <div class="mfield">
-      <label>進化狀態</label>
-      <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">未指定</span><span class="cdd-arr">▼</span></div>
-      <div class="cdd-body sg3" id="mEvoBody"></div></div>
+    <div class="accordion-section">
+      <div class="accordion-header" onclick="toggleAcc(this)">
+        型態<span class="acc-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <div class="sg3" id="mFormStageGrid"></div>
+        <div class="mfield" id="trueBeastSkillsWrap" style="display:none;margin-top:10px;margin-bottom:0;">
+          <label>射擊技能</label>
+          <textarea class="mtarea" id="newShootSkill" placeholder="請輸入射擊技能效果說明"></textarea>
+          <label style="margin-top:8px;display:block;">支援技能</label>
+          <textarea class="mtarea" id="newSupportSkill" placeholder="請輸入支援技能效果說明"></textarea>
+        </div>
+      </div>
     </div>
 
     <div class="mfield">
@@ -572,15 +574,6 @@
       </div>
     </div>
 
-    <div class="accordion-section">
-      <div class="accordion-header" onclick="toggleAcc(this)">
-        型態<span class="acc-arrow">▼</span>
-      </div>
-      <div class="accordion-body">
-        <div class="sg3" id="mFormStageGrid"></div>
-      </div>
-    </div>
-
     <div class="mbtnrow" style="margin-top:16px;">
       <button class="mcancel red" id="mDeleteBtn" style="display:none;" onclick="deleteCharFromModal()">🗑 刪除</button>
       <button class="mcancel" onclick="closeModal()">取消</button>
@@ -627,6 +620,13 @@
     <div class="view-section" id="vFormsWrap">
       <div class="view-section-title">型態</div>
       <div class="view-tag-grid" id="vForms"></div>
+    </div>
+
+    <div class="view-section" id="vTrueBeastWrap">
+      <div class="view-section-title">射擊技能</div>
+      <div class="view-text" id="vShootSkill"></div>
+      <div class="view-section-title" style="margin-top:10px;">支援技能</div>
+      <div class="view-text" id="vSupportSkill"></div>
     </div>
 
     <div class="mbtnrow" style="margin-top:16px;">
@@ -718,7 +718,6 @@ const FRIEND_SKILLS = ['爆炸','光暈','雷射','導引彈','能量環','擴�
 const RACES         = ['龍','機械','魔人','神','鳥','獸','亞人','魔族','妖精','礦物','魔王','幻獸','外星','宇宙','聖騎士','武士','同盟國','軸心國','幻妖','鬥神','神獸','聖域獵人','怪獸','EVA駕駛員','使徒','鬥士','妖怪','青銅聖鬥士','黃金聖鬥士','人造人','怪異','巨人','魔神','人偶','嵌合蟻','米奇與好朋友','死神','燃燒者','BORDER隊員','近界民','十刃','假面軍勢'];
 const FORM_STAGES    = ['進化','神化','獸神化','獸神化改','真獸神化'];
 const HERO_FRUITS   = {'數值強化':['同族','擊種','戰型','加攻','加速','加命','孤高'],'怪物強化':['熱血友擊','傷害減輕','將命削減','兵命削減','一擊失心','加速必殺','耐毒','小小治癒','愛心'],'冒險效果':['學習','發財','超速過關','S級別','賺取點數']};
-const EVO_STATES    = ['進化前','進化/神化前','進化/神化','獸神化解禁','獸神化','獸神化·改解禁','獸神化·改','真獸神化解禁','真獸神化'];
 const OBTAIN        = ['幸運轉蛋','幸運轉蛋🥚','其他'];
 const RARITIES      = ['★6','★5','★4','★3'];
 const RARITY_NUMS    = ['6','5','4','3'];
@@ -793,12 +792,12 @@ function sortChars(arr) {
   });
 }
 
-const fSets = { skills:new Set(), superSkills:new Set(), strikeType:new Set(), battleType:new Set(), rarity:new Set(), races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), evo:new Set(), obtain:new Set(), collab:new Set() };
+const fSets = { skills:new Set(), superSkills:new Set(), strikeType:new Set(), battleType:new Set(), rarity:new Set(), races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), obtain:new Set(), collab:new Set() };
 let filterAttr = '';
 let filterFriendMain = '';
 const mSets = { races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), skills:new Set(), superSkills:new Set(), obtain:new Set(), formStages:new Set() };
 // modal single-select states
-let mRarity = '6', mStrike = '反射型', mBattle = '平衡', mEvo = '', mFriendMain = '';
+let mRarity = '6', mStrike = '反射型', mBattle = '平衡', mFriendMain = '';
 let mTargetAccount = null; // 新增角色時，要存到哪個帳號（從「全部」開新增時需要指定）
 
 // ── 初始化 ───────────────────────────────────────────
@@ -822,13 +821,11 @@ function init() {
   buildCddBody('fBattleBody', BATTLE_TYPES, 'battleType', true);
   buildCddBody('fRarityBody', RARITIES,     'rarity',     true);
   buildCddBody('fRaceGrid',   RACES,        'races',      true);
-  buildCddBody('fEvoBody',    EVO_STATES,   'evo',        true);
   buildCddBody('fObtainBody', OBTAIN,       'obtain',     true);
   // 友情技（主單選／副可複選，皆可搜尋）
   buildFriendGrid('fFriendMainGrid', null,             true, true);
   buildFriendGrid('fFriendSubGrid',  'friendSkillsSub', true, false);
   // 下拉內容（表單）
-  buildCddBody('mEvoBody',      EVO_STATES,    'evo',         false, true);
   buildCddBody('mRaceGrid',     RACES,         'races',       false);
   buildFriendGrid('mFriendMainGrid', null,             false, true);
   buildFriendGrid('mFriendSubGrid',  'friendSkillsSub', false, false);
@@ -948,9 +945,19 @@ function buildGrid(containerId, items, key, cls, isFilter) {
   c.className = cls; c.innerHTML = '';
   items.forEach(item => {
     const b = mkBtn(item);
-    b.onclick = () => { toggleSet(b, key, item, isFilter); if(isFilter) renderList(); else updateCntBadge('cntSkill','skills','cntSuper','superSkills'); };
+    b.onclick = () => {
+      toggleSet(b, key, item, isFilter);
+      if(isFilter) renderList(); else updateCntBadge('cntSkill','skills','cntSuper','superSkills');
+      if(key==='formStages') updateFormStageDependents();
+    };
     c.appendChild(b);
   });
+}
+// 型態勾選「真獸神化」時，才顯示射擊技能／支援技能欄位（遊戲裡只有真獸神化才有這兩項）
+function updateFormStageDependents(){
+  const wrap = document.getElementById('trueBeastSkillsWrap');
+  if(!wrap) return;
+  wrap.style.display = mSets.formStages.has('真獸神化') ? 'block' : 'none';
 }
 
 function buildSingleGrid(containerId, items, setter, getter, valMapper) {
@@ -966,19 +973,12 @@ function buildSingleGrid(containerId, items, setter, getter, valMapper) {
   update();
 }
 
-function buildCddBody(bodyId, items, key, isFilter, singleSelect) {
+function buildCddBody(bodyId, items, key, isFilter) {
   const body = document.getElementById(bodyId); if(!body) return;
   body.innerHTML = '';
   items.forEach(item => {
     const b = mkBtn(item);
     b.onclick = () => {
-      if (singleSelect) {
-        body.querySelectorAll('.skill-btn').forEach(x => x.classList.remove('active'));
-        b.classList.toggle('active', !b.classList.contains('active') || true);
-        if (singleSelect) { mEvo = b.classList.contains('active') ? item : ''; }
-        updateCddLabel(b.closest('.cdd'));
-        return;
-      }
       toggleSet(b, key, item, isFilter);
       updateCddLabel(b.closest('.cdd'));
       if(isFilter) renderList();
@@ -1201,7 +1201,6 @@ function matchesFilters(c, q) {
   if(fSets.rarity.size>0  && !fSets.rarity.has(`★${c.rarity}`)) return false;
   if(fSets.strikeType.size>0 && !fSets.strikeType.has(c.strikeType)) return false;
   if(fSets.battleType.size>0 && !fSets.battleType.has(c.battleType)) return false;
-  if(fSets.evo.size>0     && !fSets.evo.has(c.evolutionState)) return false;
   if(fSets.collab.size>0  && !fSets.collab.has(c.collab||'')) return false;
   if(fSets.heroFruits.size>0) {
     const hf = c.heroFruits||[];
@@ -1581,7 +1580,7 @@ function resetModalSets(){
 }
 
 function clearModalForm(){
-  uploadedImg=null; uploadedImg2=null; mRarity='6'; mStrike='反射型'; mBattle='平衡'; mEvo=''; mFriendMain=''; mTargetAccount=null;
+  uploadedImg=null; uploadedImg2=null; mRarity='6'; mStrike='反射型'; mBattle='平衡'; mFriendMain=''; mTargetAccount=null;
   document.getElementById('imgPreviewEl').style.display='none';
   document.getElementById('imgHint').style.display='block';
   document.getElementById('imgRemoveBtn').style.display='none';
@@ -1596,9 +1595,12 @@ function clearModalForm(){
   document.getElementById('newSSRounds').value='';
   document.getElementById('newSSName').value='';
   document.getElementById('newSSDesc').value='';
+  document.getElementById('newShootSkill').value='';
+  document.getElementById('newSupportSkill').value='';
   document.getElementById('newGokuUn').checked=false;
   resetModalSets(); selectAttr('火');
   updateGokuUnVisibility();
+  updateFormStageDependents();
   // 重設角色編輯視窗內所有下拉搜尋欄（技能／種族／合作活動等），避免上一次搜尋文字殘留、清單維持被篩選狀態
   document.querySelectorAll('#addCharModal .cdd-search').forEach(input=>{
     input.value = '';
@@ -1632,7 +1634,9 @@ function prefillModal(c){
   document.getElementById('newSSRounds').value=c.ssRounds||'';
   document.getElementById('newSSName').value=c.ssName||'';
   document.getElementById('newSSDesc').value=c.ssDesc||'';
-  mRarity=String(c.rarity||6); mStrike=c.strikeType||'反射型'; mBattle=c.battleType||'平衡'; mEvo=c.evolutionState||'';
+  document.getElementById('newShootSkill').value=c.shootSkill||'';
+  document.getElementById('newSupportSkill').value=c.supportSkill||'';
+  mRarity=String(c.rarity||6); mStrike=c.strikeType||'反射型'; mBattle=c.battleType||'平衡';
   selectAttr(c.attribute||'火');
 
   const activateSet=(setKey, arr, bodyId, isCdd)=>{
@@ -1671,16 +1675,16 @@ function prefillModal(c){
   }
 
   // single-select grids
-  ['mRarityGrid','mStrikeGrid','mBattleGrid','mEvoBody'].forEach(id=>{
+  ['mRarityGrid','mStrikeGrid','mBattleGrid'].forEach(id=>{
     const cont=document.getElementById(id); if(!cont) return;
     cont.querySelectorAll('.skill-btn').forEach(b=>{
       if(id==='mRarityGrid')b.classList.toggle('active',b.dataset.val===mRarity);
       if(id==='mStrikeGrid')b.classList.toggle('active',b.dataset.val===mStrike);
       if(id==='mBattleGrid')b.classList.toggle('active',b.dataset.val===mBattle);
-      if(id==='mEvoBody'){b.classList.toggle('active',b.dataset.val===mEvo); if(b.dataset.val===mEvo)updateCddLabel(b.closest('.cdd'));}
     });
   });
   activateSet('formStages', c.formStages, 'mFormStageGrid', false);
+  updateFormStageDependents();
   updateCntBadge('cntSkill','skills','cntSuper','superSkills');
 }
 
@@ -1724,12 +1728,11 @@ function handleAddModalOverlayClick(e){
   closeModal();
 }
 function isModalFormDirty(){
-  const textFields=['newName','newCharNo','newCharNo2','newCollab','newSSRounds','newSSName','newSSDesc'];
+  const textFields=['newName','newCharNo','newCharNo2','newCollab','newSSRounds','newSSName','newSSDesc','newShootSkill','newSupportSkill'];
   if(textFields.some(id=>document.getElementById(id)?.value.trim())) return true;
   if(document.getElementById('newGokuUn')?.checked) return true;
   if(uploadedImg || uploadedImg2) return true;
   if(mFriendMain) return true;
-  if(mEvo) return true;
   if(Object.values(mSets).some(s=>s && s.size>0)) return true;
   return false;
 }
@@ -1832,6 +1835,12 @@ function openViewModal(id){
   formsWrap.style.display = stages.length ? '' : 'none';
   document.getElementById('vForms').innerHTML = stages.map(s=>`<span class="view-tag">${s}</span>`).join('');
 
+  const trueBeastWrap = document.getElementById('vTrueBeastWrap');
+  const hasTrueBeastSkills = c.shootSkill || c.supportSkill;
+  trueBeastWrap.style.display = hasTrueBeastSkills ? '' : 'none';
+  document.getElementById('vShootSkill').textContent = c.shootSkill || '';
+  document.getElementById('vSupportSkill').textContent = c.supportSkill || '';
+
   document.getElementById('viewCharModal').classList.add('open');
 }
 function closeViewModal(){ document.getElementById('viewCharModal').classList.remove('open'); viewCharId=null; }
@@ -1860,7 +1869,7 @@ function confirmChar(){
   const name=document.getElementById('newName').value.trim(); if(!name){alert('請輸入角色名稱');return;}
   if(editCharId===null && !mTargetAccount){ alert('請選擇要新增到哪個帳號'); return; }
   const qty=Math.max(1, parseInt(document.getElementById('newQty').value)||1);
-  const data={charNo:document.getElementById('newCharNo').value.trim(),charNo2:document.getElementById('newCharNo2').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,evolutionState:mEvo,collab:document.getElementById('newCollab').value.trim(),quantity:qty,hasGokuUn:document.getElementById('newGokuUn').checked,ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:uploadedImg,imageData2:uploadedImg2,formStages:[...mSets.formStages]};
+  const data={charNo:document.getElementById('newCharNo').value.trim(),charNo2:document.getElementById('newCharNo2').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,collab:document.getElementById('newCollab').value.trim(),quantity:qty,hasGokuUn:document.getElementById('newGokuUn').checked,ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:uploadedImg,imageData2:uploadedImg2,formStages:[...mSets.formStages],shootSkill:mSets.formStages.has('真獸神化')?document.getElementById('newShootSkill').value.trim():'',supportSkill:mSets.formStages.has('真獸神化')?document.getElementById('newSupportSkill').value.trim():''};
   if(editCharId!==null){
     const list=currentChars();
     const idx=list.findIndex(x=>x.id===editCharId);if(idx>=0)list[idx]={id:editCharId,...data};
@@ -2116,6 +2125,10 @@ function migrateCharacterFields(c){
     });
     c.formStages = [...new Set(c.formStages)];
   }
+  if(c.shootSkill === undefined) c.shootSkill = '';
+  if(c.supportSkill === undefined) c.supportSkill = '';
+  // 進化狀態欄位已於2026.09移除，刪除舊資料裡殘留的內容
+  if(c.evolutionState !== undefined) delete c.evolutionState;
   // 技能名稱更新：「維持怒能倍率/凍身」→「維持聚能倍率/渾身」（2026.09 修正舊名稱）
   if(Array.isArray(c.skills)){
     const oldIdx = c.skills.indexOf('維持怒能倍率/凍身');
