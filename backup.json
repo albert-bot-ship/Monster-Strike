@@ -29,7 +29,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "速度",
-        "evolutionState": "進化/神化",
         "collab": "Love Live!",
         "quantity": 1,
         "hasGokuUn": true,
@@ -56,7 +55,9 @@
         "imageData2": null,
         "formStages": [
           "進化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 2,
@@ -67,7 +68,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "真獸神化",
         "collab": "咒術回戰",
         "quantity": 1,
         "hasGokuUn": false,
@@ -96,7 +96,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 3,
@@ -107,7 +109,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "獸神化·改",
         "collab": "",
         "quantity": 1,
         "hasGokuUn": false,
@@ -136,7 +137,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 4,
@@ -147,7 +150,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "真獸神化",
         "collab": "咒術回戰",
         "quantity": 1,
         "hasGokuUn": false,
@@ -175,7 +177,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 5,
@@ -186,7 +190,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "獸神化",
         "collab": "火影忍者",
         "quantity": 1,
         "hasGokuUn": false,
@@ -215,7 +218,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 6,
@@ -226,7 +231,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "速度",
-        "evolutionState": "獸神化",
         "collab": "火影忍者",
         "quantity": 1,
         "hasGokuUn": false,
@@ -255,7 +259,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 7,
@@ -266,7 +272,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "獸神化",
         "collab": "火影忍者",
         "quantity": 1,
         "hasGokuUn": false,
@@ -294,7 +299,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 8,
@@ -305,7 +312,6 @@
         "rarity": 5,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "進化/神化",
         "collab": "火影忍者",
         "quantity": 1,
         "hasGokuUn": false,
@@ -333,7 +339,9 @@
         "imageData2": null,
         "formStages": [
           "進化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 9,
@@ -344,7 +352,6 @@
         "rarity": 5,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "進化/神化",
         "collab": "火影忍者",
         "quantity": 1,
         "hasGokuUn": false,
@@ -373,7 +380,9 @@
         "imageData2": null,
         "formStages": [
           "進化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 10,
@@ -384,7 +393,6 @@
         "rarity": 5,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "進化/神化",
         "collab": "火影忍者",
         "quantity": 1,
         "hasGokuUn": false,
@@ -412,7 +420,9 @@
         "imageData2": null,
         "formStages": [
           "進化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 11,
@@ -423,7 +433,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "速度",
-        "evolutionState": "進化/神化",
         "collab": "火影忍者",
         "quantity": 1,
         "hasGokuUn": false,
@@ -452,7 +461,9 @@
         "imageData2": null,
         "formStages": [
           "進化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 12,
@@ -463,7 +474,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "獸神化",
         "collab": "Love Live!",
         "quantity": 1,
         "hasGokuUn": false,
@@ -492,7 +502,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 13,
@@ -503,7 +515,6 @@
         "rarity": 5,
         "strikeType": "反射型",
         "battleType": "速度",
-        "evolutionState": "進化/神化",
         "collab": "Love Live!",
         "quantity": 1,
         "hasGokuUn": false,
@@ -531,7 +542,9 @@
         "imageData2": null,
         "formStages": [
           "進化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 14,
@@ -542,7 +555,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "獸神化",
         "collab": "Love Live!",
         "quantity": 1,
         "hasGokuUn": false,
@@ -571,7 +583,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 15,
@@ -582,7 +596,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "砲擊",
-        "evolutionState": "進化/神化",
         "collab": "Love Live!",
         "quantity": 1,
         "hasGokuUn": false,
@@ -609,7 +622,9 @@
         "imageData2": null,
         "formStages": [
           "進化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 16,
@@ -620,7 +635,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "獸神化",
         "collab": "咒術回戰",
         "quantity": 1,
         "hasGokuUn": false,
@@ -649,7 +663,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 17,
@@ -660,7 +676,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "獸神化",
         "collab": "咒術回戰",
         "quantity": 1,
         "hasGokuUn": false,
@@ -689,7 +704,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 18,
@@ -700,7 +717,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "獸神化",
         "collab": "咒術回戰",
         "quantity": 1,
         "hasGokuUn": false,
@@ -729,7 +745,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 19,
@@ -740,7 +758,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "砲擊",
-        "evolutionState": "獸神化·改",
         "collab": "咒術回戰",
         "quantity": 1,
         "hasGokuUn": false,
@@ -769,7 +786,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 20,
@@ -780,7 +799,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "砲擊",
-        "evolutionState": "真獸神化",
         "collab": "咒術回戰",
         "quantity": 1,
         "hasGokuUn": false,
@@ -810,7 +828,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 21,
@@ -821,7 +841,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "獸神化",
         "collab": "咒術回戰",
         "quantity": 1,
         "hasGokuUn": false,
@@ -850,7 +869,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 22,
@@ -861,7 +882,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "獸神化",
         "collab": "激獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -891,7 +911,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 23,
@@ -902,7 +924,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "砲擊",
-        "evolutionState": "獸神化",
         "collab": "激獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -931,7 +952,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 24,
@@ -942,7 +965,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "砲擊",
-        "evolutionState": "獸神化·改",
         "collab": "怪物彈珠精選角色DX",
         "quantity": 1,
         "hasGokuUn": false,
@@ -969,7 +991,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 25,
@@ -980,7 +1004,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "砲擊",
-        "evolutionState": "獸神化·改",
         "collab": "怪物彈珠世代2015",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1009,7 +1032,9 @@
         "imageData2": "data:image/jpeg;base64,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",
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 26,
@@ -1020,7 +1045,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "獸神化·改",
         "collab": "鏈鋸人",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1048,7 +1072,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 27,
@@ -1059,7 +1085,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "獸神化·改",
         "collab": "鏈鋸人",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1087,7 +1112,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 28,
@@ -1098,7 +1125,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "獸神化·改",
         "collab": "我推的孩子",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1120,7 +1146,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 29,
@@ -1131,7 +1159,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "獸神化·改",
         "collab": "葬送的芙莉蓮",
         "quantity": 3,
         "hasGokuUn": false,
@@ -1160,7 +1187,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 30,
@@ -1171,7 +1200,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "遊戲王",
         "quantity": 2,
         "hasGokuUn": false,
@@ -1201,7 +1229,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 31,
@@ -1212,7 +1242,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "鬼滅之刃",
         "quantity": 2,
         "hasGokuUn": false,
@@ -1239,7 +1268,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 32,
@@ -1250,7 +1281,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超速度",
-        "evolutionState": "",
         "collab": "鬼滅之刃",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1277,7 +1307,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 33,
@@ -1288,7 +1320,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "鬼滅之刃",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1315,7 +1346,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 34,
@@ -1326,7 +1359,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "鬼滅之刃",
         "quantity": 2,
         "hasGokuUn": false,
@@ -1352,7 +1384,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 35,
@@ -1363,7 +1397,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超砲擊",
-        "evolutionState": "",
         "collab": "鬼滅之刃",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1391,7 +1424,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 36,
@@ -1402,7 +1437,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "鬼滅之刃",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1430,7 +1464,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 37,
@@ -1441,7 +1477,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "鬼滅之刃",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1470,7 +1505,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 38,
@@ -1481,7 +1518,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "鬼滅之刃",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1510,7 +1546,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 39,
@@ -1521,7 +1559,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "鬼滅之刃",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1551,7 +1588,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 40,
@@ -1562,7 +1601,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超速度",
-        "evolutionState": "",
         "collab": "鋼彈",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1592,7 +1630,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 41,
@@ -1603,7 +1643,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超砲擊",
-        "evolutionState": "",
         "collab": "期間限定",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1634,7 +1673,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 42,
@@ -1645,7 +1686,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "鋼彈",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1674,7 +1714,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 43,
@@ -1685,7 +1727,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "速度",
-        "evolutionState": "",
         "collab": "鋼彈",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1714,7 +1755,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 44,
@@ -1725,7 +1768,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "鋼彈",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1755,7 +1797,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 45,
@@ -1766,7 +1810,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超速度",
-        "evolutionState": "",
         "collab": "鋼彈",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1796,7 +1839,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 46,
@@ -1807,7 +1852,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "名偵探柯南",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1839,7 +1883,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 47,
@@ -1850,7 +1896,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "名偵探柯南",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1880,7 +1925,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 48,
@@ -1891,7 +1938,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "關於我轉生變成史萊姆這檔事",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1921,7 +1967,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 49,
@@ -1932,7 +1980,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "關於我轉生變成史萊姆這檔事",
         "quantity": 1,
         "hasGokuUn": false,
@@ -1961,7 +2008,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 50,
@@ -1972,7 +2021,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "JoJo的奇妙冒險",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2000,7 +2048,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 51,
@@ -2011,7 +2061,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "JoJo的奇妙冒險",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2040,7 +2089,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 52,
@@ -2051,7 +2102,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "JoJo的奇妙冒險",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2081,7 +2131,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 53,
@@ -2092,7 +2144,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超速度",
-        "evolutionState": "",
         "collab": "JoJo的奇妙冒險",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2123,7 +2174,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 54,
@@ -2134,7 +2187,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "砲擊",
-        "evolutionState": "",
         "collab": "JoJo的奇妙冒險",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2164,7 +2216,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 55,
@@ -2175,7 +2229,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "砲擊",
-        "evolutionState": "",
         "collab": "五等分的新娘",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2205,7 +2258,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 56,
@@ -2216,7 +2271,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "五等分的新娘",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2246,7 +2300,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 57,
@@ -2257,7 +2313,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "五等分的新娘",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2286,7 +2341,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 58,
@@ -2297,7 +2354,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "魔法少女☆小圓",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2326,7 +2382,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 59,
@@ -2337,7 +2395,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "魔法少女☆小圓",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2367,7 +2424,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 60,
@@ -2378,7 +2437,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超砲擊",
-        "evolutionState": "",
         "collab": "魔法少女☆小圓",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2406,7 +2464,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 61,
@@ -2417,7 +2477,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超砲擊",
-        "evolutionState": "",
         "collab": "魔法少女☆小圓",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2446,7 +2505,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 62,
@@ -2457,7 +2518,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "魔法少女☆小圓",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2488,7 +2548,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 63,
@@ -2499,7 +2561,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超速度",
-        "evolutionState": "",
         "collab": "超獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2528,7 +2589,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 64,
@@ -2539,7 +2602,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超砲擊",
-        "evolutionState": "",
         "collab": "超獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2569,7 +2631,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 65,
@@ -2580,7 +2644,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "怪物彈珠世代2013&2014",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2610,7 +2673,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 66,
@@ -2621,7 +2686,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "怪物彈珠世代2013&2014",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2650,7 +2714,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 67,
@@ -2661,7 +2727,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "超獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2688,7 +2753,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 68,
@@ -2699,7 +2766,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "水之遊宴",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2729,7 +2795,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 69,
@@ -2740,7 +2808,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "激獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2770,7 +2837,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 70,
@@ -2781,7 +2850,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "怪物彈珠世代2018",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2810,7 +2878,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 71,
@@ -2821,7 +2891,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "超獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2852,7 +2921,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 72,
@@ -2863,7 +2934,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超砲擊",
-        "evolutionState": "",
         "collab": "超獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2892,7 +2962,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 73,
@@ -2903,7 +2975,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "怪物彈珠世代2019",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2932,7 +3003,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 74,
@@ -2943,7 +3016,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "怪物彈珠世代2018",
         "quantity": 1,
         "hasGokuUn": false,
@@ -2971,7 +3043,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 75,
@@ -2982,7 +3056,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3009,7 +3082,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 76,
@@ -3020,7 +3095,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "怪物彈珠世代2013&2014",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3049,7 +3123,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 77,
@@ -3060,7 +3136,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3088,7 +3163,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 78,
@@ -3099,7 +3176,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3127,7 +3203,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 79,
@@ -3138,7 +3216,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "咒術回戰",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3170,7 +3247,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 80,
@@ -3181,7 +3260,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "進擊的巨人",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3210,7 +3288,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 81,
@@ -3221,7 +3301,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超砲擊",
-        "evolutionState": "",
         "collab": "光屬性祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3251,7 +3330,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 82,
@@ -3262,7 +3343,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "速度",
-        "evolutionState": "",
         "collab": "怪物彈珠世代2019",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3292,7 +3372,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 83,
@@ -3303,7 +3385,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "怪物彈珠世代2015",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3333,7 +3414,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 84,
@@ -3344,7 +3427,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "怪物彈珠世代2019",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3372,7 +3454,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 85,
@@ -3383,7 +3467,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "激獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3411,7 +3494,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 86,
@@ -3422,7 +3507,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "砲擊",
-        "evolutionState": "",
         "collab": "激獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3452,7 +3536,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 87,
@@ -3463,7 +3549,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "",
         "collab": "期間限定",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3491,7 +3576,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 88,
@@ -3502,7 +3589,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超砲擊",
-        "evolutionState": "",
         "collab": "期間限定",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3532,7 +3618,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 89,
@@ -3543,7 +3631,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "怪物彈珠世代2018",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3571,7 +3658,136 @@
         "imageData2": null,
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
+      },
+      {
+        "id": 90,
+        "charNo": "No.9037",
+        "charNo2": "",
+        "name": "B小町的天真爛漫 露比",
+        "attribute": "火",
+        "rarity": 6,
+        "strikeType": "反射型",
+        "battleType": "超平衡",
+        "collab": "我推的孩子",
+        "quantity": 1,
+        "hasGokuUn": false,
+        "ssRounds": "",
+        "ssName": "",
+        "ssDesc": "",
+        "races": [
+          "亞人"
+        ],
+        "friendSkillMain": "",
+        "friendSkillsSub": [],
+        "heroFruits": [],
+        "skills": [
+          "反板塊",
+          "反魔法陣/魔法陣增幅",
+          "觸壁增幅",
+          "耐性"
+        ],
+        "superSkills": [
+          "超掃雷者",
+          "超反移轉壁"
+        ],
+        "obtainMethods": [
+          "幸運轉蛋"
+        ],
+        "imageData": "data:image/jpeg;base64,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",
+        "imageData2": null,
+        "formStages": [
+          "獸神化改"
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
+      },
+      {
+        "id": 91,
+        "charNo": "No.7290",
+        "charNo2": "",
+        "name": "東京卍會總長 佐野萬次郎",
+        "attribute": "火",
+        "rarity": 6,
+        "strikeType": "貫通型",
+        "battleType": "平衡",
+        "collab": "東京復仇者",
+        "quantity": 1,
+        "hasGokuUn": false,
+        "ssRounds": "",
+        "ssName": "",
+        "ssDesc": "",
+        "races": [
+          "亞人"
+        ],
+        "friendSkillMain": "",
+        "friendSkillsSub": [],
+        "heroFruits": [],
+        "skills": [
+          "掃雷者",
+          "耐性",
+          "反魔法陣/魔法陣增幅",
+          "反移轉壁",
+          "初擊殺手",
+          "衝刺",
+          "SS回合"
+        ],
+        "superSkills": [
+          "超反傷害壁"
+        ],
+        "obtainMethods": [
+          "幸運轉蛋"
+        ],
+        "imageData": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAB4AHgDASIAAhEBAxEB/8QAHAAAAgMBAQEBAAAAAAAAAAAABgcABQgEAwIB/8QASRAAAQMCBAMDBwcJBgYDAAAAAQIDBAURAAYSIQcTMSJBUQgUMlJhcYEVFiORkqHSM0JVYmOTsbPBJENzgqKyF0RTZaPTcsPR/8QAGwEAAQUBAQAAAAAAAAAAAAAABAACAwUGBwH/xAAxEQABAwMDAAgGAQUAAAAAAAABAAIDBAUREiExExQiQVFhcbEGQoGRofAVMlJictH/2gAMAwEAAhEDEQA/ALPyk+NdSaqj1CoL4DFiAArsab21rsRrKrEhJOkJsSCTshKTVc51iWI9PdekvEatDUVrZI7z2QEj2kgY7szUyVVM7qhxW+Y++tllpO4FyhCQDboBffwAOO/OlVpVBhry1TnFpgx7GRyzpcnOb9pSt9trgHZKdNgSdqZ1QXvwuiQ2qGmpxsOAST5rhkuZmjgpezPRkOpvqb5zSlA+HZbI+/FRLr+Z4yrLqAUk9FobZUk/EJxMmKTmKovw47FOizEs6oTbrBU29Y9tKrntkADfqN/aMEFPyzUJ05ykVCitU6eG1vJs4PNpaEJuQ1qOywATpvuAfRNsNfNhxbnfwSp6WGTD/lPfjb644Qwc1ZiBt8oK/ctfhxPnTmPr8oKt/gtfhwzuFnC+gZomyKfU6pLiSEKbcaKEoKVMqvc3V3g2+Chgle4H5aX5qiBV6nLWsr5yW2EnRboOnuxG2pLhkFKoNHTymKRm452SL+dWYv0gr9y1+HE+dWYv0gf3LX4caGj+TQh9xRRNltM2GkvJQD7dsdjvkuRExStOYXVvAX5Yjp39xviTXIVAau2ju/Czd86cxfpBX7lr8OJ86sxfpBX7lr8OHZRuCeXUZjTRMyVedCMheiHJQ2gNuL/6agfRV4b2OCTMHkxwYITIp9TnTWkflo+hCXSPFB6H3EC/jhhmcEjV20OwW/hZu+dWYf0gr9w1+HE+dWYv0gr9y1+HGkYHk5ZPqtKcl07M1SCkiyg5GQVNK8FI2O2Aao8IaXTZPmdQqjjSlnQxMbSlcZ1XgehQf1VfAnC6ZyTaq3E40/hKgZpzF31A/uWvw4+XczV9xtTblQKkqFiCw1uPs4YlT4YR6ewp95+QWk9l4oQkqYPcoj85B8RbAPX8vP0qSppRDjYAUl1I7K0k9fZ7R7sIzuRtNHRVD9DRg+ibHk3cbsx0LNsCgZjqb0/L855MdQkrK1Q1rNkOIUe1o1EBSSSADcWsQZhJmP2V3FxoNwfdiYnjriG4Qdw+GGOly3bKcmTIMaTxdiJkuhrskoUVW7fmpt/XApD4eqzjxar1KkVFNPpVOkXkSbAqUnohKAdtRCep2AF7G4xYV92RCzMJcM6ZLAadbPioIT2fiLp+JxWz6u6hVRq9LLyXZzJ5mkErQ6lJSNQ+oewi+KUyyCR2jncem61NbZnTMYXPwwtB+wP79Uzqg1wQpcyiUZWZ6fAkUKVzWOW92gvcKQ4ux2Ud1C4uRvi3Q/RalWK7kyVUGVKEdupUqWkhWppRJSb+s24Oo6pKfbhacJTwZTwwcjZugxXK06HfPXpTf07RJOnlKvdNhYjT1N773wJ8I6XUX5zlVmyJcWixYpjNzHUlN21LJ5bRPprIHQbJvva1j4aBr9WHOJb3nxznI/e9ZSlM5kax40tdxj/n7wtFcJcuwJ8rKdTlA8+dS1OvxwSkpBbCtx3AEI+7D6iRIsRsIjR22kj1E2wpvJ9p0upOzM5TGFR4rrQh0poiwDAKdSk+KTpQkHv0KPQjDgxZ0kWiPfvJKpbrK59S4F2rGBn0/cKYmP1tJWoJHU4rM45goeVIaZFXqCW1L/JspGp1w/qoG5waGk7qsLgDhDnFHLMWsUl5xaNiLOlOyh4LB7iD34+ODGbHqrHk5ZrzgVXKOAhSz1lMn0HR43Gx8CDgIn8Rc551fkU7I9HaiwhdLsuS2XSB39Dpv7AT7bYG3KTmulVONmWNXTLr1MCuW2uOGkPIPpsqtvY/cbHAkmGnIRbY3Sx6cbp7Zhguwp/y9RkWfQf7S0n++R/U44q/lnK2daWXJcBI84R2nmDoX8bd49uOjIubKZnKgNVemKKSexIYXsuO6PSQodxB+vFkzCaiyFvx1FlKzdxA9Anxt3HAjnkbJgG2/ISAzZkbNuUe3S54zFSWgUpS7YS20eorucHcL74WdTVElUmoMcnS4zGcUlpxJStntt9kg742JWaRS6rGW3LQkahbmNr0KHuIwiONGUKLRIb0+JVJU6S5DdaUl5aVlKNbR6gA9bdce6+yVd2aTXWRMPiPdZyUwOU4QP7tf8DiYtVsAR31fsl/wxMCxy5C67W0LekRVmZkKrLih1CGv5aMFnDrg/Fz9QavUYtZdo1WhqRy3CkLjuAoJ+kTsb7ekDcDuOKuuRgqprUU9W2u79knDL4Py3IWSswQY9xKqUmNDZ3se2leo/BIV8bYit0rXVjg7jdZv4oqJI7LE6I4cNOClDUsg5/o1BYzA87l9yI86GmFr0rdWb2uApsm3f16Xxz5fpNVzBnTLUPMFTVObnVVuN5um+hTYBWsX9UpQRYAYcPGJx6pVmnZfiKDUOEBGjDvW4R9Iv3JT3+N8KbNwagVGjuoW80xEqjbalsuFC0IXdokKG42X1HdfFxC4axtsufPqql8JLn7n0H5C2JU8wZUoy2oC6xSYSGkBtthLqUhtI2CQkbAAbWx2QZcSfFRKhSWZLC/RcaWFJPxGEbVcjcO6bTp4qUlumsRUDnVSTLsnnEX0gK9OwO58TgP4I5spFO4iqpGWsyqrEN/sPMt6g0d/wAoAdr/APx+OCXPO5wqdkeeyCtBcTc4HJWU5FYYhOzphIZistp1XcVsCrwSOpxnnLapOasxTavn6rNU6mMNh6ZKkP6FLJNw2D0SkD81ONFZsoqa9SjBW6UAq1e/Gcs8cB6tUqzWUsTZFVfapYmQ2316WW3w4bNoHS5SLXNyMKImV2jgJ72tiZr5KIneKvDhNVZoeRoOY6xLIKWG6S+YzC7C50qWQg7Y86bn96tZydy1Ly1XKdNYYS66ue+w5oSb6bls9q9jbrgM4P5fYoHESBWq9Bfp0KltOuP+cJSVrdKdKW0JSSVK3J8NsHmScu1POfE+r5xkRDS4D6wEBKbHloSUtNnxJ1KUq2wuBieqhjjjwOVHSSvdLqPCqKIiuZZ4iVypZZfCH3ENSlxHieRKbOykn1VAjZQ6XwfRuNtAqUUsKjCFUmyUSqZUDyyo94Qv0T/A4HM+PpyfmKmVuYkrjR5HmVQAGyoztgVf5SAr3A48uJnD1qQtFVgoZktOoBQ4UhSH0HcBXgfA4pj5q1dGx7l0VXN3DIq1zU1qgPrOwZmEIv7AklP3YBK+/R5s2oGj5jq9UZNNePImAFLf0jW4ISP69cUdRy7LpiubGpbQUkXDS2+yfcR0x7ZbqRnvVCC7TXIshqmuqUVjqOY0LeHhhkpxG4+StLVCI6yI5+Ye6opce0ORYdGV/wADiYuZ0W0GSdJ/Ir7v1TiYpaWfLSus1cw18phzKRzXkuafSaaPT9mnHXw+aMLP8krUQzDpyZIRfbWeYlJ+7BtGpKXIkZywuqO0f/GnAVXnfkfPlUSARzKE0oeB0rev/T68Mt4PXX/X3XMblcesUTIj5ey4cnPO5l4qVSY6SqPTqc8pm/edQSVfE3+rANm2AKozW4Tm6damD3WJTcH68PnhvRksTqBqItUclNBJPe4XVur/AJownrp/4iV6gPNq1TJLIa26LBAP3HGnewsdss5Tzh+dSFWKBWeJNFkyalU01HMYjR5tLZWoNpWlGz8ZtJOgObE6jubi52wy/Jr4fQ2qnOnVamv0+px5TbkFDqhzgAizhUBsEnpv1tfBfwhyLlmsUyuUOpQ+avLlefjtq6K0r0vBJ8RZzbwwYZvnpyJllc+hUJtUdpdnxHbALSD1csN1W78WTpyI9JHKq2xB0mWnhW0iuRmK78luAg7AOX21HuxfRYiJKDzD2ehThHZZzCmv5oYaQxJccdWl3nWBQoe8Yd0Z9TC7ixB6jAETu1uj6iMtbhvK+H6LSojRLEGOhStieWLn42x5oQhtsIbQlCU7BKRYD4Y6ZcjnqGxAHdjwOHvIJ2UMTSG7pV8Y6OisuPQFOFoPIQorA6WP/wCYFOHWeIuTas9kDM7ynaI3pTT6i8LpYC+jDp8PBXTuPtPM/uAVtRPRDQvvjOOZM85Nrr8xdYoc9hY1x0SO2W5CUKIsNPU3HQ4HEeskYR7saG5K1BUsnU6W35xAkBlChqG+tsj2YB8x5XfhStalMOtOQX0ocaOx7bJ/phO8P8154y3HC6PVEx4LytUekTRzmkNdyb3uCRvYGwwyOHVdOZs3PMv5fNJkfJkhx3zeWXIrh5jAulBtpV8O/AdSwtjeM9x9kRSySxSseeMhVdVoxTTJitPSO4en6pxMMeu0dIok82G0V0/6DiYyLHuaOytVPecu5Xi3VuUxHb1+jHaHX9mnH7Gy27neLXG4K2UVGM1F83W6bJUFB4LQSLkAjfp1SMAFQqxblcvV6LTQ/wDGnDX8m2R507XnSb7Rh9zuL6zNDrg4HzVXfaA09sbMP8Vd55pq8r0jLdbgtlbWXm0RZASP+WKUoKvckpSfcSe7CrrNJYb8oiBOZKVwKw0mawodCpIsbe0bY0y82280tp1CXG1pKVoULhQOxBB6jCOzzlpWT81UGSw2p+hKn2iKUbrgOLBu3fvQoXtfpax7idbWQuwXtWHppRnS5dmVpqKBx+r9CWUNs5lpzdRi92uQyA27c9CSnlWHXY4YK0hSVIWAoEFKgR1GEV5QSZTz9Cr1LkCHVafIU5EkAX5biTbfxSodkjvBOGDwr4iU7PtKUSlEKuxEhNSpyldptXrp9ZtViQq334FY7XGPEI0xGI57irFmDlXK0vntpiwHpHYQgGxV7EpG/wBQxzy8/UOKtSVRK24E9VtUx1SfuTi0nUmPHlza7TqbDfrjjAbaek3ISB0A9Ue7rjxyrKzI6C1XWWdQBPNaToHutjwYCd2ncq5jPIkMIfbCtDiQpOpNjY+IOPtxQQgqUbJSLknwx9dMBHEbM8SnwH2lykMstJvJeUqyUj1b4aThPY3UcIA4y5map1CrFZWvSOWoNb9drDCXpba4OV4OrS6UNBT1hsrV6Svvvi5qMuRn2ssz5LCmcvRF6orLgsqUsdFqB/MHUePXAxSKp5rWapR5beiGxMLLLh9EXAVoPh12w0tIbhHRuAdvxwFbU5tMyjMoKyki6UOJO6SDsR92DvhTWUN5ok0+dFEasQ6S9zFJFkvtFxjS4Pfhf0vl0pb1PfcCGQVPMLWbAoPUfD+FsWmSM0IrebpE5iMGY8WgPx231HtyRz2DqA9UdAe++Bpoy6F5xtgoqMtfNHGeSQE563WdVGnDXe8Z3v8A1TiYXdTrGqmy06urDg/0nExjo4i8ZC1k9mw7hUtek6am4m42Q1/KThyeS/WaZDZzAmfUIkQgRl3feS2NNnBftEdMIbND+mruj9m1/LRgSzBTmarVWy6pxZEVASzzy2hXaV1A9LGqtMJFeT6p/wAYMxYGH/X2W1sy+UBwjoJW3JzlBkvJAPLhhT5PuKQU/fhZcRvKg4W1XL0qlxqfWqm44jU0eRykocSboVquSLHfpjLyaGhtwpKWI4G2hlq1vicUctpoS1pSpxSAq257sbMx7HK4w12+Vqit1E5so1FWyrUHITkxXvUoaR8d8LWPU/k7ObbcacaPW9AcptRT3LGymXB0U2ra6T3+BscBFBzzWKPW489h0qYZaSwY5PZU0n833+3BLxYapeZKDFzjRHUqQ0rTLZv22Ce8/HFEKZ8UgztlaJtVHJAQN8LUnCbiZFzaFUersopWZ4yP7TCKuy6B/eMk+kk/WO/DCUpKASqyQO84wdQ6/HrWS5kyfMfZrVB0OxJjK9L+k7Ag+I6eBHXBLV+JXEyVTaVGm5pjKpMx9EdUuLG0vlKtkqJJIuTYbDqcelu+O9RgAjLdwtB8T+KVEy2wIbckvTHuy0ywNbzh8EJH8TsMIupIq+bpyJuaNLMJtWuPSm13RfuU8fz1d9ugPja+Omm0aFTHXHG2nFy3Py0h9RW8s+1R3+HTF7TaeuSlx9wlDDaSpSz7O7A5fg7I6OEAdpUqHVKqy4yB9GwwkqA6XJ2+7Am7HYGc69AfaQpmVHZlWI2USCk/7Rg9oMLm5Vk1jTvLll1s/sh2U/AgX+OFrxUVOh16myqapKX5cZ6Isk+gDvzP8oB+vD4mdI7QF5LII2dIeAgh6rSqhEdizl82lxHyEFXpvLB2bB9UDri+4OVFyVmWuurIOmiuAeAHOZsAO4DuwDVyWyG24kNJRHaTpbF+7vUfao74JOCi9FWrp/7K5/OZxZVkTWUj2N8EFY5HTXWEu/uHumTNk3gydx+RX/tOJinlSNUOSAerK/4HExiqWDDV3qqhGtemb5CkVxyxsOW2P9Cce9JyBnXNtOmVjJ8eDVE05tpEqmOKAeVfWQtF/cRbrtikzhLS5XHi2sKQUNlKh0P0acXfCbiNVOH2Y/lOnFt9l5AalR3L6HkXuAbbpINyFDpc9QSMXVK4QVOs8brM36CS52VsEP8AUAD64QTInvMy3or0SVEnMEpkwJg0PNkbEpv1F8DhWHCVpPU407xhzbws4rUFDtWp7dKzChr+z1GO9qcYXb0VHQOYi9uoB8LYz+zlF9IsvM2X1kG2rmujUPaOX1xpBWQn5lyA2SvG3RH7KhOwvjw+UpLClpjPLbQtOlaQdljwI78E72UlLb0pzJQAT+2d/wDXjl+ZDndmbL3s+me/9ePDVQO2LgvRZrg3cRO+yFBMeaU6GllKXUlK0g7EYs6dmmZDy7NozoEiM6NbWr0mXUm6VpPdv1GLFeQpBO2aMugf4z1/5ePen8P45ePyjmmjckAkJYdc1KPtJb2HwxE+anduSpo7VcW8Rn7LUWWTDzHlak1d9hJckxW3VEbG+kXx2zKa7XZsbKVOPJ867UxxIsGIo9M37ir0R9fdgLy3nTLlDy1TKNFlQ1JhREMkmQrtKA3PodCcWFH4l0ik0qU3FlQXKjOXrlyVSFArt6LabIOlCRtb3nFNgBxKuzRVZYB0Zz6FFedTTYMZ+FAabYipAZjtIFgANtsZg4lVcyMy1Kx+jitogtq9Uq7Tn1jT9WGTPzYufLK3KtQ2QfRXz3HSn3J0JH34BWKLETV6jLk5ipL6ZUguizziL7DqnlkA+4nBdC6Njy55Qtfb6t8QZHGfsUp5CluPKVy3Fe5BwacGw6mdmF5aFJSmkLSSU2Au81b68GXybRiq66tSwO8+cOH/AOvHzVarS4FNdo9FW4+mQtK5ctxOku6fQQhPUIBud91E9wAGCq2piMJDTklSfDtmrRcIpHxlrWnJJ8lxLfSWHhfq0v8A24mKovjkOHUAOWr+GJjORRYC6/XXBgk5Tm8o3g9mKg5nnV+g01+fQJa1PpVFbLioZUbqbWgdrSCSUqAIANjbSCUOHk3FnEEHvCsTExbVkLGOyByuaWC71MlPpceFBIt+cn7QxPOD6w+1iYmBNIV/1+VTzg+sn7WJ5wfWH2sTEwtIS/kJVPOD6w+1iecH1h9rExMLSEuvyqecH1h9rE84PrD7WJiYWkJdflU84PrJ+1iecH1h9rExMLSEuvyqGR+uPtYhfTa5Uiw6kqxMTHoaMppuEwCe3k6cG6/X8zQK9XqW/AoER1MhSpTZbXMUk3S2hB7WnUAVKIAIFhfVcTExMXkNOxrAMLmt2udTUVJc93G2y//Z",
+        "imageData2": null,
+        "formStages": [
+          "獸神化"
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
+      },
+      {
+        "id": 92,
+        "charNo": "No.8212",
+        "charNo2": "",
+        "name": "釣起笑容的笑福神 惠比壽",
+        "attribute": "火",
+        "rarity": 6,
+        "strikeType": "貫通型",
+        "battleType": "超平衡",
+        "collab": "火焰之星",
+        "quantity": 1,
+        "hasGokuUn": false,
+        "ssRounds": "",
+        "ssName": "",
+        "ssDesc": "",
+        "races": [],
+        "friendSkillMain": "",
+        "friendSkillsSub": [],
+        "heroFruits": [],
+        "skills": [
+          "毒殺手",
+          "SS回合",
+          "反減速壁",
+          "反魔法陣/魔法陣增幅",
+          "木屬性殺手"
+        ],
+        "superSkills": [
+          "超反傷害壁",
+          "超掃雷者"
+        ],
+        "obtainMethods": [
+          "幸運轉蛋🥚"
+        ],
+        "imageData": "data:image/jpeg;base64,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",
+        "imageData2": null,
+        "formStages": [
+          "獸神化改"
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       }
     ],
     "a2": [],
@@ -3585,7 +3801,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "速度",
-        "evolutionState": "",
         "collab": "激獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3612,7 +3827,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 2,
@@ -3623,7 +3840,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超砲擊",
-        "evolutionState": "",
         "collab": "超獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3652,7 +3868,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 3,
@@ -3663,7 +3881,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超速度",
-        "evolutionState": "",
         "collab": "闇屬性祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3693,7 +3910,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 4,
@@ -3704,7 +3923,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "怪物彈珠世代2013&2014",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3734,7 +3952,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 5,
@@ -3745,7 +3965,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超平衡",
-        "evolutionState": "",
         "collab": "怪物彈珠世代2013&2014",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3774,7 +3993,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 6,
@@ -3785,7 +4006,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超速度",
-        "evolutionState": "",
         "collab": "超獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3814,7 +4034,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 7,
@@ -3825,7 +4047,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "超砲擊",
-        "evolutionState": "",
         "collab": "超獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3855,7 +4076,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 8,
@@ -3866,7 +4089,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "砲擊",
-        "evolutionState": "獸神化·改",
         "collab": "怪物彈珠世代2015",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3895,7 +4117,9 @@
         "imageData2": "data:image/jpeg;base64,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",
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       }
     ],
     "a4": [
@@ -3908,7 +4132,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "真獸神化",
         "collab": "咒術回戰",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3937,7 +4160,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 2,
@@ -3948,7 +4173,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "砲擊",
-        "evolutionState": "獸神化·改",
         "collab": "怪物彈珠世代2015",
         "quantity": 1,
         "hasGokuUn": false,
@@ -3977,7 +4201,9 @@
         "imageData2": "data:image/jpeg;base64,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",
         "formStages": [
           "獸神化改"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 3,
@@ -3988,7 +4214,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "速度",
-        "evolutionState": "獸神化",
         "collab": "火影忍者",
         "quantity": 1,
         "hasGokuUn": false,
@@ -4018,7 +4243,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 4,
@@ -4029,7 +4256,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "速度",
-        "evolutionState": "獸神化",
         "collab": "火影忍者",
         "quantity": 1,
         "hasGokuUn": false,
@@ -4058,7 +4284,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 5,
@@ -4069,7 +4297,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "平衡",
-        "evolutionState": "獸神化",
         "collab": "火影忍者",
         "quantity": 1,
         "hasGokuUn": false,
@@ -4097,7 +4324,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 6,
@@ -4108,7 +4337,6 @@
         "rarity": 6,
         "strikeType": "貫通型",
         "battleType": "超砲擊",
-        "evolutionState": "",
         "collab": "超獸神祭",
         "quantity": 1,
         "hasGokuUn": false,
@@ -4137,7 +4365,9 @@
         "imageData2": null,
         "formStages": [
           "真獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       },
       {
         "id": 7,
@@ -4148,7 +4378,6 @@
         "rarity": 6,
         "strikeType": "反射型",
         "battleType": "平衡",
-        "evolutionState": "獸神化",
         "collab": "Love Live!",
         "quantity": 1,
         "hasGokuUn": false,
@@ -4177,7 +4406,9 @@
         "imageData2": null,
         "formStages": [
           "獸神化"
-        ]
+        ],
+        "shootSkill": "",
+        "supportSkill": ""
       }
     ]
   },
