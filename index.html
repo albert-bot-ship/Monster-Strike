@@ -369,6 +369,11 @@
   <div class="modal-box">
     <h2 id="modalTitle">新增角色</h2>
 
+    <div class="mfield" id="mAccountField" style="display:none;">
+      <label>新增到哪個帳號 *</label>
+      <div class="filter-2col" id="mAccountPicker" style="gap:6px;"></div>
+    </div>
+
     <button class="gbtn" id="copyFromAccBtn" style="width:100%;margin-bottom:12px;display:none;" onclick="openCopyPicker()">📋 從其他帳號複製</button>
 
     <div class="mfield">
@@ -794,6 +799,7 @@ let filterFriendMain = '';
 const mSets = { races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), skills:new Set(), superSkills:new Set(), obtain:new Set(), formStages:new Set() };
 // modal single-select states
 let mRarity = '6', mStrike = '反射型', mBattle = '平衡', mEvo = '', mFriendMain = '';
+let mTargetAccount = null; // 新增角色時，要存到哪個帳號（從「全部」開新增時需要指定）
 
 // ── 初始化 ───────────────────────────────────────────
 function init() {
@@ -1556,7 +1562,7 @@ function resetModalSets(){
 }
 
 function clearModalForm(){
-  uploadedImg=null; uploadedImg2=null; mRarity='6'; mStrike='反射型'; mBattle='平衡'; mEvo=''; mFriendMain='';
+  uploadedImg=null; uploadedImg2=null; mRarity='6'; mStrike='反射型'; mBattle='平衡'; mEvo=''; mFriendMain=''; mTargetAccount=null;
   document.getElementById('imgPreviewEl').style.display='none';
   document.getElementById('imgHint').style.display='block';
   document.getElementById('imgRemoveBtn').style.display='none';
@@ -1659,10 +1665,32 @@ function prefillModal(c){
   updateCntBadge('cntSkill','skills','cntSuper','superSkills');
 }
 
-function openAddModal(){if(activeAccount==='__ALL__'){alert('請先切換到單一帳號分頁再新增角色');return;}editCharId=null;document.getElementById('modalTitle').textContent='新增角色';clearModalForm();document.getElementById('copyFromAccBtn').style.display='block';document.getElementById('mDeleteBtn').style.display='none';const m=document.getElementById('addCharModal');m.classList.add('open');m.scrollTop=0;}
+function openAddModal(){
+  editCharId=null;
+  document.getElementById('modalTitle').textContent='新增角色';
+  clearModalForm();
+  mTargetAccount = (activeAccount==='__ALL__') ? null : activeAccount;
+  renderAccountPicker();
+  document.getElementById('mAccountField').style.display='block';
+  document.getElementById('copyFromAccBtn').style.display='block';
+  document.getElementById('mDeleteBtn').style.display='none';
+  const m=document.getElementById('addCharModal');m.classList.add('open');m.scrollTop=0;
+}
+// 畫出新增角色視窗裡的「帳號」選擇按鈕
+function renderAccountPicker(){
+  const box=document.getElementById('mAccountPicker'); if(!box) return;
+  box.innerHTML = accounts.map(a=>
+    `<div class="skill-btn${a.id===mTargetAccount?' active':''}" onclick="selectTargetAccount('${a.id}')">${a.name}</div>`
+  ).join('');
+}
+function selectTargetAccount(accId){
+  mTargetAccount = accId;
+  renderAccountPicker();
+}
 function openEditModal(id){
   editCharId=id; const c=currentChars().find(x=>x.id===id); if(!c)return;
   document.getElementById('modalTitle').textContent='編輯角色';clearModalForm();prefillModal(c);
+  document.getElementById('mAccountField').style.display='none';
   document.getElementById('copyFromAccBtn').style.display='none';
   document.getElementById('mDeleteBtn').style.display='block';
   const m=document.getElementById('addCharModal');m.classList.add('open');m.scrollTop=0;
@@ -1793,11 +1821,17 @@ function editFromView(){
 
 function confirmChar(){
   const name=document.getElementById('newName').value.trim(); if(!name){alert('請輸入角色名稱');return;}
+  if(editCharId===null && !mTargetAccount){ alert('請選擇要新增到哪個帳號'); return; }
   const qty=Math.max(1, parseInt(document.getElementById('newQty').value)||1);
   const data={charNo:document.getElementById('newCharNo').value.trim(),charNo2:document.getElementById('newCharNo2').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,evolutionState:mEvo,collab:document.getElementById('newCollab').value.trim(),quantity:qty,hasGokuUn:document.getElementById('newGokuUn').checked,ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:uploadedImg,imageData2:uploadedImg2,formStages:[...mSets.formStages]};
-  const list=currentChars();
-  if(editCharId!==null){const idx=list.findIndex(x=>x.id===editCharId);if(idx>=0)list[idx]={id:editCharId,...data};}
-  else{const maxId=list.reduce((m,c)=>Math.max(m,c.id||0),0);list.push({id:maxId+1,...data});}
+  if(editCharId!==null){
+    const list=currentChars();
+    const idx=list.findIndex(x=>x.id===editCharId);if(idx>=0)list[idx]={id:editCharId,...data};
+  } else {
+    ensureAcc(mTargetAccount);
+    const list=charactersByAccount[mTargetAccount];
+    const maxId=list.reduce((m,c)=>Math.max(m,c.id||0),0);list.push({id:maxId+1,...data});
+  }
   closeModal(); saveState(); renderAll();
 }
 
