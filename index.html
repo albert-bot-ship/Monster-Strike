@@ -317,6 +317,11 @@
     </div></div>
   </div>
 
+  <div class="drawer-section">
+    <div class="drawer-lbl">型態（可多選）</div>
+    <div class="sg3" id="fFormStageGrid"></div>
+  </div>
+
   <div class="drawer-section filter-2col">
     <div>
       <div class="drawer-lbl">主友情技</div>
@@ -792,7 +797,7 @@ function sortChars(arr) {
   });
 }
 
-const fSets = { skills:new Set(), superSkills:new Set(), strikeType:new Set(), battleType:new Set(), rarity:new Set(), races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), obtain:new Set(), collab:new Set() };
+const fSets = { skills:new Set(), superSkills:new Set(), strikeType:new Set(), battleType:new Set(), rarity:new Set(), races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), formStages:new Set(), obtain:new Set(), collab:new Set() };
 let filterAttr = '';
 let filterFriendMain = '';
 const mSets = { races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), skills:new Set(), superSkills:new Set(), obtain:new Set(), formStages:new Set() };
@@ -809,6 +814,7 @@ function init() {
   buildGrid('fSuperGrid',  SUPER_SKILLS, 'superSkills',  'sg3', true);
   buildGrid('fStrikeGrid', STRIKE_TYPES, 'strikeType',   'sg2', true);
   buildGrid('fHeroFruitGrid', ['有英雄果實','無英雄果實'], 'heroFruits', 'sg2', true);
+  buildGrid('fFormStageGrid', FORM_STAGES, 'formStages', 'sg3', true);
   buildGrid('mSkillGrid',  SKILLS,       'skills',       'sg3', false);
   buildGrid('mSuperGrid',  SUPER_SKILLS, 'superSkills',  'sg3', false);
   buildGrid('mObtainGrid', OBTAIN,       'obtain',       'sg3', false);
@@ -948,7 +954,7 @@ function buildGrid(containerId, items, key, cls, isFilter) {
     b.onclick = () => {
       toggleSet(b, key, item, isFilter);
       if(isFilter) renderList(); else updateCntBadge('cntSkill','skills','cntSuper','superSkills');
-      if(key==='formStages') updateFormStageDependents();
+      if(key==='formStages' && !isFilter) updateFormStageDependents();
     };
     c.appendChild(b);
   });
@@ -1211,6 +1217,7 @@ function matchesFilters(c, q) {
   for(const s of fSets.skills)       if(!(c.skills||[]).includes(s))       return false;
   for(const s of fSets.superSkills)  if(!(c.superSkills||[]).includes(s))  return false;
   for(const s of fSets.races)        if(!(c.races||[]).includes(s))        return false;
+  for(const s of fSets.formStages)   if(!(c.formStages||[]).includes(s))   return false;
   if(filterFriendMain && c.friendSkillMain !== filterFriendMain) return false;
   for(const s of fSets.friendSkillsSub) if(!(c.friendSkillsSub||[]).includes(s)) return false;
   for(const s of fSets.obtain)       if(!(c.obtainMethods||[]).includes(s)) return false;
