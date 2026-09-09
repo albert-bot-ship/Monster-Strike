@@ -865,8 +865,8 @@ function buildKillerCdd(bodyId, isFilter) {
   const body = document.getElementById(bodyId); if(!body) return;
   body.innerHTML = '';
   const set = isFilter ? fSets.skills : mSets.skills;
-  Object.entries(KILLER_GROUPS).forEach(([cat, items]) => {
-    const grp = document.createElement('div'); grp.className='hf-group';
+  Object.entries(KILLER_GROUPS).forEach(([cat, items], idx) => {
+    const grp = document.createElement('div'); grp.className='hf-group hf-group-'+(idx%3);
     grp.innerHTML = `<div class="hf-group-label">${cat}</div>`;
     const grid = document.createElement('div'); grid.className='sg4';
     items.forEach(label => {
@@ -990,8 +990,8 @@ function buildCddBody(bodyId, items, key, isFilter, singleSelect) {
 function buildHFCdd(bodyId, isFilter) {
   const body = document.getElementById(bodyId); if(!body) return;
   body.innerHTML = '';
-  Object.entries(HERO_FRUITS).forEach(([cat, items]) => {
-    const grp = document.createElement('div'); grp.className='hf-group';
+  Object.entries(HERO_FRUITS).forEach(([cat, items], idx) => {
+    const grp = document.createElement('div'); grp.className='hf-group hf-group-'+(idx%3);
     grp.innerHTML = `<div class="hf-group-label">${cat}</div>`;
     const grid = document.createElement('div'); grid.className='sg4';
     items.forEach(item => {
