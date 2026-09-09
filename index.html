@@ -248,7 +248,7 @@
 </div>
 
 <nav class="bottom-nav">
-  <div class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-lbl">首頁</span></div>
+  <div class="nav-item active" onclick="goHome()"><span class="nav-icon">🏠</span><span class="nav-lbl">首頁</span></div>
   <div class="nav-item" onclick="openFilter()"><span class="nav-icon">🔍</span><span class="nav-lbl">篩選</span></div>
   <div class="nav-add" onclick="openAddModal()"><span class="nav-icon">＋</span><span class="nav-lbl">新增</span></div>
   <div class="nav-item" onclick="exportBackup()"><span class="nav-icon">⬇</span><span class="nav-lbl">備份</span></div>
@@ -1240,6 +1240,14 @@ function resetAllFilters() {
   document.getElementById('searchBox').value = '';
   document.getElementById('searchSuggest').classList.remove('open');
   resetFilter();
+}
+// 底部導覽列「首頁」：回到全部帳號檢視、清空搜尋/篩選、捲回頁面最上方
+function goHome(){
+  activeAccount='__ALL__';
+  multiSelectMode=false; selectedIds.clear();
+  resetAllFilters();
+  renderAll();
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 // ── 搜尋關鍵字建議下拉（含模糊比對，打錯字也能抓到相似名稱）───
