@@ -263,11 +263,11 @@
   <div class="drawer-title">篩選條件</div>
 
   <div class="drawer-section">
-    <div class="drawer-lbl">技能（可多選）</div>
+    <div class="drawer-lbl lbl-main-skill">技能（可多選）</div>
     <div class="sg3" id="fSkillGrid"></div>
   </div>
   <div class="drawer-section">
-    <div class="drawer-lbl">殺手（可多選，點選展開）</div>
+    <div class="drawer-lbl lbl-killer">殺手（可多選，點選展開）</div>
     <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
     <div class="cdd-body" id="fKillerBody">
       <input type="text" class="minput cdd-search" placeholder="🔍 搜尋..." oninput="filterGroupedSearch(this)">
@@ -275,7 +275,7 @@
     </div></div>
   </div>
   <div class="drawer-section">
-    <div class="drawer-lbl">其他（可多選，點選展開）</div>
+    <div class="drawer-lbl lbl-other">其他（可多選，點選展開）</div>
     <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
     <div class="cdd-body" id="fOtherSkillBody">
       <input type="text" class="minput cdd-search" placeholder="🔍 搜尋..." oninput="filterCddSearch(this)">
@@ -538,13 +538,13 @@
 
     <div class="accordion-section">
       <div class="accordion-header" onclick="toggleAcc(this)">
-        技能（可多選）<span class="selected-count" id="cntSkill"></span>
+        <span class="lbl-main-skill">技能（可多選）</span><span class="selected-count" id="cntSkill"></span>
         <span class="acc-arrow">▼</span>
       </div>
       <div class="accordion-body">
         <div class="sg3" id="mSkillGrid"></div>
         <div style="margin-top:8px;">
-          <div class="drawer-lbl" style="margin-bottom:6px;">殺手（可多選，點選展開）</div>
+          <div class="drawer-lbl lbl-killer" style="margin-bottom:6px;">殺手（可多選，點選展開）</div>
           <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
           <div class="cdd-body" id="mKillerBody">
             <input type="text" class="minput cdd-search" placeholder="🔍 搜尋..." oninput="filterGroupedSearch(this)">
@@ -552,7 +552,7 @@
           </div></div>
         </div>
         <div style="margin-top:8px;">
-          <div class="drawer-lbl" style="margin-bottom:6px;">其他（可多選，點選展開）</div>
+          <div class="drawer-lbl lbl-other" style="margin-bottom:6px;">其他（可多選，點選展開）</div>
           <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
           <div class="cdd-body" id="mOtherSkillBody">
             <input type="text" class="minput cdd-search" placeholder="🔍 搜尋..." oninput="filterCddSearch(this)">
