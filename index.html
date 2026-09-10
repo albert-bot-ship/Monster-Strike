@@ -44,6 +44,7 @@
       <span class="header-icon-btn" onclick="openInfoModal()" title="收藏統計／活動情報">📊</span>
       <span class="header-icon-btn" onclick="openCompareModal()" title="多帳號收藏比對">⚖️</span>
       <span class="header-icon-btn" onclick="openAppearanceModal()" title="外觀設定">🎨</span>
+      <span class="header-icon-btn" id="multiSelectBtn" onclick="toggleMultiSelect()" title="多選模式">☑</span>
     </div>
   </div>
   <div class="accounts" id="accountTabs"></div>
@@ -58,22 +59,6 @@
     <div class="search-suggest" id="searchSuggest"></div>
   </div>
   <div class="swipe-view" id="swipeView">
-    <div class="attr-row">
-      <div class="attr-circle all active" data-attr="" onclick="setAttr(this)">全</div>
-      <div class="attr-circle fire"  data-attr="火" onclick="setAttr(this)"></div>
-      <div class="attr-circle water" data-attr="水" onclick="setAttr(this)"></div>
-      <div class="attr-circle wood"  data-attr="木" onclick="setAttr(this)"></div>
-      <div class="attr-circle light" data-attr="光" onclick="setAttr(this)"></div>
-      <div class="attr-circle dark"  data-attr="暗" onclick="setAttr(this)"></div>
-    </div>
-    <div class="sort-bar">
-      <span class="sort-lbl">排序：</span>
-      <div class="sort-btn active" onclick="setSort('no',this)">No.</div>
-      <div class="sort-btn" onclick="setSort('name',this)">名稱</div>
-      <div class="sort-btn" onclick="setSort('attr',this)">屬性</div>
-      <div class="sort-dir-btn" id="sortDirBtn" onclick="toggleSortDir()">↑ 正序</div>
-      <div class="multi-select-btn" id="multiSelectBtn" onclick="toggleMultiSelect()">☑ 多選</div>
-    </div>
     <div class="char-grid" id="charGrid"></div>
     <div id="gridSentinel" style="height:1px;"></div>
   </div>
@@ -261,6 +246,28 @@
 <div class="filter-drawer" id="filterDrawer">
   <div class="drawer-handle"></div>
   <div class="drawer-title">篩選條件</div>
+
+  <div class="drawer-section">
+    <div class="drawer-lbl">屬性</div>
+    <div class="attr-row">
+      <div class="attr-circle all active" data-attr="" onclick="setAttr(this)">全</div>
+      <div class="attr-circle fire"  data-attr="火" onclick="setAttr(this)"></div>
+      <div class="attr-circle water" data-attr="水" onclick="setAttr(this)"></div>
+      <div class="attr-circle wood"  data-attr="木" onclick="setAttr(this)"></div>
+      <div class="attr-circle light" data-attr="光" onclick="setAttr(this)"></div>
+      <div class="attr-circle dark"  data-attr="暗" onclick="setAttr(this)"></div>
+    </div>
+  </div>
+
+  <div class="drawer-section">
+    <div class="drawer-lbl">排序</div>
+    <div class="sort-bar">
+      <div class="sort-btn active" onclick="setSort('no',this)">No.</div>
+      <div class="sort-btn" onclick="setSort('name',this)">名稱</div>
+      <div class="sort-btn" onclick="setSort('attr',this)">屬性</div>
+      <div class="sort-dir-btn" id="sortDirBtn" onclick="toggleSortDir()">↑ 正序</div>
+    </div>
+  </div>
 
   <div class="drawer-section">
     <div class="drawer-lbl lbl-main-skill">技能（可多選）</div>
@@ -1579,12 +1586,18 @@ window.addEventListener('beforeunload',e=>{if(hasUnsaved){e.preventDefault();e.r
 // ── 篩選抽屜 ─────────────────────────────────────────
 function openFilter(){
   buildCollabFilter();
-  document.getElementById('filterDrawer').classList.add('open');
-  document.getElementById('drawerOverlay').classList.add('open');
+  if(window.openFilterGesture) window.openFilterGesture();
+  else {
+    document.getElementById('filterDrawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('open');
+  }
 }
 function closeFilter(){
-  document.getElementById('filterDrawer').classList.remove('open');
-  document.getElementById('drawerOverlay').classList.remove('open');
+  if(window.closeFilterGesture) window.closeFilterGesture();
+  else {
+    document.getElementById('filterDrawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+  }
 }
 function toggleAcc(hdr){
   hdr.classList.toggle('open');
@@ -2348,6 +2361,107 @@ setInterval(()=>{ if(themeMode==='auto') applyTheme(); refreshEventCountdownUI()
   }
   view.addEventListener('touchend', endDrag, {passive:true});
   view.addEventListener('touchcancel', endDrag, {passive:true});
+})();
+
+// ── 篩選抽屜手勢（拖曳把手 1:1 跟隨、放手依速度決定關閉或彈回、可隨時中斷）───
+(function initFilterDrawerGesture(){
+  const drawer = document.getElementById('filterDrawer');
+  const overlay = document.getElementById('drawerOverlay');
+  const handle = drawer ? drawer.querySelector('.drawer-handle') : null;
+  if(!drawer || !overlay || !handle) return;
+
+  let isOpen=false, dragging=false, startY=0, baseY=0, liveY=0, hist=[];
+  let cancelSpring=null, drawerH=0;
+
+  function measureHeight(){
+    drawerH = drawer.getBoundingClientRect().height || Math.round(window.innerHeight*0.82);
+  }
+  function setY(y){
+    liveY=y;
+    drawer.style.transform = `translateY(${y}px)`;
+    const h=drawerH||1;
+    overlay.style.opacity = String(Math.max(0, Math.min(1, 1-y/h)));
+  }
+  function rubberband(overshoot, dim, k=0.55){
+    return (overshoot*dim*k)/(dim+k*Math.abs(overshoot));
+  }
+  function project(v, decel=0.998){
+    return (v/1000)*decel/(1-decel);
+  }
+  // 臨界阻尼彈簧：damping/response 兩參數，可在動畫途中被下一次拖曳從當下位置中斷
+  function springTo(from, to, v0, damping, response, onDone){
+    if(cancelSpring) cancelSpring();
+    const w=2*Math.PI/response, k=w*w, c=2*damping*w;
+    let pos=from, vel=v0, last=performance.now(), raf;
+    function step(now){
+      const dt=Math.min((now-last)/1000, 0.032); last=now;
+      const force=-k*(pos-to)-c*vel;
+      vel+=force*dt; pos+=vel*dt;
+      setY(pos);
+      if(Math.abs(pos-to)<0.5 && Math.abs(vel)<20){ setY(to); cancelSpring=null; if(onDone) onDone(); return; }
+      raf=requestAnimationFrame(step);
+    }
+    raf=requestAnimationFrame(step);
+    cancelSpring=()=>{ cancelAnimationFrame(raf); cancelSpring=null; };
+  }
+
+  function finishClose(){
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    drawer.style.transform=''; overlay.style.opacity='';
+  }
+
+  window.openFilterGesture = function(){
+    overlay.classList.add('open');
+    drawer.classList.add('open');
+    measureHeight();
+    isOpen=true;
+    setY(drawerH);
+    requestAnimationFrame(()=> springTo(drawerH, 0, 0, 1, 0.4));
+  };
+  window.closeFilterGesture = function(){
+    if(!isOpen) return;
+    isOpen=false;
+    measureHeight();
+    springTo(liveY, drawerH, 0, 1, 0.35, finishClose);
+  };
+
+  handle.addEventListener('touchstart', e=>{
+    if(!isOpen) return;
+    dragging=true;
+    startY=e.touches[0].clientY;
+    if(cancelSpring) cancelSpring(); // 中斷：從目前畫面上的即時位置繼續，不從目標值重來
+    baseY=liveY;
+    measureHeight();
+    hist=[{y:startY,t:performance.now()}];
+  }, {passive:true});
+
+  handle.addEventListener('touchmove', e=>{
+    if(!dragging) return;
+    e.preventDefault();
+    const y=e.touches[0].clientY;
+    const dy=y-startY;
+    let ty=baseY+dy;
+    if(ty<0) ty=-rubberband(-ty, drawerH); // 往上拖給一點阻力，不完全鎖死
+    hist.push({y,t:performance.now()}); if(hist.length>5) hist.shift();
+    setY(ty);
+  }, {passive:false});
+
+  function endDrag(){
+    if(!dragging) return; dragging=false;
+    const first=hist[0], last=hist[hist.length-1];
+    const dt=Math.max((last.t-first.t)/1000, 0.001);
+    const velocity=(last.y-first.y)/dt; // px/s，正值代表往下滑
+    const projected = liveY + project(velocity);
+    if(projected > drawerH*0.35 || velocity > 500){
+      isOpen=false;
+      springTo(liveY, drawerH, velocity, 0.86, 0.32, finishClose); // 有拋擲速度，允許一點彈跳感
+    } else {
+      springTo(liveY, 0, velocity, 1, 0.35); // 沒過門檻，臨界阻尼回彈到原位，不過衝
+    }
+  }
+  handle.addEventListener('touchend', endDrag, {passive:true});
+  handle.addEventListener('touchcancel', endDrag, {passive:true});
 })();
 
 // ── 載入 ─────────────────────────────────────────────
