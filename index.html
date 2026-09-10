@@ -1555,7 +1555,11 @@ function renderTabs() {
   });
 }
 
-function renderAll() { renderTabs(); renderStats(); renderList(); buildCollabFilter(); }
+function updateSortBarVisibility(){
+  const bar = document.querySelector('.sort-bar');
+  if(bar) bar.style.display = activeAccount==='__ALL__' ? 'none' : '';
+}
+function renderAll() { updateSortBarVisibility(); renderTabs(); renderStats(); renderList(); buildCollabFilter(); }
 
 // ── 收藏操作 ─────────────────────────────────────────
 // ── 本機自動存檔（localStorage，只存在這台裝置這個瀏覽器裡）───
