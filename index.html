@@ -59,6 +59,13 @@
     <div class="search-suggest" id="searchSuggest"></div>
   </div>
   <div class="swipe-view" id="swipeView">
+    <div class="sort-bar">
+      <span class="sort-lbl">排序：</span>
+      <div class="sort-btn active" onclick="setSort('no',this)">No.</div>
+      <div class="sort-btn" onclick="setSort('name',this)">名稱</div>
+      <div class="sort-btn" onclick="setSort('attr',this)">屬性</div>
+      <div class="sort-dir-btn" id="sortDirBtn" onclick="toggleSortDir()">↑ 正序</div>
+    </div>
     <div class="char-grid" id="charGrid"></div>
     <div id="gridSentinel" style="height:1px;"></div>
   </div>
@@ -256,16 +263,6 @@
       <div class="attr-circle wood"  data-attr="木" onclick="setAttr(this)"></div>
       <div class="attr-circle light" data-attr="光" onclick="setAttr(this)"></div>
       <div class="attr-circle dark"  data-attr="暗" onclick="setAttr(this)"></div>
-    </div>
-  </div>
-
-  <div class="drawer-section">
-    <div class="drawer-lbl">排序</div>
-    <div class="sort-bar">
-      <div class="sort-btn active" onclick="setSort('no',this)">No.</div>
-      <div class="sort-btn" onclick="setSort('name',this)">名稱</div>
-      <div class="sort-btn" onclick="setSort('attr',this)">屬性</div>
-      <div class="sort-dir-btn" id="sortDirBtn" onclick="toggleSortDir()">↑ 正序</div>
     </div>
   </div>
 
