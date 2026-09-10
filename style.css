@@ -775,6 +775,10 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 @media (min-width:600px) {
   .stats { grid-template-columns:repeat(4,1fr); }
 }
+@media (min-width:900px) {
+  /* 電腦版：搜尋框上下內邊距明顯縮減，變細，手機版不受影響 */
+  .search-input { padding-top:4px; padding-bottom:4px; }
+}
 
 /* ── 自訂下拉（Custom Dropdown）──────────────────── */
 .cdd { margin-bottom: 0; }
