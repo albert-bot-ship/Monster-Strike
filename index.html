@@ -873,6 +873,7 @@ function init() {
     b.addEventListener('click', updateGokuUnVisibility);
   });
   updateGokuUnVisibility();
+  requestAnimationFrame(()=> document.body.classList.add('intro')); // 首次載入的一次性進場動畫
 }
 
 // 極運勾選：只有在入手方式不是幸運轉蛋時才顯示
