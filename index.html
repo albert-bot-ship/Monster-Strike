@@ -1427,7 +1427,7 @@ function renderAllList() {
   renderedCount=0;
   if(!q && !hasActiveFilters()) {
     filteredList=[];
-    grid.innerHTML=`<div class="empty-state"><div class="eicon">🔍</div><div class="etxt">搜尋角色名稱，一次查全部帳號</div><div class="esub">輸入名稱後，會顯示各帳號的持有狀況</div></div>`;
+    grid.innerHTML='';
     return;
   }
   filteredList=sortChars(getAllAccountsMatches());
