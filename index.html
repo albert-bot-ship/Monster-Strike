@@ -447,6 +447,42 @@
       <div class="sg2" id="mStrikeGrid"></div>
     </div>
 
+    <div class="accordion-section">
+      <div class="accordion-header" onclick="toggleAcc(this)">
+        <span class="lbl-main-skill">技能（可多選）</span><span class="selected-count" id="cntSkill"></span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <div class="sg3" id="mSkillGrid"></div>
+        <div style="margin-top:8px;">
+          <div class="drawer-lbl lbl-killer" style="margin-bottom:6px;">殺手（可多選，點選展開）</div>
+          <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
+          <div class="cdd-body" id="mKillerBody">
+            <input type="text" class="minput cdd-search" placeholder="🔍 搜尋..." oninput="filterGroupedSearch(this)">
+            <div id="mKillerGrid"></div>
+          </div></div>
+        </div>
+        <div style="margin-top:8px;">
+          <div class="drawer-lbl lbl-other" style="margin-bottom:6px;">其他（可多選，點選展開）</div>
+          <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
+          <div class="cdd-body" id="mOtherSkillBody">
+            <input type="text" class="minput cdd-search" placeholder="🔍 搜尋..." oninput="filterCddSearch(this)">
+            <div class="sg3" id="mOtherSkillGrid"></div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-section">
+      <div class="accordion-header" onclick="toggleAcc(this)">
+        超反技能（可多選）<span class="selected-count" id="cntSuper"></span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <div class="sg3" id="mSuperGrid"></div>
+      </div>
+    </div>
+
     <div class="mfield">
       <label>戰型</label>
       <div class="sg4" id="mBattleGrid"></div>
@@ -544,42 +580,6 @@
           <label>招式說明</label>
           <textarea class="mtarea" id="newSSDesc" placeholder="請輸入招式效果說明"></textarea>
         </div>
-      </div>
-    </div>
-
-    <div class="accordion-section">
-      <div class="accordion-header" onclick="toggleAcc(this)">
-        <span class="lbl-main-skill">技能（可多選）</span><span class="selected-count" id="cntSkill"></span>
-        <span class="acc-arrow">▼</span>
-      </div>
-      <div class="accordion-body">
-        <div class="sg3" id="mSkillGrid"></div>
-        <div style="margin-top:8px;">
-          <div class="drawer-lbl lbl-killer" style="margin-bottom:6px;">殺手（可多選，點選展開）</div>
-          <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
-          <div class="cdd-body" id="mKillerBody">
-            <input type="text" class="minput cdd-search" placeholder="🔍 搜尋..." oninput="filterGroupedSearch(this)">
-            <div id="mKillerGrid"></div>
-          </div></div>
-        </div>
-        <div style="margin-top:8px;">
-          <div class="drawer-lbl lbl-other" style="margin-bottom:6px;">其他（可多選，點選展開）</div>
-          <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
-          <div class="cdd-body" id="mOtherSkillBody">
-            <input type="text" class="minput cdd-search" placeholder="🔍 搜尋..." oninput="filterCddSearch(this)">
-            <div class="sg3" id="mOtherSkillGrid"></div>
-          </div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="accordion-section">
-      <div class="accordion-header" onclick="toggleAcc(this)">
-        超反技能（可多選）<span class="selected-count" id="cntSuper"></span>
-        <span class="acc-arrow">▼</span>
-      </div>
-      <div class="accordion-body">
-        <div class="sg3" id="mSuperGrid"></div>
       </div>
     </div>
 
