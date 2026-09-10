@@ -172,6 +172,11 @@ html[data-theme="light"] header::after { opacity:.55; }
   border:1px solid var(--border); transition: filter .15s, transform .12s;
 }
 .header-icon-btn:active { transform:scale(.9); filter:brightness(1.2); }
+.header-icon-btn.active {
+  background: linear-gradient(180deg, #5090e8, #2060c0);
+  border-color: #98c0ff; box-shadow: 0 0 8px rgba(80,144,232,.5);
+  color:#fff;
+}
 .app-title {
   font-size: 15px; font-weight: 800; letter-spacing: .6px;
   background: linear-gradient(90deg, var(--water), var(--dark) 55%, var(--fire));
@@ -541,8 +546,10 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,.65); z-index:40;
   backdrop-filter:blur(3px);
+  opacity:0;
 }
 .drawer-overlay.open { display:block; }
+/* opacity 由 JS 依抽屜拖曳/彈簧位移進度逐幀設定，不用 CSS transition */
 
 .filter-drawer {
   position:fixed; bottom:0; left:0; right:0;
@@ -552,9 +559,10 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
   padding: 10px 14px calc(var(--nav-h) + 10px);
   z-index:50; max-height:82vh; overflow-y:auto;
   transform: translateY(100%);
-  transition: transform .28s cubic-bezier(.4,0,.2,1);
 }
 .filter-drawer.open { transform:translateY(0); }
+/* 開合位移改由 JS 彈簧動畫逐幀控制（見 index.html 篩選抽屜手勢區塊），
+   這裡不再放 CSS transition，避免兩者互相打架造成卡頓 */
 
 .drawer-handle {
   width:36px; height:4px; background:var(--border2);
