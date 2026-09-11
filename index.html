@@ -50,6 +50,7 @@
       <span class="header-icon-btn" onclick="openAppearanceModal()" title="外觀設定">🎨</span>
       <span class="header-icon-btn" id="multiSelectBtn" onclick="toggleMultiSelect()" title="多選模式">☑</span>
       <span class="header-icon-btn" onclick="openShareModal()" title="分享">📤</span>
+      <span class="header-icon-btn" onclick="openImageMergeScan()" title="整理重複圖片">🧹</span>
     </div>
   </div>
   <div class="accounts" id="accountTabs"></div>
@@ -403,7 +404,7 @@
       </div>
       <div class="mfield" style="margin-bottom:0;">
         <label>角色名稱 *</label>
-        <input type="text" class="minput" id="newName" placeholder="請輸入角色名稱">
+        <input type="text" class="minput" id="newName" placeholder="請輸入角色名稱" onblur="maybeAutoFillSharedImage()">
       </div>
     </div>
 
@@ -732,6 +733,18 @@
   </div>
 </div>
 
+<!-- 整理重複圖片（掃描同名同屬性但圖片不同步的角色） -->
+<div class="modal-overlay" id="imageMergeModal">
+  <div class="modal-box" style="max-width:460px;max-height:86vh;overflow-y:auto;">
+    <h2>🧹 整理重複圖片</h2>
+    <div class="appear-hint" style="margin-bottom:10px;">以下角色在不同帳號存了不同的圖片，點選一張當作共用版本，其餘帳號會自動改用這張，並釋放重複占用的空間。</div>
+    <div id="imageMergeList"></div>
+    <div class="mbtnrow" style="margin-top:14px;">
+      <button class="mcancel" onclick="closeImageMergeModal()" style="flex:1;">關閉</button>
+    </div>
+  </div>
+</div>
+
 <!-- 分享收藏卡片 -->
 <div class="modal-overlay" id="shareModal">
   <div class="modal-box" style="max-width:380px;">
@@ -831,8 +844,83 @@ const EGG_ICON_B64  = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
 
 // ── 狀態 ─────────────────────────────────────────────
 let charactersByAccount = {}, accounts = [{id:'a1',name:'帳號1'},{id:'a2',name:'帳號2'},{id:'a3',name:'帳號3'},{id:'a4',name:'帳號4'}];
+// ── 共用圖片庫：同名稱+同屬性的角色，主圖共用同一份，改一次全部帳號一起變 ──
+let sharedImages = {}; // { "名稱__屬性": dataURL }
+function sharedImgKey(name, attribute){ return `${name}__${attribute}`; }
+function resolveCharImage(c){
+  return c.imageData || (c.imageRef ? (sharedImages[c.imageRef]||null) : null);
+}
+// 刪除角色後，檢查是否還有其他帳號的角色仍在用同一把共用圖片 key，沒有的話才釋放
+function gcUnusedSharedImages(){
+  const inUse = new Set();
+  Object.values(charactersByAccount).forEach(list=>(list||[]).forEach(c=>{ if(c.imageRef) inUse.add(c.imageRef); }));
+  Object.keys(sharedImages).forEach(key=>{ if(!inUse.has(key)) delete sharedImages[key]; });
+}
+
+// ── 整理既有重複圖片：掃出同名稱+同屬性、但各帳號圖片還沒統一的角色 ──
+let imageMergeGroups=[];
+function scanImageGroups(){
+  const groups={};
+  accounts.forEach(acc=>{
+    (charactersByAccount[acc.id]||[]).forEach(c=>{
+      const key=sharedImgKey(c.name, c.attribute);
+      if(!groups[key]) groups[key]=[];
+      groups[key].push({accId:acc.id, accName:acc.name, charId:c.id, image:resolveCharImage(c)});
+    });
+  });
+  const result=[];
+  Object.entries(groups).forEach(([key, members])=>{
+    if(members.length<2) return; // 只有一個帳號持有，不需要整理
+    const distinctImages=[...new Set(members.map(m=>m.image).filter(Boolean))];
+    if(distinctImages.length<=1) return; // 沒有圖片、或已經統一，不需要處理
+    const [name, attribute]=key.split('__');
+    result.push({key, name, attribute, members, distinctImages});
+  });
+  return result;
+}
+function openImageMergeScan(){
+  imageMergeGroups = scanImageGroups();
+  renderImageMergeList();
+  document.getElementById('imageMergeModal').classList.add('open');
+}
+function closeImageMergeModal(){ document.getElementById('imageMergeModal').classList.remove('open'); }
+function renderImageMergeList(){
+  const wrap=document.getElementById('imageMergeList');
+  if(!imageMergeGroups.length){
+    wrap.innerHTML = `<div class="empty-state" style="padding:30px 0;"><div class="eicon">✅</div><div class="etxt">沒有發現需要整理的重複圖片</div></div>`;
+    return;
+  }
+  wrap.innerHTML = imageMergeGroups.map((g,gi)=>{
+    const thumbs = g.distinctImages.map((img,ii)=>{
+      const accNames = g.members.filter(m=>m.image===img).map(m=>m.accName).join('、');
+      return `<div class="merge-thumb" onclick="applyImageMergeChoice(${gi},${ii})">
+        <img src="${img}" alt="">
+        <div class="merge-thumb-lbl">${accNames}</div>
+      </div>`;
+    }).join('');
+    const noImgCount = g.members.filter(m=>!m.image).length;
+    return `<div class="merge-group">
+      <div class="merge-group-title">${g.name}（${g.attribute}）${noImgCount?`<span class="merge-group-sub">還有 ${noImgCount} 個帳號沒有圖片</span>`:''}</div>
+      <div class="merge-thumb-row">${thumbs}</div>
+    </div>`;
+  }).join('');
+}
+function applyImageMergeChoice(groupIdx, imgIdx){
+  const g = imageMergeGroups[groupIdx]; if(!g) return;
+  const chosen = g.distinctImages[imgIdx];
+  sharedImages[g.key] = chosen;
+  g.members.forEach(m=>{
+    const list = charactersByAccount[m.accId]||[];
+    const c = list.find(x=>x.id===m.charId);
+    if(c){ c.imageRef = g.key; c.imageData = null; }
+  });
+  gcUnusedSharedImages();
+  saveState(); renderAll();
+  imageMergeGroups.splice(groupIdx,1);
+  renderImageMergeList();
+}
 let activeAccount = '__ALL__';
-let hasUnsaved = false, editCharId = null, uploadedImg = null, uploadedImg2 = null, modalAttr = '火';
+let hasUnsaved = false, editCharId = null, uploadedImg = null, uploadedImg2 = null, modalAttr = '火', imgTouched = false;
 let customBgDesktop = [], customBgMobile = null, themeMode = 'auto', uploadedBgTemp = null;
 // 裝置判斷：iPhone/iPad/iPod/Android 視為手機版，其餘（含 Mac/Windows）視為電腦版
 function isMobileDevice(){ return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent); }
@@ -1114,6 +1202,13 @@ function buildHFCdd(bodyId, isFilter) {
   });
 }
 
+// 合作活動依名稱自動分配一個固定顏色，方便一眼辨識不同活動
+const COLLAB_PALETTE = ['#ff6b6b','#4dabf7','#69db7c','#ffd43b','#da77f2','#3bc9db','#ff922b','#f783ac','#94d82d','#748ffc','#63e6be','#e64980'];
+function collabColor(name){
+  let h=0;
+  for(let i=0;i<name.length;i++){ h = (h*31 + name.charCodeAt(i)) >>> 0; }
+  return COLLAB_PALETTE[h % COLLAB_PALETTE.length];
+}
 function buildCollabFilter() {
   const grid = document.getElementById('fCollabGrid'); if(!grid) return;
   const source = activeAccount==='__ALL__' ? accounts.flatMap(a=>charactersByAccount[a.id]||[]) : currentChars();
@@ -1124,6 +1219,8 @@ function buildCollabFilter() {
   if (!collabs.length) { grid.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px 4px;">尚無合作活動資料</div>'; return; }
   collabs.forEach(collab => {
     const b = mkBtn(collab);
+    b.classList.add('collab-btn');
+    b.style.setProperty('--collab-color', collabColor(collab));
     if (fSets.collab.has(collab)) b.classList.add('active');
     b.onclick = () => { toggleSet(b, 'collab', collab, true); updateCddLabel(cdd); renderList(); };
     grid.appendChild(b);
@@ -1434,6 +1531,7 @@ function batchDelete() {
   if(!selectedIds.size) return;
   if(!confirm(`確定要刪除選取的 ${selectedIds.size} 隻角色嗎？此動作無法復原。`)) return;
   charactersByAccount[activeAccount]=currentChars().filter(c=>!selectedIds.has(c.id));
+  gcUnusedSharedImages();
   selectedIds.clear();
   saveState();
   multiSelectMode=false;
@@ -1525,12 +1623,13 @@ function appendCardBatch() {
   slice.forEach(c => {
     const qty=c.quantity||1;
     const hasImg2=!!c.imageData2;
+    const cImg=resolveCharImage(c);
     const selected=multiSelectMode && selectedIds.has(c.id);
     const card=document.createElement('div');
     card.className='char-card owned'+(multiSelectMode?' selectable':'')+(selected?' selected':'');
     card.innerHTML=`
-      <div class="card-img ${c.imageData?'':'bg-'+c.attribute}">
-        ${c.imageData?`<img src="${c.imageData}" alt="${c.name}">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`}
+      <div class="card-img ${cImg?'':'bg-'+c.attribute}">
+        ${cImg?`<img src="${cImg}" alt="${c.name}">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`}
       </div>
       ${(c.charNo||c.charNo2)?`<div class="card-no-top">${c.charNo||''}</div>`:''}
       <div class="card-attr attr-${c.attribute}"></div>
@@ -1572,9 +1671,10 @@ function appendAllCardBatch() {
     }).join('');
     const card=document.createElement('div');
     card.className='char-card owned all-mode-card';
+    const cImgAll=resolveCharImage(c);
     card.innerHTML=`
-      <div class="card-img ${c.imageData?'':'bg-'+c.attribute}">
-        ${c.imageData?`<img src="${c.imageData}" alt="${c.name}">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`}
+      <div class="card-img ${cImgAll?'':'bg-'+c.attribute}">
+        ${cImgAll?`<img src="${cImgAll}" alt="${c.name}">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`}
       </div>
       <div class="card-attr attr-${c.attribute}"></div>
       <div class="card-acc-tags">${tagsHtml}</div>
@@ -1630,7 +1730,7 @@ function switchCardImage(e, id, idx){
   e.stopPropagation();
   const c=currentChars().find(x=>x.id===id); if(!c) return;
   const card=e.target.closest('.char-card'); if(!card) return;
-  const img=idx===0?c.imageData:(c.imageData2||c.imageData);
+  const img=idx===0?resolveCharImage(c):(c.imageData2||resolveCharImage(c));
   const no=idx===0?c.charNo:(c.charNo2||c.charNo);
   const imgWrap=card.querySelector('.card-img');
   imgWrap.className='card-img'+(img?'':' bg-'+c.attribute);
@@ -1698,6 +1798,20 @@ function selectAttr(attr){
     const m={'火':'mFire','水':'mWater','木':'mWood','光':'mLight','暗':'mDark'};
     document.getElementById(m[a])?.classList.toggle('active',a===attr);
   });
+  maybeAutoFillSharedImage();
+}
+// 新增角色時，如果名稱+屬性已經有其他帳號存在共用圖片，且目前還沒選圖，自動帶入（可再自行更換/移除）
+function maybeAutoFillSharedImage(){
+  if(editCharId!==null) return; // 只在「新增」時自動帶入，編輯既有角色不做這個動作
+  if(uploadedImg) return;
+  const name=document.getElementById('newName')?.value.trim(); if(!name) return;
+  const key=sharedImgKey(name, modalAttr);
+  const existing=sharedImages[key];
+  if(!existing) return;
+  uploadedImg=existing;
+  const imgEl=document.getElementById('imgPreviewEl'); imgEl.src=uploadedImg; imgEl.style.display='block';
+  document.getElementById('imgChoices').style.display='none';
+  document.getElementById('imgRemoveBtn').style.display='block';
 }
 
 function resetModalSets(){
@@ -1709,7 +1823,7 @@ function resetModalSets(){
 }
 
 function clearModalForm(){
-  uploadedImg=null; uploadedImg2=null; mRarity='6'; mStrike='反射型'; mBattle='平衡'; mFriendMain=''; mTargetAccount=null;
+  uploadedImg=null; uploadedImg2=null; mRarity='6'; mStrike='反射型'; mBattle='平衡'; mFriendMain=''; mTargetAccount=null; imgTouched=false;
   document.getElementById('imgPreviewEl').style.display='none';
   document.getElementById('imgChoices').style.display='flex';
   document.getElementById('imgRemoveBtn').style.display='none';
@@ -1747,9 +1861,9 @@ function clearModalForm(){
 }
 
 function prefillModal(c){
-  uploadedImg=c.imageData||null;
+  uploadedImg=resolveCharImage(c);
   const imgEl=document.getElementById('imgPreviewEl'), choices=document.getElementById('imgChoices');
-  if(c.imageData){imgEl.src=c.imageData;imgEl.style.display='block';choices.style.display='none';document.getElementById('imgRemoveBtn').style.display='block';}
+  if(uploadedImg){imgEl.src=uploadedImg;imgEl.style.display='block';choices.style.display='none';document.getElementById('imgRemoveBtn').style.display='block';}
   else{imgEl.style.display='none';choices.style.display='flex';document.getElementById('imgRemoveBtn').style.display='none';}
   uploadedImg2=c.imageData2||null;
   const imgEl2=document.getElementById('imgPreviewEl2'), choices2=document.getElementById('imgChoices2');
@@ -1870,6 +1984,7 @@ function deleteCharFromModal(){
   const c=currentChars().find(x=>x.id===editCharId); if(!c) return;
   if(!confirm(`確定要刪除「${c.name}」嗎？此動作無法復原。`)) return;
   charactersByAccount[activeAccount]=currentChars().filter(x=>x.id!==editCharId);
+  gcUnusedSharedImages();
   saveState(); closeModal(); renderAll();
 }
 
@@ -1928,9 +2043,10 @@ function openViewModal(id){
   document.getElementById('vName').innerHTML = (c.hasGokuUn?`<img src="${GOKUUN_ICON_B64}" class="view-gokuun-icon" alt="極運">`:'') + (c.name || '');
 
   const imgWrap = document.getElementById('vImgWrap');
-  imgWrap.className = 'view-img-wrap' + (c.imageData ? '' : ' bg-'+c.attribute);
-  imgWrap.innerHTML = c.imageData
-    ? `<img src="${c.imageData}" alt="${c.name}">`
+  const vImg = resolveCharImage(c);
+  imgWrap.className = 'view-img-wrap' + (vImg ? '' : ' bg-'+c.attribute);
+  imgWrap.innerHTML = vImg
+    ? `<img src="${vImg}" alt="${c.name}">`
     : `<span class="card-placeholder" style="font-size:44px;">${ATTR_EMOJI[c.attribute]||'？'}</span>`;
 
   const showNav = !!c.imageData2;
@@ -1975,7 +2091,7 @@ function openViewModal(id){
 function closeViewModal(){ document.getElementById('viewCharModal').classList.remove('open'); viewCharId=null; }
 function switchViewImage(idx){
   const c = currentChars().find(x=>x.id===viewCharId); if(!c) return;
-  const img = idx===0 ? c.imageData : (c.imageData2||c.imageData);
+  const img = idx===0 ? resolveCharImage(c) : (c.imageData2||resolveCharImage(c));
   const no = idx===0 ? c.charNo : (c.charNo2||c.charNo);
   const imgWrap = document.getElementById('vImgWrap');
   imgWrap.className = 'view-img-wrap' + (img?'':' bg-'+c.attribute);
@@ -2033,7 +2149,7 @@ async function drawCharShareCard(c, accName){
   const imgSize=W;
   ctx.save();
   roundRect(ctx,0,0,W,imgSize,0); ctx.clip();
-  const img = await loadImg(c.imageData);
+  const img = await loadImg(resolveCharImage(c));
   if(img){
     const s = Math.max(imgSize/img.width, imgSize/img.height);
     const dw=img.width*s, dh=img.height*s;
@@ -2217,7 +2333,7 @@ async function drawListShareCard(accId){
     ctx.fillText('沒有符合目前搜尋／篩選條件的角色', W/2, headerH+50);
   }
 
-  const images = await Promise.all(chars.map(c=>loadImg(c.imageData)));
+  const images = await Promise.all(chars.map(c=>loadImg(resolveCharImage(c))));
   chars.forEach((c,i)=>{
     const col=i%cols, row=Math.floor(i/cols);
     const x=pad+col*(cell+gap), y=headerH+row*(cell+34);
@@ -2315,7 +2431,17 @@ function confirmChar(){
   const name=document.getElementById('newName').value.trim(); if(!name){alert('請輸入角色名稱');return;}
   if(editCharId===null && !mTargetAccount){ alert('請選擇要新增到哪個帳號'); return; }
   const qty=Math.max(1, parseInt(document.getElementById('newQty').value)||1);
-  const data={charNo:document.getElementById('newCharNo').value.trim(),charNo2:document.getElementById('newCharNo2').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,collab:document.getElementById('newCollab').value.trim(),quantity:qty,hasGokuUn:document.getElementById('newGokuUn').checked,ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:uploadedImg,imageData2:uploadedImg2,formStages:[...mSets.formStages],shootSkill:mSets.formStages.has('真獸神化')?document.getElementById('newShootSkill').value.trim():'',supportSkill:mSets.formStages.has('真獸神化')?document.getElementById('newSupportSkill').value.trim():''};
+  // 主圖改走共用圖片庫：同名稱+同屬性的角色共用同一份，換一次全部帳號一起變
+  const shareKey = sharedImgKey(name, modalAttr);
+  let imageRef = null;
+  if(uploadedImg){
+    if(imgTouched || !(shareKey in sharedImages)){
+      sharedImages[shareKey] = uploadedImg; // 使用者主動換了圖，或這組名稱+屬性原本沒有共用圖：直接寫入
+    }
+    // 沒有主動換圖、但這組已經有其他帳號的共用圖時，保留原本共用群組的圖片，不覆蓋掉別人的
+    imageRef = shareKey;
+  }
+  const data={charNo:document.getElementById('newCharNo').value.trim(),charNo2:document.getElementById('newCharNo2').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,collab:document.getElementById('newCollab').value.trim(),quantity:qty,hasGokuUn:document.getElementById('newGokuUn').checked,ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:null,imageRef,imageData2:uploadedImg2,formStages:[...mSets.formStages],shootSkill:mSets.formStages.has('真獸神化')?document.getElementById('newShootSkill').value.trim():'',supportSkill:mSets.formStages.has('真獸神化')?document.getElementById('newSupportSkill').value.trim():''};
   if(editCharId!==null){
     const list=currentChars();
     const idx=list.findIndex(x=>x.id===editCharId);if(idx>=0)list[idx]={id:editCharId,...data};
@@ -2324,6 +2450,7 @@ function confirmChar(){
     const list=charactersByAccount[mTargetAccount];
     const maxId=list.reduce((m,c)=>Math.max(m,c.id||0),0);list.push({id:maxId+1,...data});
   }
+  gcUnusedSharedImages();
   closeModal(); saveState(); renderAll();
 }
 
@@ -2388,7 +2515,7 @@ async function pasteImageFromClipboard(slot){
     if(!blob){ alert('剪貼簿裡沒有偵測到圖片，請先複製一張圖片再試一次'); return; }
     compressImage(blob).then(dataUrl=>{
       if(slot===1){
-        uploadedImg=dataUrl;
+        uploadedImg=dataUrl; imgTouched=true;
         const imgEl=document.getElementById('imgPreviewEl'); imgEl.src=uploadedImg; imgEl.style.display='block';
         document.getElementById('imgChoices').style.display='none';
         document.getElementById('imgRemoveBtn').style.display='block';
@@ -2406,7 +2533,7 @@ async function pasteImageFromClipboard(slot){
 function handleImgUpload(e){
   const file=e.target.files[0]; if(!file)return;
   compressImage(file).then(dataUrl=>{
-    uploadedImg=dataUrl;
+    uploadedImg=dataUrl; imgTouched=true;
     const imgEl=document.getElementById('imgPreviewEl'); imgEl.src=uploadedImg; imgEl.style.display='block';
     document.getElementById('imgChoices').style.display='none';
     document.getElementById('imgRemoveBtn').style.display='block';
@@ -2425,7 +2552,7 @@ function handleImgUpload2(e){
 
 function removeUploadedImg(which){
   if(which===1){
-    uploadedImg=null;
+    uploadedImg=null; imgTouched=true;
     document.getElementById('imgPreviewEl').style.display='none';
     document.getElementById('imgChoices').style.display='flex';
     document.getElementById('imgRemoveBtn').style.display='none';
@@ -2619,7 +2746,7 @@ function applyTheme(){
 
 function exportBackup(){
   const savedAt = new Date().toISOString();
-  dl(JSON.stringify({version:5,accounts,charactersByAccount,customBgDesktop,customBgMobile,themeMode,savedAt},null,2),'backup.json');
+  dl(JSON.stringify({version:6,accounts,charactersByAccount,sharedImages,customBgDesktop,customBgMobile,themeMode,savedAt},null,2),'backup.json');
   hasUnsaved=false; document.getElementById('unsavedBadge').style.display='none';
 }
 function importBackup(e){
@@ -2630,6 +2757,7 @@ function importBackup(e){
       const data=JSON.parse(reader.result);
       if(data.accounts)accounts=data.accounts;
       charactersByAccount=migrateToPerAccount(data);
+      sharedImages = data.sharedImages || {};
       activeAccount='__ALL__';
       loadBgFields(data);
       themeMode = data.themeMode || 'auto';
@@ -2679,6 +2807,7 @@ function migrateCharacterFields(c){
       c.skills.splice(oldIdx, 1); // 新名稱已存在，避免重複
     }
   }
+  if(c.imageRef === undefined) c.imageRef = null;
   return c;
 }
 
@@ -2968,6 +3097,7 @@ fetch('backup.json')
   .then(data=>{
     if(data.accounts)accounts=data.accounts;
     charactersByAccount=migrateToPerAccount(data);
+    sharedImages = data.sharedImages || {};
     activeAccount='__ALL__';
     loadBgFields(data);
     themeMode = data.themeMode || 'auto';
@@ -2978,8 +3108,8 @@ fetch('backup.json')
 
 // ── GitHub 備份同步比對 ───────────────────────────────
 let pendingRemoteSync = null;
-function snapshotForSync(accs, chars, bgD, bgM, theme){
-  return JSON.stringify({accounts:accs, charactersByAccount:chars, customBgDesktop:bgD||null, customBgMobile:bgM||null, themeMode:theme});
+function snapshotForSync(accs, chars, imgs, bgD, bgM, theme){
+  return JSON.stringify({accounts:accs, charactersByAccount:chars, sharedImages:imgs, customBgDesktop:bgD||null, customBgMobile:bgM||null, themeMode:theme});
 }
 function formatSyncTime(iso){
   if(!iso) return '無記錄';
@@ -2995,6 +3125,7 @@ function checkGithubSync(){
     .then(data=>{
       const remoteChars = migrateToPerAccount(data);
       const remoteAccounts = data.accounts || accounts;
+      const remoteImages = data.sharedImages || {};
       let remoteBgD, remoteBgM;
       if(data.customBgDesktop !== undefined || data.customBgMobile !== undefined){
         remoteBgD = normalizeBgDesktop(data.customBgDesktop); remoteBgM = data.customBgMobile || null;
@@ -3003,13 +3134,13 @@ function checkGithubSync(){
       }
       const remoteTheme = data.themeMode || 'auto';
 
-      const localSnap  = snapshotForSync(accounts, charactersByAccount, customBgDesktop, customBgMobile, themeMode);
-      const remoteSnap = snapshotForSync(remoteAccounts, remoteChars, remoteBgD, remoteBgM, remoteTheme);
+      const localSnap  = snapshotForSync(accounts, charactersByAccount, sharedImages, customBgDesktop, customBgMobile, themeMode);
+      const remoteSnap = snapshotForSync(remoteAccounts, remoteChars, remoteImages, remoteBgD, remoteBgM, remoteTheme);
       if(localSnap === remoteSnap) return; // 完全相同,不用問
 
       const localCount  = Object.values(charactersByAccount).reduce((s,l)=>s+(l?l.length:0),0);
       const remoteCount = Object.values(remoteChars).reduce((s,l)=>s+(l?l.length:0),0);
-      pendingRemoteSync = {accounts:remoteAccounts, charactersByAccount:remoteChars, customBgDesktop:remoteBgD, customBgMobile:remoteBgM, themeMode:remoteTheme};
+      pendingRemoteSync = {accounts:remoteAccounts, charactersByAccount:remoteChars, sharedImages:remoteImages, customBgDesktop:remoteBgD, customBgMobile:remoteBgM, themeMode:remoteTheme};
       document.getElementById('syncLocalInfo').textContent = `更新時間：${formatSyncTime(localSavedAt)}　角色總數：${localCount}　帳號數：${accounts.length}`;
       document.getElementById('syncRemoteInfo').textContent = `更新時間：${formatSyncTime(data.savedAt)}　角色總數：${remoteCount}　帳號數：${remoteAccounts.length}`;
       document.getElementById('syncConflictModal').classList.add('open');
@@ -3024,6 +3155,7 @@ function useGithubData(){
   if(!pendingRemoteSync) return;
   accounts = pendingRemoteSync.accounts;
   charactersByAccount = pendingRemoteSync.charactersByAccount;
+  sharedImages = pendingRemoteSync.sharedImages || {};
   customBgDesktop = normalizeBgDesktop(pendingRemoteSync.customBgDesktop);
   customBgMobile = pendingRemoteSync.customBgMobile;
   themeMode = pendingRemoteSync.themeMode;
