@@ -1622,26 +1622,10 @@ function updateSortBarVisibility(){
 function renderAll() { updateSortBarVisibility(); renderTabs(); renderStats(); renderList(); buildCollabFilter(); }
 
 // ── 收藏操作 ─────────────────────────────────────────
-// ── 本機自動存檔（localStorage，只存在這台裝置這個瀏覽器裡）───
-const LS_KEY='msCollectAutoSave';
-let lsQuotaWarned=false;
-let localSavedAt=null;
-function persistToLocalStorage(){
-  try{
-    localSavedAt = new Date().toISOString();
-    localStorage.setItem(LS_KEY, JSON.stringify({accounts, charactersByAccount, customBgDesktop, customBgMobile, themeMode, savedAt: localSavedAt}));
-  }catch(e){
-    if(!lsQuotaWarned){ lsQuotaWarned=true; alert('本機自動存檔空間不足（可能角色圖片太多），請記得手動匯出備份，避免資料遺失。'); }
-  }
-}
-function loadFromLocalStorage(){
-  try{
-    const raw=localStorage.getItem(LS_KEY);
-    return raw ? JSON.parse(raw) : null;
-  }catch(e){ return null; }
-}
+// ── 存檔狀態標記（改回最早的設計：不做本機自動存檔，只靠手動備份匯出/匯入）───
+let localSavedAt=null; // 沒有自動存檔後，本機更新時間不再追蹤，保留變數避免其他地方參照出錯
 
-function saveState(){hasUnsaved=true;document.getElementById('unsavedBadge').style.display='inline-block';persistToLocalStorage();}
+function saveState(){hasUnsaved=true;document.getElementById('unsavedBadge').style.display='inline-block';}
 window.addEventListener('beforeunload',e=>{if(hasUnsaved){e.preventDefault();e.returnValue='';}});
 
 // ── 篩選抽屜 ─────────────────────────────────────────
@@ -2262,7 +2246,6 @@ function importBackup(e){
       themeMode = data.themeMode || 'auto';
       applyBackground(); applyTheme();
       hasUnsaved=false; document.getElementById('unsavedBadge').style.display='none';
-      persistToLocalStorage();
       renderAll(); alert('匯入完成');
     }catch{alert('匯入失敗，檔案格式錯誤');}
   };
@@ -2591,32 +2574,18 @@ setInterval(()=>{ if(themeMode==='auto') applyTheme(); refreshEventCountdownUI()
 })();
 
 // ── 載入 ─────────────────────────────────────────────
-const lsData = loadFromLocalStorage();
-if(lsData){
-  if(lsData.accounts) accounts=lsData.accounts;
-  charactersByAccount=migrateToPerAccount(lsData);
-  activeAccount='__ALL__';
-  loadBgFields(lsData);
-  themeMode = lsData.themeMode || 'auto';
-  localSavedAt = lsData.savedAt || null;
-  applyBackground(); applyTheme();
-  init(); renderAll();
-  checkGithubSync();
-} else {
-  fetch('backup.json')
-    .then(r=>r.json())
-    .then(data=>{
-      if(data.accounts)accounts=data.accounts;
-      charactersByAccount=migrateToPerAccount(data);
-      activeAccount='__ALL__';
-      loadBgFields(data);
-      themeMode = data.themeMode || 'auto';
-      applyBackground(); applyTheme();
-      init(); renderAll();
-      persistToLocalStorage(); // 把第一次讀到的 backup.json 內容也存一份到本機，之後重整就不用再靠這份檔案
-    })
-    .catch(()=>{applyBackground();applyTheme();init();renderAll();});
-}
+fetch('backup.json')
+  .then(r=>r.json())
+  .then(data=>{
+    if(data.accounts)accounts=data.accounts;
+    charactersByAccount=migrateToPerAccount(data);
+    activeAccount='__ALL__';
+    loadBgFields(data);
+    themeMode = data.themeMode || 'auto';
+    applyBackground(); applyTheme();
+    init(); renderAll();
+  })
+  .catch(()=>{applyBackground();applyTheme();init();renderAll();});
 
 // ── GitHub 備份同步比對 ───────────────────────────────
 let pendingRemoteSync = null;
@@ -2671,7 +2640,6 @@ function useGithubData(){
   themeMode = pendingRemoteSync.themeMode;
   activeAccount = '__ALL__';
   applyBackground(); applyTheme();
-  persistToLocalStorage();
   renderAll();
   document.getElementById('syncConflictModal').classList.remove('open');
   pendingRemoteSync = null;
