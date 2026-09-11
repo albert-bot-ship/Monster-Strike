@@ -253,7 +253,7 @@ html:not([data-theme="light"]) .app-title { animation: titlePowerOn 2.4s ease-ou
 main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 auto; }
 
 /* 搜尋列 */
-.searchbar { display:flex; gap:8px; margin-bottom:12px; position:relative; }
+.searchbar { display:flex; gap:8px; margin-bottom:12px; position:relative; z-index:30; }
 .search-suggest {
   position:absolute; top:100%; left:0; right:0; z-index:25;
   margin-top:4px; background:var(--panel); border:1px solid var(--border);
