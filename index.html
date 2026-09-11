@@ -34,6 +34,10 @@
 </head>
 <body>
 
+<!-- 電腦版背景幻燈片圖層（淡入淡出輪播用，手機版不使用） -->
+<div class="bg-slide-layer" id="bgLayerA"></div>
+<div class="bg-slide-layer" id="bgLayerB"></div>
+
 <div class="pull-refresh-indicator" id="pullRefreshIndicator">↓ 下拉重新整理</div>
 
 <header>
@@ -652,16 +656,33 @@
 
     <div class="appear-section">
       <div class="appear-label" id="bgSectionLabel">背景圖片</div>
-      <div class="bg-preview" id="bgPreviewBox">
-        <span id="bgPreviewHint">尚未設定背景圖</span>
-        <img id="bgPreviewImg" style="display:none;">
+
+      <!-- 手機版：單張背景（不變） -->
+      <div id="bgMobileUI">
+        <div class="bg-preview" id="bgPreviewBox">
+          <span id="bgPreviewHint">尚未設定背景圖</span>
+          <img id="bgPreviewImg" style="display:none;">
+        </div>
+        <div class="appear-btn-row">
+          <label class="gbtn" style="cursor:pointer;">
+            上傳圖片
+            <input type="file" accept="image/*" style="display:none" onchange="handleBgUpload(event)">
+          </label>
+          <button class="gbtn" onclick="clearBg()">清除背景</button>
+        </div>
       </div>
-      <div class="appear-btn-row">
-        <label class="gbtn" style="cursor:pointer;">
-          上傳圖片
-          <input type="file" accept="image/*" style="display:none" onchange="handleBgUpload(event)">
-        </label>
-        <button class="gbtn" onclick="clearBg()">清除背景</button>
+
+      <!-- 電腦版：最多5張輪播幻燈片 -->
+      <div id="bgDesktopUI" style="display:none;">
+        <div class="bg-slideshow-grid" id="bgSlideshowGrid"></div>
+        <div class="appear-btn-row">
+          <label class="gbtn" id="bgAddBtn" style="cursor:pointer;">
+            新增圖片
+            <input type="file" accept="image/*" style="display:none" onchange="handleBgUpload(event)">
+          </label>
+          <button class="gbtn" onclick="clearBg()">清除全部</button>
+        </div>
+        <div class="appear-hint">最多可上傳 5 張，會每 5 秒自動淡入淡出輪播</div>
       </div>
     </div>
 
@@ -770,20 +791,26 @@ const EGG_ICON_B64  = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
 let charactersByAccount = {}, accounts = [{id:'a1',name:'帳號1'},{id:'a2',name:'帳號2'},{id:'a3',name:'帳號3'},{id:'a4',name:'帳號4'}];
 let activeAccount = '__ALL__';
 let hasUnsaved = false, editCharId = null, uploadedImg = null, uploadedImg2 = null, modalAttr = '火';
-let customBgDesktop = null, customBgMobile = null, themeMode = 'auto', uploadedBgTemp = null;
+let customBgDesktop = [], customBgMobile = null, themeMode = 'auto', uploadedBgTemp = null;
 // 裝置判斷：iPhone/iPad/iPod/Android 視為手機版，其餘（含 Mac/Windows）視為電腦版
 function isMobileDevice(){ return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent); }
-function currentBg(){ return isMobileDevice() ? customBgMobile : customBgDesktop; }
+function currentBg(){ return isMobileDevice() ? customBgMobile : (customBgDesktop[0]||null); }
+// 電腦版背景相容處理：舊版是單一字串，新版是最多5張的陣列
+function normalizeBgDesktop(val){
+  if(!val) return [];
+  if(Array.isArray(val)) return val.filter(Boolean).slice(0,5);
+  return [val];
+}
 // 讀取背景欄位：相容舊版單一 customBg 格式（沒有新欄位時，兩邊都先帶入舊圖，之後可各自替換）
 function loadBgFields(data){
   if(data.customBgDesktop !== undefined || data.customBgMobile !== undefined){
-    customBgDesktop = data.customBgDesktop || null;
+    customBgDesktop = normalizeBgDesktop(data.customBgDesktop);
     customBgMobile = data.customBgMobile || null;
   } else if(data.customBg){
-    customBgDesktop = data.customBg;
+    customBgDesktop = normalizeBgDesktop(data.customBg);
     customBgMobile = data.customBg;
   } else {
-    customBgDesktop = null; customBgMobile = null;
+    customBgDesktop = []; customBgMobile = null;
   }
 }
 let multiSelectMode = false, selectedIds = new Set();
@@ -2096,43 +2123,108 @@ function renderCompareTable(){
   wrap.innerHTML = `<table class="compare-table"><thead>${head}</thead><tbody>${rows}</tbody></table>`;
 }
 function openAppearanceModal(){
-  const img=document.getElementById('bgPreviewImg');
-  const hint=document.getElementById('bgPreviewHint');
+  const mobile=isMobileDevice();
+  document.getElementById('bgMobileUI').style.display = mobile?'':'none';
+  document.getElementById('bgDesktopUI').style.display = mobile?'none':'';
   const label=document.getElementById('bgSectionLabel');
-  const bg=currentBg();
-  label.textContent = isMobileDevice() ? '背景圖片（手機版）' : '背景圖片（電腦版）';
-  if(bg){ img.src=bg; img.style.display='block'; hint.style.display='none'; }
-  else { img.style.display='none'; hint.style.display='block'; }
+  label.textContent = mobile ? '背景圖片（手機版）' : '背景圖片（電腦版，最多5張輪播）';
+  if(mobile){
+    const img=document.getElementById('bgPreviewImg'); const hint=document.getElementById('bgPreviewHint');
+    if(customBgMobile){ img.src=customBgMobile; img.style.display='block'; hint.style.display='none'; }
+    else { img.style.display='none'; hint.style.display='block'; }
+  } else {
+    renderBgSlideshowGrid();
+  }
   document.querySelectorAll('.theme-opt').forEach(el=>el.classList.toggle('active', el.dataset.mode===themeMode));
   document.getElementById('appearanceModal').classList.add('open');
 }
 function closeAppearanceModal(){
   document.getElementById('appearanceModal').classList.remove('open');
 }
+function renderBgSlideshowGrid(){
+  const grid=document.getElementById('bgSlideshowGrid'); if(!grid) return;
+  grid.innerHTML = customBgDesktop.map((url,i)=>
+    `<div class="bg-slide-thumb"><img src="${url}" alt=""><span class="bg-slide-remove" onclick="removeBgDesktopAt(${i})">✕</span></div>`
+  ).join('') + (customBgDesktop.length<5 ? `<div class="bg-slide-thumb bg-slide-empty">+${5-customBgDesktop.length}</div>` : '');
+  const addBtn=document.getElementById('bgAddBtn');
+  if(addBtn) addBtn.style.display = customBgDesktop.length>=5 ? 'none' : '';
+}
+function removeBgDesktopAt(i){
+  customBgDesktop.splice(i,1);
+  applyBackground(); saveState(); renderBgSlideshowGrid();
+}
 function handleBgUpload(e){
-  const file=e.target.files[0]; if(!file)return;
+  const file=e.target.files[0]; if(!file){ return; }
   compressImage(file, 1920, 0.82).then(dataUrl=>{
-    if(isMobileDevice()){ customBgMobile=dataUrl; } else { customBgDesktop=dataUrl; }
+    if(isMobileDevice()){
+      customBgMobile=dataUrl;
+      const img=document.getElementById('bgPreviewImg'); const hint=document.getElementById('bgPreviewHint');
+      img.src=dataUrl; img.style.display='block'; hint.style.display='none';
+    } else {
+      if(customBgDesktop.length>=5){ alert('最多只能上傳 5 張背景圖，請先移除一張再新增'); return; }
+      customBgDesktop.push(dataUrl);
+      renderBgSlideshowGrid();
+    }
     applyBackground(); saveState();
-    const img=document.getElementById('bgPreviewImg'); const hint=document.getElementById('bgPreviewHint');
-    img.src=dataUrl; img.style.display='block'; hint.style.display='none';
   }).catch(()=>alert('圖片處理失敗，請換一張圖片'));
+  e.target.value='';
 }
 function clearBg(){
-  if(isMobileDevice()){ customBgMobile=null; } else { customBgDesktop=null; }
+  if(isMobileDevice()){
+    customBgMobile=null;
+    document.getElementById('bgPreviewImg').style.display='none';
+    document.getElementById('bgPreviewHint').style.display='block';
+  } else {
+    customBgDesktop=[];
+    renderBgSlideshowGrid();
+  }
   applyBackground(); saveState();
-  document.getElementById('bgPreviewImg').style.display='none';
-  document.getElementById('bgPreviewHint').style.display='block';
+}
+let bgSlideTimer=null;
+function stopBgSlideshow(){
+  if(bgSlideTimer){ clearInterval(bgSlideTimer); bgSlideTimer=null; }
+}
+function startBgSlideshow(){
+  stopBgSlideshow();
+  const layerA=document.getElementById('bgLayerA'), layerB=document.getElementById('bgLayerB');
+  if(!layerA || !layerB || !customBgDesktop.length) return;
+  const setLayer=(el,url)=>{ el.style.backgroundImage = `linear-gradient(rgba(12,14,34,.72), rgba(12,14,34,.72)), url(${url})`; };
+  setLayer(layerA, customBgDesktop[0]); layerA.classList.add('visible'); layerB.classList.remove('visible');
+  if(customBgDesktop.length<2) return; // 只有一張，不需要輪播計時
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // 尊重減少動態偏好，只顯示第一張
+  let showingA=true, idx=0;
+  bgSlideTimer=setInterval(()=>{
+    idx=(idx+1)%customBgDesktop.length;
+    const showEl = showingA? layerB : layerA;
+    const hideEl = showingA? layerA : layerB;
+    setLayer(showEl, customBgDesktop[idx]);
+    showEl.classList.add('visible');
+    hideEl.classList.remove('visible');
+    showingA=!showingA;
+  }, 5000);
 }
 function applyBackground(){
-  const bg=currentBg();
-  if(bg){
-    document.body.style.backgroundImage = `linear-gradient(rgba(12,14,34,.72), rgba(12,14,34,.72)), url(${bg})`;
-    document.body.style.backgroundSize='cover';
-    document.body.style.backgroundPosition='center';
-    document.body.style.backgroundAttachment='fixed';
+  if(isMobileDevice()){
+    stopBgSlideshow();
+    document.getElementById('bgLayerA')?.classList.remove('visible');
+    document.getElementById('bgLayerB')?.classList.remove('visible');
+    if(customBgMobile){
+      document.body.style.backgroundImage = `linear-gradient(rgba(12,14,34,.72), rgba(12,14,34,.72)), url(${customBgMobile})`;
+      document.body.style.backgroundSize='cover';
+      document.body.style.backgroundPosition='center';
+      document.body.style.backgroundAttachment='fixed';
+    } else {
+      document.body.style.backgroundImage='';
+    }
   } else {
-    document.body.style.backgroundImage='';
+    document.body.style.backgroundImage=''; // 電腦版改由幻燈片圖層顯示，body本身不疊圖
+    if(customBgDesktop.length){
+      startBgSlideshow();
+    } else {
+      stopBgSlideshow();
+      document.getElementById('bgLayerA')?.classList.remove('visible');
+      document.getElementById('bgLayerB')?.classList.remove('visible');
+    }
   }
 }
 
@@ -2547,9 +2639,9 @@ function checkGithubSync(){
       const remoteAccounts = data.accounts || accounts;
       let remoteBgD, remoteBgM;
       if(data.customBgDesktop !== undefined || data.customBgMobile !== undefined){
-        remoteBgD = data.customBgDesktop || null; remoteBgM = data.customBgMobile || null;
+        remoteBgD = normalizeBgDesktop(data.customBgDesktop); remoteBgM = data.customBgMobile || null;
       } else {
-        remoteBgD = data.customBg || null; remoteBgM = data.customBg || null;
+        remoteBgD = normalizeBgDesktop(data.customBg); remoteBgM = data.customBg || null;
       }
       const remoteTheme = data.themeMode || 'auto';
 
@@ -2574,7 +2666,7 @@ function useGithubData(){
   if(!pendingRemoteSync) return;
   accounts = pendingRemoteSync.accounts;
   charactersByAccount = pendingRemoteSync.charactersByAccount;
-  customBgDesktop = pendingRemoteSync.customBgDesktop;
+  customBgDesktop = normalizeBgDesktop(pendingRemoteSync.customBgDesktop);
   customBgMobile = pendingRemoteSync.customBgMobile;
   themeMode = pendingRemoteSync.themeMode;
   activeAccount = '__ALL__';
