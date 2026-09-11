@@ -692,6 +692,17 @@
   </div>
 </div>
 
+<!-- 全部頁點卡片：角色被多個帳號持有時，先選要看哪個帳號的版本 -->
+<div class="modal-overlay" id="accPickerModal">
+  <div class="modal-box" style="max-width:320px;">
+    <h2>選擇要查看的帳號</h2>
+    <div id="accPickerList"></div>
+    <div class="mbtnrow" style="margin-top:14px;">
+      <button class="mcancel" onclick="closeAccPicker()" style="flex:1;">取消</button>
+    </div>
+  </div>
+</div>
+
 <!-- 下拉更新前的備份提醒 -->
 <div class="modal-overlay" id="backupReminderModal">
   <div class="modal-box" style="max-width:340px;">
@@ -1499,9 +1510,30 @@ function appendAllCardBatch() {
       <div class="card-attr attr-${c.attribute}"></div>
       <div class="card-acc-tags">${tagsHtml}</div>
       <div class="card-name-bar">${c.hasGokuUn?`<img src="${GOKUUN_ICON_B64}" class="card-gokuun-icon" alt="極運">`:c.name}</div>`;
+    card.onclick=()=>{
+      if(swipeJustHappened) return;
+      const owningIds = accounts.filter(a=>c.owners.some(o=>o.accId===a.id)).map(a=>a.id);
+      if(owningIds.length===0) return;
+      if(owningIds.length===1) jumpToAccount(owningIds[0], c.name);
+      else openAccPicker(c.name, owningIds);
+    };
     grid.appendChild(card);
   });
   renderedCount += slice.length;
+}
+
+// 全部頁點卡片：角色被多帳號持有時，彈出選單讓使用者選要看哪個帳號
+function openAccPicker(name, accIds){
+  const list=document.getElementById('accPickerList');
+  const safeName=name.replace(/'/g,"\\'");
+  list.innerHTML = accIds.map(accId=>{
+    const acc=accounts.find(a=>a.id===accId);
+    return `<div class="search-suggest-item" onclick="closeAccPicker();jumpToAccount('${accId}','${safeName}')">${acc?acc.name:accId}</div>`;
+  }).join('');
+  document.getElementById('accPickerModal').classList.add('open');
+}
+function closeAccPicker(){
+  document.getElementById('accPickerModal').classList.remove('open');
 }
 
 // 從「全部」首頁點帳號標籤，跳到該帳號並打開該角色詳情
