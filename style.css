@@ -1062,3 +1062,33 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 body.intro header      { animation: introUp .55s cubic-bezier(.16,1,.3,1) both; }
 body.intro .searchbar  { animation: introUp .55s cubic-bezier(.16,1,.3,1) .08s both; }
 body.intro .swipe-view { animation: introUp .55s cubic-bezier(.16,1,.3,1) .16s both; }
+
+/* ── 電腦版背景幻燈片（最多5張，柔和淡入淡出輪播） ────────── */
+.bg-slide-layer {
+  position: fixed; inset: 0; z-index: -1;
+  background-size: cover; background-position: center;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  pointer-events: none;
+}
+.bg-slide-layer.visible { opacity: 1; }
+
+.bg-slideshow-grid {
+  display: grid; grid-template-columns: repeat(5,1fr); gap: 6px;
+  margin-bottom: 10px;
+}
+.bg-slide-thumb {
+  position: relative; aspect-ratio: 1/1; border-radius: 8px;
+  overflow: hidden; border: 1px solid var(--border2); background: var(--panel2);
+}
+.bg-slide-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.bg-slide-remove {
+  position: absolute; top: 2px; right: 2px; width: 18px; height: 18px;
+  border-radius: 50%; background: rgba(0,0,0,.65); color: #fff;
+  font-size: 11px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.bg-slide-empty {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--muted); border-style: dashed;
+}
