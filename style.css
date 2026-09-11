@@ -144,6 +144,17 @@ body {
 }
 .skill-btn:active { filter: brightness(.9); }
 
+/* 合作活動篩選：依名稱自動分配顏色，左側色條＋文字上色方便辨識不同活動 */
+.skill-btn.collab-btn {
+  border-left: 4px solid var(--collab-color, var(--border2));
+  color: var(--collab-color, var(--modal-sub));
+  font-weight: 600;
+}
+.skill-btn.collab-btn.active {
+  border-left-color: var(--collab-color, #98c0ff);
+  color: #fff;
+}
+
 /* 格狀排列 */
 .sg3 { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }
 .sg2 { display:grid; grid-template-columns:repeat(2,1fr); gap:5px; }
@@ -1099,3 +1110,22 @@ body.intro .swipe-view { animation: introUp .55s cubic-bezier(.16,1,.3,1) .16s b
   display: flex; align-items: center; justify-content: center;
   font-size: 11px; color: var(--muted); border-style: dashed;
 }
+
+/* ── 整理重複圖片 ─────────────────────────────────────── */
+.merge-group {
+  margin-bottom: 16px; padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.merge-group:last-child { border-bottom: none; }
+.merge-group-title { font-size: 14px; font-weight: 700; color: var(--gold2); margin-bottom: 8px; }
+.merge-group-sub { font-size: 11px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+.merge-thumb-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.merge-thumb {
+  width: 84px; cursor: pointer; text-align: center;
+  border: 2px solid var(--border2); border-radius: 8px; padding: 4px;
+  transition: border-color .15s, transform .12s;
+}
+.merge-thumb:hover { border-color: var(--gold); }
+.merge-thumb:active { transform: scale(.96); }
+.merge-thumb img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px; display: block; }
+.merge-thumb-lbl { font-size: 11px; color: var(--modal-sub); margin-top: 4px; line-height: 1.3; word-break: break-all; }
