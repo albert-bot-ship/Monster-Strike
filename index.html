@@ -34,7 +34,7 @@
 </head>
 <body>
 
-<!-- 電腦版背景幻燈片圖層（淡入淡出輪播用，手機版不使用） -->
+<!-- 背景幻燈片圖層（淡入淡出輪播，手機電腦共用） -->
 <div class="bg-slide-layer" id="bgLayerA"><div class="bg-blur"></div><div class="bg-contain"></div><div class="bg-overlay"></div></div>
 <div class="bg-slide-layer" id="bgLayerB"><div class="bg-blur"></div><div class="bg-contain"></div><div class="bg-overlay"></div></div>
 
@@ -58,7 +58,8 @@
 </header>
 
 <main>
-  <div class="searchbar">
+  <div class="searchbar" id="searchbarWrap">
+    <button class="search-toggle-btn" id="searchToggleBtn" onclick="expandSearch()" title="搜尋角色名稱">🔍</button>
     <input class="search-input" type="text" id="searchBox" placeholder="🔍 搜尋角色名稱..." autocomplete="off">
     <button class="gbtn" onclick="resetAllFilters()">↺ 重置</button>
     <button class="gbtn" onclick="openFilter()">▼ 篩選</button>
@@ -664,25 +665,9 @@
     <h2>🎨 外觀設定</h2>
 
     <div class="appear-section">
-      <div class="appear-label" id="bgSectionLabel">背景圖片</div>
+      <div class="appear-label" id="bgSectionLabel">背景圖片（可上傳多張，自動輪播）</div>
 
-      <!-- 手機版：單張背景（不變） -->
-      <div id="bgMobileUI">
-        <div class="bg-preview" id="bgPreviewBox">
-          <span id="bgPreviewHint">尚未設定背景圖</span>
-          <img id="bgPreviewImg" style="display:none;">
-        </div>
-        <div class="appear-btn-row">
-          <label class="gbtn" style="cursor:pointer;">
-            上傳圖片
-            <input type="file" accept="image/*" style="display:none" onchange="handleBgUpload(event)">
-          </label>
-          <button class="gbtn" onclick="clearBg()">清除背景</button>
-        </div>
-      </div>
-
-      <!-- 電腦版：最多5張輪播幻燈片 -->
-      <div id="bgDesktopUI" style="display:none;">
+      <div id="bgUI">
         <div class="bg-slideshow-grid" id="bgSlideshowGrid"></div>
         <div class="appear-btn-row">
           <label class="gbtn" id="bgAddBtn" style="cursor:pointer;">
@@ -691,9 +676,10 @@
           </label>
           <button class="gbtn" onclick="clearBg()">清除全部</button>
         </div>
-        <div class="appear-hint">最多可上傳 5 張，會每 5 秒自動淡入淡出輪播</div>
+        <div class="appear-hint">張數不限，會每 5 秒自動淡入淡出輪播</div>
       </div>
     </div>
+
 
     <div class="appear-section">
       <div class="appear-label">主題模式</div>
@@ -924,24 +910,25 @@ let hasUnsaved = false, editCharId = null, uploadedImg = null, uploadedImg2 = nu
 let customBgDesktop = [], customBgMobile = null, themeMode = 'auto', uploadedBgTemp = null;
 // 裝置判斷：iPhone/iPad/iPod/Android 視為手機版，其餘（含 Mac/Windows）視為電腦版
 function isMobileDevice(){ return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent); }
-function currentBg(){ return isMobileDevice() ? customBgMobile : (customBgDesktop[0]||null); }
-// 電腦版背景相容處理：舊版是單一字串，新版是最多5張的陣列
+function currentBg(){ return customBgDesktop[0]||null; }
+// 電腦版背景相容處理：舊版是單一字串，新版是陣列（不限張數）
 function normalizeBgDesktop(val){
   if(!val) return [];
-  if(Array.isArray(val)) return val.filter(Boolean).slice(0,5);
+  if(Array.isArray(val)) return val.filter(Boolean);
   return [val];
 }
-// 讀取背景欄位：相容舊版單一 customBg 格式（沒有新欄位時，兩邊都先帶入舊圖，之後可各自替換）
+// 讀取背景欄位：相容舊版單一 customBg／customBgMobile 格式，一律併入同一組陣列（手機/電腦共用，不再分開、不限張數）
 function loadBgFields(data){
   if(data.customBgDesktop !== undefined || data.customBgMobile !== undefined){
     customBgDesktop = normalizeBgDesktop(data.customBgDesktop);
-    customBgMobile = data.customBgMobile || null;
+    const legacyMobile = data.customBgMobile || null;
+    if(legacyMobile && !customBgDesktop.includes(legacyMobile)) customBgDesktop.push(legacyMobile);
   } else if(data.customBg){
     customBgDesktop = normalizeBgDesktop(data.customBg);
-    customBgMobile = data.customBg;
   } else {
-    customBgDesktop = []; customBgMobile = null;
+    customBgDesktop = [];
   }
+  customBgMobile = null;
 }
 let multiSelectMode = false, selectedIds = new Set();
 let swipeJustHappened = false;
@@ -1034,7 +1021,12 @@ function init() {
   buildCddBody('mOtherSkillGrid', OTHER_SKILLS, 'skills', false);
   document.getElementById('searchBox').addEventListener('input', ()=>{ renderList(); updateSearchSuggest(); });
   document.getElementById('searchBox').addEventListener('focus', updateSearchSuggest);
-  document.getElementById('searchBox').addEventListener('blur', ()=>{ setTimeout(()=>document.getElementById('searchSuggest').classList.remove('open'), 150); });
+  document.getElementById('searchBox').addEventListener('blur', ()=>{
+    setTimeout(()=>{
+      document.getElementById('searchSuggest').classList.remove('open');
+      collapseSearchIfEmpty();
+    }, 150);
+  });
   enhanceEggIcons();
   document.getElementById('gokuUnIconLabel').src = GOKUUN_ICON_B64;
   document.querySelectorAll('#mObtainGrid .skill-btn').forEach(b=>{
@@ -1449,11 +1441,22 @@ function resetAllFilters() {
   document.getElementById('searchSuggest').classList.remove('open');
   resetFilter();
 }
+// 搜尋列預設收合成圖示，點擊才展開；失焦且沒有輸入內容時自動收合回去
+function expandSearch(){
+  document.getElementById('searchbarWrap').classList.add('expanded');
+  document.getElementById('searchBox').focus();
+}
+function collapseSearchIfEmpty(){
+  if(!document.getElementById('searchBox').value.trim()){
+    document.getElementById('searchbarWrap').classList.remove('expanded');
+  }
+}
 // 底部導覽列「首頁」：回到全部帳號檢視、清空搜尋/篩選、捲回頁面最上方
 function goHome(){
   activeAccount='__ALL__';
   multiSelectMode=false; selectedIds.clear();
   resetAllFilters();
+  collapseSearchIfEmpty();
   renderAll();
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -2623,18 +2626,7 @@ function renderCompareTable(){
   wrap.innerHTML = `<table class="compare-table"><thead>${head}</thead><tbody>${rows}</tbody></table>`;
 }
 function openAppearanceModal(){
-  const mobile=isMobileDevice();
-  document.getElementById('bgMobileUI').style.display = mobile?'':'none';
-  document.getElementById('bgDesktopUI').style.display = mobile?'none':'';
-  const label=document.getElementById('bgSectionLabel');
-  label.textContent = mobile ? '背景圖片（手機版）' : '背景圖片（電腦版，最多5張輪播）';
-  if(mobile){
-    const img=document.getElementById('bgPreviewImg'); const hint=document.getElementById('bgPreviewHint');
-    if(customBgMobile){ img.src=customBgMobile; img.style.display='block'; hint.style.display='none'; }
-    else { img.style.display='none'; hint.style.display='block'; }
-  } else {
-    renderBgSlideshowGrid();
-  }
+  renderBgSlideshowGrid();
   document.querySelectorAll('.theme-opt').forEach(el=>el.classList.toggle('active', el.dataset.mode===themeMode));
   document.getElementById('appearanceModal').classList.add('open');
 }
@@ -2645,9 +2637,7 @@ function renderBgSlideshowGrid(){
   const grid=document.getElementById('bgSlideshowGrid'); if(!grid) return;
   grid.innerHTML = customBgDesktop.map((url,i)=>
     `<div class="bg-slide-thumb"><img src="${url}" alt=""><span class="bg-slide-remove" onclick="removeBgDesktopAt(${i})">✕</span></div>`
-  ).join('') + (customBgDesktop.length<5 ? `<div class="bg-slide-thumb bg-slide-empty">+${5-customBgDesktop.length}</div>` : '');
-  const addBtn=document.getElementById('bgAddBtn');
-  if(addBtn) addBtn.style.display = customBgDesktop.length>=5 ? 'none' : '';
+  ).join('');
 }
 function removeBgDesktopAt(i){
   customBgDesktop.splice(i,1);
@@ -2656,28 +2646,15 @@ function removeBgDesktopAt(i){
 function handleBgUpload(e){
   const file=e.target.files[0]; if(!file){ return; }
   compressImage(file, 1920, 0.82).then(dataUrl=>{
-    if(isMobileDevice()){
-      customBgMobile=dataUrl;
-      const img=document.getElementById('bgPreviewImg'); const hint=document.getElementById('bgPreviewHint');
-      img.src=dataUrl; img.style.display='block'; hint.style.display='none';
-    } else {
-      if(customBgDesktop.length>=5){ alert('最多只能上傳 5 張背景圖，請先移除一張再新增'); return; }
-      customBgDesktop.push(dataUrl);
-      renderBgSlideshowGrid();
-    }
+    customBgDesktop.push(dataUrl);
+    renderBgSlideshowGrid();
     applyBackground(); saveState();
   }).catch(()=>alert('圖片處理失敗，請換一張圖片'));
   e.target.value='';
 }
 function clearBg(){
-  if(isMobileDevice()){
-    customBgMobile=null;
-    document.getElementById('bgPreviewImg').style.display='none';
-    document.getElementById('bgPreviewHint').style.display='block';
-  } else {
-    customBgDesktop=[];
-    renderBgSlideshowGrid();
-  }
+  customBgDesktop=[];
+  renderBgSlideshowGrid();
   applyBackground(); saveState();
 }
 let bgSlideTimer=null;
@@ -2708,26 +2685,13 @@ function startBgSlideshow(){
   }, 5000);
 }
 function applyBackground(){
-  if(isMobileDevice()){
-    stopBgSlideshow();
-    document.body.style.backgroundImage='';
-    const layerA=document.getElementById('bgLayerA'), layerB=document.getElementById('bgLayerB');
-    layerB?.classList.remove('visible');
-    if(customBgMobile && layerA){
-      setBgLayer(layerA, customBgMobile);
-      layerA.classList.add('visible');
-    } else {
-      layerA?.classList.remove('visible');
-    }
+  document.body.style.backgroundImage=''; // 一律改由幻燈片圖層顯示，body本身不疊圖
+  if(customBgDesktop.length){
+    startBgSlideshow();
   } else {
-    document.body.style.backgroundImage=''; // 電腦版改由幻燈片圖層顯示，body本身不疊圖
-    if(customBgDesktop.length){
-      startBgSlideshow();
-    } else {
-      stopBgSlideshow();
-      document.getElementById('bgLayerA')?.classList.remove('visible');
-      document.getElementById('bgLayerB')?.classList.remove('visible');
-    }
+    stopBgSlideshow();
+    document.getElementById('bgLayerA')?.classList.remove('visible');
+    document.getElementById('bgLayerB')?.classList.remove('visible');
   }
 }
 
@@ -3129,21 +3093,23 @@ function checkGithubSync(){
       const remoteChars = migrateToPerAccount(data);
       const remoteAccounts = data.accounts || accounts;
       const remoteImages = data.sharedImages || {};
-      let remoteBgD, remoteBgM;
+      let remoteBgD;
       if(data.customBgDesktop !== undefined || data.customBgMobile !== undefined){
-        remoteBgD = normalizeBgDesktop(data.customBgDesktop); remoteBgM = data.customBgMobile || null;
+        remoteBgD = normalizeBgDesktop(data.customBgDesktop);
+        const legacyMobile = data.customBgMobile || null;
+        if(legacyMobile && !remoteBgD.includes(legacyMobile)) remoteBgD.push(legacyMobile);
       } else {
-        remoteBgD = normalizeBgDesktop(data.customBg); remoteBgM = data.customBg || null;
+        remoteBgD = normalizeBgDesktop(data.customBg);
       }
       const remoteTheme = data.themeMode || 'auto';
 
-      const localSnap  = snapshotForSync(accounts, charactersByAccount, sharedImages, customBgDesktop, customBgMobile, themeMode);
-      const remoteSnap = snapshotForSync(remoteAccounts, remoteChars, remoteImages, remoteBgD, remoteBgM, remoteTheme);
+      const localSnap  = snapshotForSync(accounts, charactersByAccount, sharedImages, customBgDesktop, null, themeMode);
+      const remoteSnap = snapshotForSync(remoteAccounts, remoteChars, remoteImages, remoteBgD, null, remoteTheme);
       if(localSnap === remoteSnap) return; // 完全相同,不用問
 
       const localCount  = Object.values(charactersByAccount).reduce((s,l)=>s+(l?l.length:0),0);
       const remoteCount = Object.values(remoteChars).reduce((s,l)=>s+(l?l.length:0),0);
-      pendingRemoteSync = {accounts:remoteAccounts, charactersByAccount:remoteChars, sharedImages:remoteImages, customBgDesktop:remoteBgD, customBgMobile:remoteBgM, themeMode:remoteTheme};
+      pendingRemoteSync = {accounts:remoteAccounts, charactersByAccount:remoteChars, sharedImages:remoteImages, customBgDesktop:remoteBgD, themeMode:remoteTheme};
       document.getElementById('syncLocalInfo').textContent = `更新時間：${formatSyncTime(localSavedAt)}　角色總數：${localCount}　帳號數：${accounts.length}`;
       document.getElementById('syncRemoteInfo').textContent = `更新時間：${formatSyncTime(data.savedAt)}　角色總數：${remoteCount}　帳號數：${remoteAccounts.length}`;
       document.getElementById('syncConflictModal').classList.add('open');
@@ -3160,7 +3126,7 @@ function useGithubData(){
   charactersByAccount = pendingRemoteSync.charactersByAccount;
   sharedImages = pendingRemoteSync.sharedImages || {};
   customBgDesktop = normalizeBgDesktop(pendingRemoteSync.customBgDesktop);
-  customBgMobile = pendingRemoteSync.customBgMobile;
+  customBgMobile = null;
   themeMode = pendingRemoteSync.themeMode;
   activeAccount = '__ALL__';
   applyBackground(); applyTheme();
