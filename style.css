@@ -12,10 +12,10 @@
   --bg-input:     #2e3468;  /* 輸入框背景 */
   --bg-modal:     #1c2040;  /* 彈窗／抽屜背景 */
 
-  /* ── 邊框（黑白半透明為主，強調色另外給藍/紅）──────── */
+  /* ── 邊框（黑白半透明為主，強調色另外給藍/紅；--bdr-accent 隨主題色變動）── */
   --bdr-subtle: rgba(255,255,255,.08);
   --bdr-normal: rgba(255,255,255,.16);
-  --bdr-accent: rgba(28,105,212,.40);
+  --bdr-accent: rgba(var(--m-blue-rgb),.40);
   --bdr-red:    rgba(226,35,26,.40);
 
   /* ── 文字（由明到淡，另加強調色文字）───────────────── */
@@ -42,8 +42,8 @@
   --sha-md: 0 8px 20px rgba(0,0,0,.4);
   --sha-lg: 0 8px 30px rgba(0,0,0,.5);
 
-  /* ── 發光效果（選中／強調狀態用）───────────────────── */
-  --glo-blue: rgba(28,105,212,.5);
+  /* ── 發光效果（選中／強調狀態用；--glo-blue 隨主題色變動，--glo-red/--glo-grn 固定）── */
+  --glo-blue: rgba(var(--m-blue-rgb),.5);
   --glo-red:  rgba(226,35,26,.5);
   --glo-grn:  rgba(61,220,132,.5);
 
@@ -65,17 +65,24 @@
   --radius-sm:6px;
   --radius-lg:14px;
 
-  /* ── 品牌色（BMW M 三色，用於強調線／光暈）─────────── */
-  --m-blue:       #1c69d4;
-  --m-blue-light: #4d8dff;
+  /* ── 品牌色（BMW M 三色，用於強調線／光暈）─────────────
+     --m-blue/--m-blue-light/--m-violet 改由 RGB 三元組推導，
+     主題色切換（body.accent-xxx）只需覆寫 --m-blue-rgb/--m-blue-light-rgb/--m-violet-rgb 這三個，
+     --bdr-accent、--glo-blue、--m-blue-glow、--m-violet-glow 都會跟著變。
+     紅色（--m-red/--m-red-light）是刪除/危險語意色，10 組主題色都不動它。 */
+  --m-blue-rgb:       28,105,212;
+  --m-blue-light-rgb: 77,141,255;
+  --m-violet-rgb:     111,66,193;
+  --m-blue:       rgb(var(--m-blue-rgb));
+  --m-blue-light: rgb(var(--m-blue-light-rgb));
   --m-red:        #e2231a;
   --m-red-light:  #ff5577;
-  --m-violet:     #6f42c1;
+  --m-violet:     rgb(var(--m-violet-rgb));
   --body-radial: #28205a;
   /* 背景縱深層專用的低透明度光暈（比卡片光暈更淡，做環境氛圍用） */
-  --m-blue-glow:   rgba(28,105,212,.16);
+  --m-blue-glow:   rgba(var(--m-blue-rgb),.16);
   --m-red-glow:    rgba(226,35,26,.13);
-  --m-violet-glow: rgba(111,66,193,.16);
+  --m-violet-glow: rgba(var(--m-violet-rgb),.16);
 
   /* 活動月曆配色（分類色，不在本次新命名系統範圍內，維持原樣） */
   --ev1: #4d8dff;
@@ -100,23 +107,37 @@ body.light-theme {
 
   --bdr-subtle: rgba(20,24,50,.06);
   --bdr-normal: rgba(20,24,50,.14);
-  --bdr-accent: rgba(28,105,212,.30);
+  --bdr-accent: rgba(var(--m-blue-rgb),.30);
 
   --tx-primary:   #1b1e2b;
   --tx-secondary: #565d70;
   --tx-muted:     #838aa0;
 
-  --glo-blue: rgba(28,105,212,.35);
+  --glo-blue: rgba(var(--m-blue-rgb),.35);
   --glo-red:  rgba(226,35,26,.35);
 
   --sha-md: 0 8px 20px rgba(20,24,50,.12);
   --sha-lg: 0 8px 30px rgba(20,24,50,.18);
 
-  --body-radial: rgba(28,105,212,.06);
-  --m-blue-glow:   rgba(28,105,212,.05);
+  --body-radial: rgba(var(--m-blue-rgb),.06);
+  --m-blue-glow:   rgba(var(--m-blue-rgb),.05);
   --m-red-glow:    rgba(226,35,26,.04);
-  --m-violet-glow: rgba(111,66,193,.05);
+  --m-violet-glow: rgba(var(--m-violet-rgb),.05);
 }
+
+/* ── 主題色（10 組，深色/淺色模式通用；只覆寫品牌色 RGB 三元組，
+   --bdr-accent/--glo-blue/--m-blue-glow/--m-violet-glow 都會自動跟著變）──
+   對照表：主色 → --m-blue-rgb，主色-light → --m-blue-light-rgb，輔色 → --m-violet-rgb */
+body.accent-mblue {     --m-blue-rgb:0,87,184;    --m-blue-light-rgb:77,159,255;  --m-violet-rgb:111,44,167; }  /* M藍 */
+body.accent-emerald {   --m-blue-rgb:0,137,123;   --m-blue-light-rgb:77,182,172;  --m-violet-rgb:0,105,92; }   /* 翠綠 */
+body.accent-amber {     --m-blue-rgb:192,122,0;   --m-blue-light-rgb:255,179,0;   --m-violet-rgb:230,81,0; }   /* 琥珀 */
+body.accent-rose {      --m-blue-rgb:173,20,87;   --m-blue-light-rgb:240,98,146;  --m-violet-rgb:106,27,154; } /* 玫瑰 */
+body.accent-electric {  --m-blue-rgb:0,180,216;   --m-blue-light-rgb:72,202,228;  --m-violet-rgb:123,47,190; } /* 電藍 */
+body.accent-coral {     --m-blue-rgb:255,107,107; --m-blue-light-rgb:255,142,83;  --m-violet-rgb:255,71,87; }  /* 珊瑚橘 */
+body.accent-lavender {  --m-blue-rgb:155,89,182;  --m-blue-light-rgb:195,155,211; --m-violet-rgb:142,68,173; } /* 薰衣草 */
+body.accent-glacier {   --m-blue-rgb:116,185,255; --m-blue-light-rgb:168,216,234; --m-violet-rgb:9,132,227; }  /* 冰川藍 */
+body.accent-charcoal {  --m-blue-rgb:99,110,114;  --m-blue-light-rgb:178,190,195; --m-violet-rgb:45,52,54; }   /* 炭灰 */
+body.accent-jadegold {  --m-blue-rgb:26,107,74;   --m-blue-light-rgb:0,184,148;   --m-violet-rgb:200,160,0; }  /* 翡翠金 */
 
 /* ── Reset ─────────────────────────────────────────── */
 *,*::before,*::after { box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
@@ -232,11 +253,6 @@ body.light-theme header::after { opacity:.55; }
   border:1px solid var(--bdr-normal); transition: filter .15s, transform .12s;
 }
 .header-icon-btn:active { transform:scale(.9); filter:brightness(1.2); }
-.header-icon-btn.active {
-  background: linear-gradient(180deg, #5090e8, #2060c0);
-  border-color: #98c0ff; box-shadow: 0 0 8px var(--glo-blue);
-  color:#fff;
-}
 .app-title {
   font-size: 15px; font-weight: 800; letter-spacing: .6px;
   background: linear-gradient(90deg, var(--water), var(--dark) 55%, var(--fire));
@@ -298,7 +314,7 @@ body:not(.light-theme) .app-title { animation: titlePowerOn 2.4s ease-out 1; }
 }
 
 /* ── Main ──────────────────────────────────────────── */
-main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 auto; }
+main { padding:12px 12px calc(var(--nav-h) * 0.55 + 16px); max-width:600px; margin:0 auto; }
 
 /* 搜尋欄：現在移入篩選抽屜最上方，跟其他篩選條件放在一起 */
 .drawer-search-wrap { position:relative; }
@@ -565,10 +581,14 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 /* ── 底部導覽列 ─────────────────────────────────────── */
 .bottom-nav {
   position:fixed; bottom:0; left:0; right:0; height:var(--nav-h);
-  background: linear-gradient(0deg, #0c0e22, #141830);
+  background: linear-gradient(0deg, rgba(12,14,34,.92), rgba(20,24,48,.86));
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   border-top: 1px solid var(--bdr-normal);
   display:flex; align-items:center; padding:0 6px 4px;
   z-index:30;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .bottom-nav { background: rgb(12,14,34); backdrop-filter: none; }
 }
 
 /* 滑動切換帳號的內容容器 */
@@ -608,6 +628,64 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 .nav-add:active { transform:scale(.93); }
 .nav-add .nav-icon { font-size:24px; color:#fff; }
 .nav-add .nav-lbl  { font-size:9px; color:rgba(255,255,255,.9); }
+
+/* ── 側欄選單 ─────────────────────────────────────── */
+.sidebar-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.6); z-index:38;
+  backdrop-filter:blur(3px);
+  opacity:0;
+}
+.sidebar-overlay.open { display:block; }
+/* opacity 由 JS 依側欄拖曳/彈簧位移進度逐幀設定，不用 CSS transition */
+
+.sidebar {
+  position:fixed; top:0; bottom:0; left:0;
+  width:78vw; max-width:300px;
+  background: var(--bg-modal);
+  border-right: 1px solid var(--bdr-accent);
+  z-index:48; overflow-y:auto;
+  padding: 14px 0 calc(var(--nav-h) + 10px);
+  transform: translateX(-100%);
+  box-shadow: var(--sha-lg);
+}
+.sidebar.open { transform:translateX(0); }
+/* 開合位移改由 JS 彈簧動畫逐幀控制（見 index.html 側欄手勢區塊，跟篩選抽屜同一套做法），
+   這裡不放 CSS transition，避免兩者互相打架造成卡頓 */
+
+.sidebar-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 4px 16px 14px; margin-bottom:6px;
+  border-bottom: 1px solid var(--bdr-normal);
+}
+.sidebar-title { font-size:15px; font-weight:900; color:var(--modal-text); letter-spacing:-0.01em; }
+.sidebar-close {
+  width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--modal-sub); font-size:15px; cursor:pointer;
+  background:var(--bg-card-hov);
+}
+.sidebar-close:active { filter:brightness(1.25); transform:scale(.92); }
+
+.sidebar-group { margin-bottom:16px; }
+.sidebar-group-label {
+  font-size:11px; font-weight:700; letter-spacing:.04em;
+  color:var(--modal-muted); padding:0 16px 6px;
+}
+.sidebar-item {
+  display:flex; align-items:center; gap:12px;
+  padding:11px 16px; cursor:pointer;
+  border-left:3px solid transparent;
+  transition: background .15s, border-color .15s;
+}
+.sidebar-item:active { background:var(--bg-card-hov); }
+.sidebar-item.active {
+  background: rgba(var(--m-blue-rgb),.14);
+  border-left-color: var(--m-blue);
+}
+.sidebar-item-icon { font-size:17px; width:22px; text-align:center; flex-shrink:0; }
+.sidebar-item-text { font-size:13.5px; color:var(--modal-text); }
+.sidebar-item.active .sidebar-item-text { color:var(--m-blue-light); font-weight:700; }
 
 /* ── 篩選抽屜 ─────────────────────────────────────── */
 .drawer-overlay {
@@ -837,6 +915,20 @@ main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 au
 }
 .theme-opt.active { border-color:var(--gold); color:var(--gold); background:var(--bg-secondary); box-shadow:0 0 8px var(--gold-dim); }
 .appear-hint { font-size:11px; color:var(--modal-muted); line-height:1.5; }
+
+/* 主題色色票（雙色球）：背景是各主題自己的兩色漸層，跟目前套用中的主題無關 */
+.accent-swatch-row { display:flex; flex-wrap:wrap; gap:11px; }
+.accent-swatch {
+  width:34px; height:34px; border-radius:50%; flex-shrink:0;
+  border:2px solid transparent; cursor:pointer;
+  box-shadow: var(--sha-sm);
+  transition: transform .15s, box-shadow .15s, border-color .15s;
+}
+.accent-swatch:active { transform:scale(.88); }
+.accent-swatch.active {
+  border-color:#fff;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.9), 0 0 9px 2px var(--sw-glow, rgba(255,255,255,.55));
+}
 
 /* 圖片上傳 */
 .img-upload-area {
