@@ -58,13 +58,6 @@
 </header>
 
 <main>
-  <div class="searchbar" id="searchbarWrap">
-    <button class="search-toggle-btn" id="searchToggleBtn" onclick="expandSearch()" title="搜尋角色名稱">🔍</button>
-    <input class="search-input" type="text" id="searchBox" placeholder="🔍 搜尋角色名稱..." autocomplete="off">
-    <button class="gbtn" onclick="resetAllFilters()">↺ 重置</button>
-    <button class="gbtn" onclick="openFilter()">▼ 篩選</button>
-    <div class="search-suggest" id="searchSuggest"></div>
-  </div>
   <div class="swipe-view" id="swipeView">
     <div class="sort-bar">
       <span class="sort-lbl">排序：</span>
@@ -259,7 +252,15 @@
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeFilter()"></div>
 <div class="filter-drawer" id="filterDrawer">
   <div class="drawer-handle"></div>
-  <div class="drawer-title">篩選條件</div>
+  <div class="drawer-title">搜尋／篩選</div>
+
+  <div class="drawer-section">
+    <div class="drawer-lbl">搜尋角色名稱</div>
+    <div class="drawer-search-wrap">
+      <input class="search-input" type="text" id="searchBox" placeholder="🔍 搜尋角色名稱..." autocomplete="off">
+      <div class="search-suggest" id="searchSuggest"></div>
+    </div>
+  </div>
 
   <div class="drawer-section">
     <div class="drawer-lbl">屬性</div>
@@ -368,7 +369,7 @@
   </div>
 
   <div class="drawer-actions">
-    <button class="drawer-reset" onclick="resetFilter()">重置</button>
+    <button class="drawer-reset" onclick="resetAllFilters()">重置</button>
     <button class="drawer-confirm" onclick="closeFilter()">決定</button>
   </div>
 </div>
@@ -1021,12 +1022,7 @@ function init() {
   buildCddBody('mOtherSkillGrid', OTHER_SKILLS, 'skills', false);
   document.getElementById('searchBox').addEventListener('input', ()=>{ renderList(); updateSearchSuggest(); });
   document.getElementById('searchBox').addEventListener('focus', updateSearchSuggest);
-  document.getElementById('searchBox').addEventListener('blur', ()=>{
-    setTimeout(()=>{
-      document.getElementById('searchSuggest').classList.remove('open');
-      collapseSearchIfEmpty();
-    }, 150);
-  });
+  document.getElementById('searchBox').addEventListener('blur', ()=>{ setTimeout(()=>document.getElementById('searchSuggest').classList.remove('open'), 150); });
   enhanceEggIcons();
   document.getElementById('gokuUnIconLabel').src = GOKUUN_ICON_B64;
   document.querySelectorAll('#mObtainGrid .skill-btn').forEach(b=>{
@@ -1441,22 +1437,11 @@ function resetAllFilters() {
   document.getElementById('searchSuggest').classList.remove('open');
   resetFilter();
 }
-// 搜尋列預設收合成圖示，點擊才展開；失焦且沒有輸入內容時自動收合回去
-function expandSearch(){
-  document.getElementById('searchbarWrap').classList.add('expanded');
-  document.getElementById('searchBox').focus();
-}
-function collapseSearchIfEmpty(){
-  if(!document.getElementById('searchBox').value.trim()){
-    document.getElementById('searchbarWrap').classList.remove('expanded');
-  }
-}
 // 底部導覽列「首頁」：回到全部帳號檢視、清空搜尋/篩選、捲回頁面最上方
 function goHome(){
   activeAccount='__ALL__';
   multiSelectMode=false; selectedIds.clear();
   resetAllFilters();
-  collapseSearchIfEmpty();
   renderAll();
   window.scrollTo({top:0, behavior:'smooth'});
 }
