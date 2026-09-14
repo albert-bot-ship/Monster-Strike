@@ -45,12 +45,7 @@
     <span class="app-title">Monster Strike Collect</span>
     <div class="header-right">
       <span id="unsavedBadge">未備份</span>
-      <span class="header-icon-btn" onclick="openInfoModal()" title="收藏統計／活動情報">📊</span>
-      <span class="header-icon-btn" onclick="openCompareModal()" title="多帳號收藏比對">⚖️</span>
-      <span class="header-icon-btn" onclick="openAppearanceModal()" title="外觀設定">🎨</span>
-      <span class="header-icon-btn" id="multiSelectBtn" onclick="toggleMultiSelect()" title="多選模式">☑</span>
-      <span class="header-icon-btn" onclick="openShareModal()" title="分享">📤</span>
-      <span class="header-icon-btn" onclick="openImageMergeScan()" title="整理重複圖片">🧹</span>
+      <span class="header-icon-btn" onclick="openSidebar()" title="選單">☰</span>
     </div>
   </div>
   <div class="accounts" id="accountTabs"></div>
@@ -247,6 +242,44 @@
   <div class="nav-item" onclick="document.getElementById('importFile').click()"><span class="nav-icon">⬆</span><span class="nav-lbl">匯入</span></div>
   <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importBackup(event)">
 </nav>
+
+<!-- 側欄選單 -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-title">選單</span>
+    <span class="sidebar-close" onclick="closeSidebar()">✕</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">檢視與分析</div>
+      <div class="sidebar-item" onclick="sidebarAction('info')">
+        <span class="sidebar-item-icon">📊</span><span class="sidebar-item-text">收藏統計／活動情報</span>
+      </div>
+      <div class="sidebar-item" onclick="sidebarAction('compare')">
+        <span class="sidebar-item-icon">⚖️</span><span class="sidebar-item-text">多帳號收藏比對</span>
+      </div>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">工具</div>
+      <div class="sidebar-item" id="multiSelectBtn" onclick="sidebarAction('multiselect')">
+        <span class="sidebar-item-icon">☑</span><span class="sidebar-item-text">多選模式</span>
+      </div>
+      <div class="sidebar-item" onclick="sidebarAction('mergeimg')">
+        <span class="sidebar-item-icon">🧹</span><span class="sidebar-item-text">整理重複圖片</span>
+      </div>
+      <div class="sidebar-item" onclick="sidebarAction('share')">
+        <span class="sidebar-item-icon">📤</span><span class="sidebar-item-text">分享</span>
+      </div>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">設定</div>
+      <div class="sidebar-item" onclick="sidebarAction('appearance')">
+        <span class="sidebar-item-icon">🎨</span><span class="sidebar-item-text">外觀設定</span>
+      </div>
+    </div>
+  </nav>
+</aside>
 
 <!-- 篩選抽屜 -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeFilter()"></div>
@@ -682,6 +715,19 @@
           </label>
           <button class="gbtn" onclick="clearBg()">清除全部</button>
         </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-header">
+        <div class="settings-section-icon icon-green">🎨</div>
+        <div>
+          <div class="settings-section-title">主題色</div>
+          <div class="settings-section-desc">套用到全站的邊框、發光、強調色，深色／淺色模式都通用</div>
+        </div>
+      </div>
+      <div class="settings-section-body">
+        <div class="accent-swatch-row" id="accentSwatchGrid"></div>
       </div>
     </div>
 
@@ -2621,11 +2667,49 @@ function renderCompareTable(){
   }).join('');
   wrap.innerHTML = `<table class="compare-table"><thead>${head}</thead><tbody>${rows}</tbody></table>`;
 }
+// 主題色（10 組，對應 style.css 裡的 body.accent-xxx；primary/light 用來畫色票的雙色漸層預覽）
+const ACCENT_THEMES = [
+  {id:'mblue',    name:'M藍',   primary:'#0057B8', light:'#4D9FFF'},
+  {id:'emerald',  name:'翠綠',  primary:'#00897B', light:'#4DB6AC'},
+  {id:'amber',    name:'琥珀',  primary:'#C07A00', light:'#FFB300'},
+  {id:'rose',     name:'玫瑰',  primary:'#AD1457', light:'#F06292'},
+  {id:'electric', name:'電藍',  primary:'#00B4D8', light:'#48CAE4'},
+  {id:'coral',    name:'珊瑚橘',primary:'#FF6B6B', light:'#FF8E53'},
+  {id:'lavender', name:'薰衣草',primary:'#9B59B6', light:'#C39BD3'},
+  {id:'glacier',  name:'冰川藍',primary:'#74B9FF', light:'#A8D8EA'},
+  {id:'charcoal', name:'炭灰',  primary:'#636e72', light:'#b2bec3'},
+  {id:'jadegold', name:'翡翠金',primary:'#1a6b4a', light:'#00b894'},
+];
+const ACCENT_STORAGE_KEY = 'msc-accent-theme';
+let accentTheme = localStorage.getItem(ACCENT_STORAGE_KEY) || 'mblue';
+
+function applyAccentTheme(){
+  ACCENT_THEMES.forEach(t=> document.body.classList.remove('accent-'+t.id));
+  document.body.classList.add('accent-'+accentTheme);
+}
+function setAccentTheme(id){
+  accentTheme = id;
+  applyAccentTheme();
+  try{ localStorage.setItem(ACCENT_STORAGE_KEY, id); }catch(e){}
+  renderAccentSwatches();
+}
+function renderAccentSwatches(){
+  const grid=document.getElementById('accentSwatchGrid'); if(!grid) return;
+  grid.innerHTML = ACCENT_THEMES.map(t=>{
+    const active = t.id===accentTheme;
+    return `<div class="accent-swatch${active?' active':''}" title="${t.name}"
+      style="background:linear-gradient(135deg, ${t.primary} 50%, ${t.light} 50%); --sw-glow:${t.primary}99;"
+      onclick="setAccentTheme('${t.id}')"></div>`;
+  }).join('');
+}
+applyAccentTheme(); // 頁面載入時立刻套用（讀 localStorage 或預設 M藍），不用等外觀設定打開
+
 function openAppearanceModal(){
   document.getElementById('bgSectionLabel').textContent = isMobileDevice()
     ? '背景圖片（手機版）'
     : '背景圖片（電腦版）';
   renderBgSlideshowGrid();
+  renderAccentSwatches();
   document.querySelectorAll('.theme-opt').forEach(el=>el.classList.toggle('active', el.dataset.mode===themeMode));
   document.getElementById('appearanceModal').classList.add('open');
 }
@@ -2652,6 +2736,8 @@ function handleBgUpload(e){
   e.target.value='';
 }
 function clearBg(){
+  if(!activeBgArray().length) return;
+  if(!confirm('確定要清除全部背景圖片嗎？此動作無法復原。')) return;
   activeBgArray().length = 0; // 只清目前裝置（手機或電腦）的背景圖，不影響另一邊
   renderBgSlideshowGrid();
   applyBackground(); saveState();
@@ -2672,7 +2758,7 @@ function startBgSlideshow(){
   if(!layerA || !layerB || !bgList.length) return;
   setBgLayer(layerA, bgList[0]); layerA.classList.add('visible'); layerB.classList.remove('visible');
   if(bgList.length<2) return; // 只有一張，不需要輪播計時
-  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // 尊重減少動態偏好，只顯示第一張
+  if(prefersReducedMotion()) return; // 尊重減少動態偏好，只顯示第一張
   let showingA=true, idx=0;
   bgSlideTimer=setInterval(()=>{
     idx=(idx+1)%bgList.length;
@@ -2859,6 +2945,11 @@ function backupThenRefresh(){
 initPullToRefresh();
 setInterval(()=>{ if(themeMode==='auto') applyTheme(); refreshEventCountdownUI(); }, 15*60*1000);
 
+// 使用者是否開啟了系統的「減少動態效果」，手勢彈簧動畫要尊重這個設定
+function prefersReducedMotion(){
+  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+
 // ── 帳號滑動切換（1:1跟隨、橡皮筋邊界、速度投擲、可中斷彈簧）───
 (function initAccountSwipe(){
   const view = document.getElementById('swipeView');
@@ -2881,6 +2972,10 @@ setInterval(()=>{ if(themeMode==='auto') applyTheme(); refreshEventCountdownUI()
   // 臨界阻尼彈簧：用 damping/response 兩個參數描述動作，可隨時被下一次觸摸中斷並從當下位置重新出發
   function springTo(from, to, v0, damping, response, onDone){
     if(cancelSpring) cancelSpring();
+    if(prefersReducedMotion()){
+      // 減少動態效果：不帶放開時的拋擲速度、不允許過衝彈跳，一律用臨界阻尼快速收斂到定點
+      v0 = 0; damping = 1; response = Math.min(response, 0.18);
+    }
     const w=2*Math.PI/response, k=w*w, c=2*damping*w;
     let pos=from, vel=v0, last=performance.now(), raf;
     function step(now){
@@ -2985,6 +3080,10 @@ setInterval(()=>{ if(themeMode==='auto') applyTheme(); refreshEventCountdownUI()
   // 臨界阻尼彈簧：damping/response 兩參數，可在動畫途中被下一次拖曳從當下位置中斷
   function springTo(from, to, v0, damping, response, onDone){
     if(cancelSpring) cancelSpring();
+    if(prefersReducedMotion()){
+      // 減少動態效果：不帶放開時的拋擲速度、不允許過衝彈跳，一律用臨界阻尼快速收斂到定點
+      v0 = 0; damping = 1; response = Math.min(response, 0.18);
+    }
     const w=2*Math.PI/response, k=w*w, c=2*damping*w;
     let pos=from, vel=v0, last=performance.now(), raf;
     function step(now){
@@ -3057,6 +3156,148 @@ setInterval(()=>{ if(themeMode==='auto') applyTheme(); refreshEventCountdownUI()
   handle.addEventListener('touchend', endDrag, {passive:true});
   handle.addEventListener('touchcancel', endDrag, {passive:true});
 })();
+
+// ── 側欄選單手勢（左邊緣滑入開啟、開啟時整片拖曳關閉、可隨時中斷）───
+(function initSidebarGesture(){
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if(!sidebar || !overlay) return;
+
+  let isOpen=false, dragging=false, fromEdge=false, startX=0, startY=0, baseX=0, liveX=0, hist=[];
+  let cancelSpring=null, sidebarW=0;
+  const EDGE_ZONE = 24; // 螢幕左邊緣多寬算「從邊緣開始滑」，比照 iOS 邊緣滑動返回手勢
+
+  function measureWidth(){
+    sidebarW = sidebar.getBoundingClientRect().width || Math.round(window.innerWidth*0.78);
+  }
+  // liveX：0 = 完全開啟，-sidebarW = 完全收起（側欄本身往左移出畫面外）
+  function setX(x){
+    liveX=x;
+    sidebar.style.transform = `translateX(${x}px)`;
+    const w=sidebarW||1;
+    overlay.style.opacity = String(Math.max(0, Math.min(1, 1 + x/w)));
+  }
+  function rubberband(overshoot, dim, k=0.55){
+    return (overshoot*dim*k)/(dim+k*Math.abs(overshoot));
+  }
+  function project(v, decel=0.998){
+    return (v/1000)*decel/(1-decel);
+  }
+  function springTo(from, to, v0, damping, response, onDone){
+    if(cancelSpring) cancelSpring();
+    if(prefersReducedMotion()){
+      v0 = 0; damping = 1; response = Math.min(response, 0.18);
+    }
+    const w=2*Math.PI/response, k=w*w, c=2*damping*w;
+    let pos=from, vel=v0, last=performance.now(), raf;
+    function step(now){
+      const dt=Math.min((now-last)/1000, 0.032); last=now;
+      const force=-k*(pos-to)-c*vel;
+      vel+=force*dt; pos+=vel*dt;
+      setX(pos);
+      if(Math.abs(pos-to)<0.5 && Math.abs(vel)<20){ setX(to); cancelSpring=null; if(onDone) onDone(); return; }
+      raf=requestAnimationFrame(step);
+    }
+    raf=requestAnimationFrame(step);
+    cancelSpring=()=>{ cancelAnimationFrame(raf); cancelSpring=null; };
+  }
+
+  function finishClose(){
+    overlay.classList.remove('open');
+    sidebar.classList.remove('open');
+    sidebar.style.transform=''; overlay.style.opacity='';
+  }
+
+  window.openSidebar = function(){
+    overlay.classList.add('open');
+    sidebar.classList.add('open');
+    measureWidth();
+    isOpen=true;
+    setX(-sidebarW);
+    requestAnimationFrame(()=> springTo(-sidebarW, 0, 0, 1, 0.4));
+  };
+  window.closeSidebar = function(){
+    if(!isOpen) return;
+    isOpen=false;
+    measureWidth();
+    springTo(liveX, -sidebarW, 0, 1, 0.35, finishClose);
+  };
+
+  // 側欄開啟時：整片背景可直接拖曳關閉（點項目／關閉鈕不要誤判成拖曳）
+  sidebar.addEventListener('touchstart', e=>{
+    if(!isOpen) return;
+    if(e.target.closest('.sidebar-item, .sidebar-close')) return;
+    dragging=true; fromEdge=false;
+    startX=e.touches[0].clientX; startY=e.touches[0].clientY;
+    if(cancelSpring) cancelSpring(); // 中斷：從畫面上的即時位置繼續，不從目標值重來
+    baseX=liveX;
+    measureWidth();
+    hist=[{x:startX,t:performance.now()}];
+  }, {passive:true});
+
+  // 側欄關閉時：從螢幕左邊緣開始滑也能拉開（若目前已有彈窗/抽屜開著就不觸發，避免疊在一起）
+  document.addEventListener('touchstart', e=>{
+    if(isOpen) return;
+    if(document.querySelector('.modal-overlay.open, .filter-drawer.open')) return;
+    const x=e.touches[0].clientX;
+    if(x>EDGE_ZONE) return;
+    dragging=true; fromEdge=true;
+    startX=x; startY=e.touches[0].clientY;
+    if(cancelSpring) cancelSpring();
+    measureWidth();
+    baseX=-sidebarW;
+    overlay.classList.add('open'); sidebar.classList.add('open');
+    setX(baseX);
+    hist=[{x:startX,t:performance.now()}];
+  }, {passive:true});
+
+  document.addEventListener('touchmove', e=>{
+    if(!dragging) return;
+    const x=e.touches[0].clientX, y=e.touches[0].clientY;
+    const dx=x-startX, dy=y-startY;
+    if(fromEdge && Math.abs(dy)>Math.abs(dx) && Math.abs(dy)>10){
+      dragging=false; finishClose(); return; // 判定為垂直捲動，放棄這次邊緣手勢
+    }
+    e.preventDefault();
+    let tx = baseX + dx;
+    if(tx>0) tx = rubberband(tx, sidebarW); // 拉超過完全開啟給一點阻力
+    if(tx<-sidebarW) tx = -sidebarW + rubberband(tx+sidebarW, sidebarW); // 推超過完全收起也給一點阻力
+    hist.push({x,t:performance.now()}); if(hist.length>5) hist.shift();
+    setX(tx);
+  }, {passive:false});
+
+  function endDrag(){
+    if(!dragging) return; dragging=false;
+    const first=hist[0], last=hist[hist.length-1];
+    const dt=Math.max((last.t-first.t)/1000, 0.001);
+    const velocity=(last.x-first.x)/dt; // px/s，正值代表往右滑（開啟方向）
+    const projected = liveX + project(velocity);
+    if(projected > -sidebarW*0.65 || velocity > 500){
+      isOpen=true;
+      overlay.classList.add('open'); sidebar.classList.add('open');
+      springTo(liveX, 0, velocity, 0.86, 0.32); // 有拋擲速度，允許一點彈跳感
+    } else {
+      isOpen=false;
+      const flungClosed = velocity < -500;
+      springTo(liveX, -sidebarW, velocity, flungClosed?0.86:1, flungClosed?0.32:0.35, finishClose);
+    }
+  }
+  document.addEventListener('touchend', endDrag, {passive:true});
+  document.addEventListener('touchcancel', endDrag, {passive:true});
+})();
+
+// 側欄選單項目點擊：執行對應動作（沿用原本右上角圖示的功能），並同步更新 active 狀態、關閉側欄
+function sidebarAction(action){
+  switch(action){
+    case 'info':       openInfoModal(); break;
+    case 'compare':    openCompareModal(); break;
+    case 'appearance': openAppearanceModal(); break;
+    case 'multiselect':toggleMultiSelect(); break;
+    case 'share':      openShareModal(); break;
+    case 'mergeimg':   openImageMergeScan(); break;
+  }
+  closeSidebar();
+}
 
 // ── 載入 ─────────────────────────────────────────────
 fetch('backup.json')
