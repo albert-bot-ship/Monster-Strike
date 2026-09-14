@@ -908,28 +908,29 @@ function applyImageMergeChoice(groupIdx, imgIdx){
 }
 let activeAccount = '__ALL__';
 let hasUnsaved = false, editCharId = null, uploadedImg = null, uploadedImg2 = null, modalAttr = '火', imgTouched = false;
-let customBgDesktop = [], customBgMobile = null, themeMode = 'auto', uploadedBgTemp = null;
+let customBgDesktop = [], customBgMobile = [], themeMode = 'auto', uploadedBgTemp = null;
 // 裝置判斷：iPhone/iPad/iPod/Android 視為手機版，其餘（含 Mac/Windows）視為電腦版
 function isMobileDevice(){ return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent); }
-function currentBg(){ return customBgDesktop[0]||null; }
-// 電腦版背景相容處理：舊版是單一字串，新版是陣列（不限張數）
-function normalizeBgDesktop(val){
+// 目前裝置對應的背景圖陣列（回傳的是原陣列參照，push/splice 會直接改到 customBgDesktop 或 customBgMobile 本身）
+function activeBgArray(){ return isMobileDevice() ? customBgMobile : customBgDesktop; }
+function currentBg(){ return activeBgArray()[0]||null; }
+// 背景欄位相容處理：舊版是單一字串，新版是陣列（不限張數）
+function normalizeBgArray(val){
   if(!val) return [];
   if(Array.isArray(val)) return val.filter(Boolean);
   return [val];
 }
-// 讀取背景欄位：相容舊版單一 customBg／customBgMobile 格式，一律併入同一組陣列（手機/電腦共用，不再分開、不限張數）
+// 讀取背景欄位：手機／電腦各自獨立一組陣列，互不影響；相容最舊版單一 customBg 字串格式
 function loadBgFields(data){
   if(data.customBgDesktop !== undefined || data.customBgMobile !== undefined){
-    customBgDesktop = normalizeBgDesktop(data.customBgDesktop);
-    const legacyMobile = data.customBgMobile || null;
-    if(legacyMobile && !customBgDesktop.includes(legacyMobile)) customBgDesktop.push(legacyMobile);
+    customBgDesktop = normalizeBgArray(data.customBgDesktop);
+    customBgMobile = normalizeBgArray(data.customBgMobile);
   } else if(data.customBg){
-    customBgDesktop = normalizeBgDesktop(data.customBg);
+    customBgDesktop = normalizeBgArray(data.customBg);
+    customBgMobile = normalizeBgArray(data.customBg);
   } else {
-    customBgDesktop = [];
+    customBgDesktop = []; customBgMobile = [];
   }
-  customBgMobile = null;
 }
 let multiSelectMode = false, selectedIds = new Set();
 let swipeJustHappened = false;
@@ -2611,6 +2612,9 @@ function renderCompareTable(){
   wrap.innerHTML = `<table class="compare-table"><thead>${head}</thead><tbody>${rows}</tbody></table>`;
 }
 function openAppearanceModal(){
+  document.getElementById('bgSectionLabel').textContent = isMobileDevice()
+    ? '背景圖片（手機版，可上傳多張，自動輪播）'
+    : '背景圖片（電腦版，可上傳多張，自動輪播）';
   renderBgSlideshowGrid();
   document.querySelectorAll('.theme-opt').forEach(el=>el.classList.toggle('active', el.dataset.mode===themeMode));
   document.getElementById('appearanceModal').classList.add('open');
@@ -2620,25 +2624,25 @@ function closeAppearanceModal(){
 }
 function renderBgSlideshowGrid(){
   const grid=document.getElementById('bgSlideshowGrid'); if(!grid) return;
-  grid.innerHTML = customBgDesktop.map((url,i)=>
-    `<div class="bg-slide-thumb"><img src="${url}" alt=""><span class="bg-slide-remove" onclick="removeBgDesktopAt(${i})">✕</span></div>`
+  grid.innerHTML = activeBgArray().map((url,i)=>
+    `<div class="bg-slide-thumb"><img src="${url}" alt=""><span class="bg-slide-remove" onclick="removeBgAt(${i})">✕</span></div>`
   ).join('');
 }
-function removeBgDesktopAt(i){
-  customBgDesktop.splice(i,1);
+function removeBgAt(i){
+  activeBgArray().splice(i,1);
   applyBackground(); saveState(); renderBgSlideshowGrid();
 }
 function handleBgUpload(e){
   const file=e.target.files[0]; if(!file){ return; }
   compressImage(file, 1920, 0.82).then(dataUrl=>{
-    customBgDesktop.push(dataUrl);
+    activeBgArray().push(dataUrl);
     renderBgSlideshowGrid();
     applyBackground(); saveState();
   }).catch(()=>alert('圖片處理失敗，請換一張圖片'));
   e.target.value='';
 }
 function clearBg(){
-  customBgDesktop=[];
+  activeBgArray().length = 0; // 只清目前裝置（手機或電腦）的背景圖，不影響另一邊
   renderBgSlideshowGrid();
   applyBackground(); saveState();
 }
@@ -2654,16 +2658,17 @@ function setBgLayer(el,url){
 function startBgSlideshow(){
   stopBgSlideshow();
   const layerA=document.getElementById('bgLayerA'), layerB=document.getElementById('bgLayerB');
-  if(!layerA || !layerB || !customBgDesktop.length) return;
-  setBgLayer(layerA, customBgDesktop[0]); layerA.classList.add('visible'); layerB.classList.remove('visible');
-  if(customBgDesktop.length<2) return; // 只有一張，不需要輪播計時
+  const bgList = activeBgArray();
+  if(!layerA || !layerB || !bgList.length) return;
+  setBgLayer(layerA, bgList[0]); layerA.classList.add('visible'); layerB.classList.remove('visible');
+  if(bgList.length<2) return; // 只有一張，不需要輪播計時
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // 尊重減少動態偏好，只顯示第一張
   let showingA=true, idx=0;
   bgSlideTimer=setInterval(()=>{
-    idx=(idx+1)%customBgDesktop.length;
+    idx=(idx+1)%bgList.length;
     const showEl = showingA? layerB : layerA;
     const hideEl = showingA? layerA : layerB;
-    setBgLayer(showEl, customBgDesktop[idx]);
+    setBgLayer(showEl, bgList[idx]);
     showEl.classList.add('visible');
     hideEl.classList.remove('visible');
     showingA=!showingA;
@@ -2671,7 +2676,7 @@ function startBgSlideshow(){
 }
 function applyBackground(){
   document.body.style.backgroundImage=''; // 一律改由幻燈片圖層顯示，body本身不疊圖
-  if(customBgDesktop.length){
+  if(activeBgArray().length){
     startBgSlideshow();
   } else {
     stopBgSlideshow();
@@ -3078,23 +3083,23 @@ function checkGithubSync(){
       const remoteChars = migrateToPerAccount(data);
       const remoteAccounts = data.accounts || accounts;
       const remoteImages = data.sharedImages || {};
-      let remoteBgD;
+      let remoteBgD, remoteBgM;
       if(data.customBgDesktop !== undefined || data.customBgMobile !== undefined){
-        remoteBgD = normalizeBgDesktop(data.customBgDesktop);
-        const legacyMobile = data.customBgMobile || null;
-        if(legacyMobile && !remoteBgD.includes(legacyMobile)) remoteBgD.push(legacyMobile);
+        remoteBgD = normalizeBgArray(data.customBgDesktop);
+        remoteBgM = normalizeBgArray(data.customBgMobile);
       } else {
-        remoteBgD = normalizeBgDesktop(data.customBg);
+        remoteBgD = normalizeBgArray(data.customBg);
+        remoteBgM = normalizeBgArray(data.customBg);
       }
       const remoteTheme = data.themeMode || 'auto';
 
-      const localSnap  = snapshotForSync(accounts, charactersByAccount, sharedImages, customBgDesktop, null, themeMode);
-      const remoteSnap = snapshotForSync(remoteAccounts, remoteChars, remoteImages, remoteBgD, null, remoteTheme);
+      const localSnap  = snapshotForSync(accounts, charactersByAccount, sharedImages, customBgDesktop, customBgMobile, themeMode);
+      const remoteSnap = snapshotForSync(remoteAccounts, remoteChars, remoteImages, remoteBgD, remoteBgM, remoteTheme);
       if(localSnap === remoteSnap) return; // 完全相同,不用問
 
       const localCount  = Object.values(charactersByAccount).reduce((s,l)=>s+(l?l.length:0),0);
       const remoteCount = Object.values(remoteChars).reduce((s,l)=>s+(l?l.length:0),0);
-      pendingRemoteSync = {accounts:remoteAccounts, charactersByAccount:remoteChars, sharedImages:remoteImages, customBgDesktop:remoteBgD, themeMode:remoteTheme};
+      pendingRemoteSync = {accounts:remoteAccounts, charactersByAccount:remoteChars, sharedImages:remoteImages, customBgDesktop:remoteBgD, customBgMobile:remoteBgM, themeMode:remoteTheme};
       document.getElementById('syncLocalInfo').textContent = `更新時間：${formatSyncTime(localSavedAt)}　角色總數：${localCount}　帳號數：${accounts.length}`;
       document.getElementById('syncRemoteInfo').textContent = `更新時間：${formatSyncTime(data.savedAt)}　角色總數：${remoteCount}　帳號數：${remoteAccounts.length}`;
       document.getElementById('syncConflictModal').classList.add('open');
@@ -3110,8 +3115,8 @@ function useGithubData(){
   accounts = pendingRemoteSync.accounts;
   charactersByAccount = pendingRemoteSync.charactersByAccount;
   sharedImages = pendingRemoteSync.sharedImages || {};
-  customBgDesktop = normalizeBgDesktop(pendingRemoteSync.customBgDesktop);
-  customBgMobile = null;
+  customBgDesktop = normalizeBgArray(pendingRemoteSync.customBgDesktop);
+  customBgMobile = normalizeBgArray(pendingRemoteSync.customBgMobile);
   themeMode = pendingRemoteSync.themeMode;
   activeAccount = '__ALL__';
   applyBackground(); applyTheme();
