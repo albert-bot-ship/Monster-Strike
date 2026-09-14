@@ -35,8 +35,8 @@
 <body>
 
 <!-- 電腦版背景幻燈片圖層（淡入淡出輪播用，手機版不使用） -->
-<div class="bg-slide-layer" id="bgLayerA"></div>
-<div class="bg-slide-layer" id="bgLayerB"></div>
+<div class="bg-slide-layer" id="bgLayerA"><div class="bg-blur"></div><div class="bg-contain"></div><div class="bg-overlay"></div></div>
+<div class="bg-slide-layer" id="bgLayerB"><div class="bg-blur"></div><div class="bg-contain"></div><div class="bg-overlay"></div></div>
 
 <div class="pull-refresh-indicator" id="pullRefreshIndicator">↓ 下拉重新整理</div>
 
@@ -2684,12 +2684,16 @@ let bgSlideTimer=null;
 function stopBgSlideshow(){
   if(bgSlideTimer){ clearInterval(bgSlideTimer); bgSlideTimer=null; }
 }
+function setBgLayer(el,url){
+  const blur=el.querySelector('.bg-blur'), contain=el.querySelector('.bg-contain');
+  if(blur) blur.style.backgroundImage = `url(${url})`;
+  if(contain) contain.style.backgroundImage = `url(${url})`;
+}
 function startBgSlideshow(){
   stopBgSlideshow();
   const layerA=document.getElementById('bgLayerA'), layerB=document.getElementById('bgLayerB');
   if(!layerA || !layerB || !customBgDesktop.length) return;
-  const setLayer=(el,url)=>{ el.style.backgroundImage = `linear-gradient(rgba(12,14,34,.72), rgba(12,14,34,.72)), url(${url})`; };
-  setLayer(layerA, customBgDesktop[0]); layerA.classList.add('visible'); layerB.classList.remove('visible');
+  setBgLayer(layerA, customBgDesktop[0]); layerA.classList.add('visible'); layerB.classList.remove('visible');
   if(customBgDesktop.length<2) return; // 只有一張，不需要輪播計時
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // 尊重減少動態偏好，只顯示第一張
   let showingA=true, idx=0;
@@ -2697,7 +2701,7 @@ function startBgSlideshow(){
     idx=(idx+1)%customBgDesktop.length;
     const showEl = showingA? layerB : layerA;
     const hideEl = showingA? layerA : layerB;
-    setLayer(showEl, customBgDesktop[idx]);
+    setBgLayer(showEl, customBgDesktop[idx]);
     showEl.classList.add('visible');
     hideEl.classList.remove('visible');
     showingA=!showingA;
@@ -2706,15 +2710,14 @@ function startBgSlideshow(){
 function applyBackground(){
   if(isMobileDevice()){
     stopBgSlideshow();
-    document.getElementById('bgLayerA')?.classList.remove('visible');
-    document.getElementById('bgLayerB')?.classList.remove('visible');
-    if(customBgMobile){
-      document.body.style.backgroundImage = `linear-gradient(rgba(12,14,34,.72), rgba(12,14,34,.72)), url(${customBgMobile})`;
-      document.body.style.backgroundSize='cover';
-      document.body.style.backgroundPosition='center';
-      document.body.style.backgroundAttachment='fixed';
+    document.body.style.backgroundImage='';
+    const layerA=document.getElementById('bgLayerA'), layerB=document.getElementById('bgLayerB');
+    layerB?.classList.remove('visible');
+    if(customBgMobile && layerA){
+      setBgLayer(layerA, customBgMobile);
+      layerA.classList.add('visible');
     } else {
-      document.body.style.backgroundImage='';
+      layerA?.classList.remove('visible');
     }
   } else {
     document.body.style.backgroundImage=''; // 電腦版改由幻燈片圖層顯示，body本身不疊圖
