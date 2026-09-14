@@ -263,8 +263,19 @@ html:not([data-theme="light"]) .app-title { animation: titlePowerOn 2.4s ease-ou
 /* ── Main ──────────────────────────────────────────── */
 main { padding:12px 12px calc(var(--nav-h) + 16px); max-width:600px; margin:0 auto; }
 
-/* 搜尋列 */
-.searchbar { display:flex; gap:8px; margin-bottom:12px; position:relative; z-index:30; }
+/* 搜尋列：預設收合成一個圖示按鈕，最小化遮住背景圖的範圍；點擊後展開輸入框 */
+.searchbar { display:flex; align-items:center; gap:8px; margin-bottom:12px; position:relative; z-index:30; }
+.search-toggle-btn {
+  width:38px; height:38px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; cursor:pointer; background:var(--panel2);
+  border:1px solid var(--border); box-shadow:0 2px 6px rgba(0,0,0,.25);
+  transition: filter .15s, transform .12s;
+}
+.search-toggle-btn:active { transform:scale(.9); filter:brightness(1.2); }
+.searchbar.expanded .search-toggle-btn { display:none; }
+.searchbar:not(.expanded) .search-input,
+.searchbar:not(.expanded) .search-input + .gbtn { display:none; }
 .search-suggest {
   position:absolute; top:100%; left:0; right:0; z-index:25;
   margin-top:4px; background:var(--panel); border:1px solid var(--border);
