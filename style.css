@@ -83,6 +83,11 @@
   --m-blue-glow:   rgba(var(--m-blue-rgb),.16);
   --m-red-glow:    rgba(226,35,26,.13);
   --m-violet-glow: rgba(var(--m-violet-rgb),.16);
+  /* 套用主題色漸層的按鈕（確認鈕、選中的分頁/按鈕）用什麼顏色的文字——
+     預設白字＋深色陰影；亮色系主題（琥珀/電藍/珊瑚橘/薰衣草/冰川藍/炭灰）
+     在下面各自的 body.accent-xxx 覆寫成深色文字＋淺色陰影，避免亮底白字看不清楚。 */
+  --accent-text: #fff;
+  --accent-text-shadow: 0 1px 2px rgba(0,0,0,.4);
 
   /* 活動月曆配色（分類色，不在本次新命名系統範圍內，維持原樣） */
   --ev1: #4d8dff;
@@ -134,13 +139,19 @@ body.light-theme {
    對照表：主色 → --m-blue-rgb，主色-light → --m-blue-light-rgb，輔色 → --m-violet-rgb */
 body.accent-mblue {     --m-blue-rgb:0,87,184;    --m-blue-light-rgb:77,159,255;  --m-violet-rgb:111,44,167; }  /* M藍 */
 body.accent-emerald {   --m-blue-rgb:0,137,123;   --m-blue-light-rgb:77,182,172;  --m-violet-rgb:0,105,92; }   /* 翠綠 */
-body.accent-amber {     --m-blue-rgb:192,122,0;   --m-blue-light-rgb:255,179,0;   --m-violet-rgb:230,81,0; }   /* 琥珀 */
+body.accent-amber {     --m-blue-rgb:192,122,0;   --m-blue-light-rgb:255,179,0;   --m-violet-rgb:230,81,0;
+  --accent-text:#241800; --accent-text-shadow:0 1px 0 rgba(255,255,255,.4); }   /* 琥珀（亮底，用深色文字） */
 body.accent-rose {      --m-blue-rgb:173,20,87;   --m-blue-light-rgb:240,98,146;  --m-violet-rgb:106,27,154; } /* 玫瑰 */
-body.accent-electric {  --m-blue-rgb:0,180,216;   --m-blue-light-rgb:72,202,228;  --m-violet-rgb:123,47,190; } /* 電藍 */
-body.accent-coral {     --m-blue-rgb:255,107,107; --m-blue-light-rgb:255,142,83;  --m-violet-rgb:255,71,87; }  /* 珊瑚橘 */
-body.accent-lavender {  --m-blue-rgb:155,89,182;  --m-blue-light-rgb:195,155,211; --m-violet-rgb:142,68,173; } /* 薰衣草 */
-body.accent-glacier {   --m-blue-rgb:116,185,255; --m-blue-light-rgb:168,216,234; --m-violet-rgb:9,132,227; }  /* 冰川藍 */
-body.accent-charcoal {  --m-blue-rgb:99,110,114;  --m-blue-light-rgb:178,190,195; --m-violet-rgb:45,52,54; }   /* 炭灰 */
+body.accent-electric {  --m-blue-rgb:0,180,216;   --m-blue-light-rgb:72,202,228;  --m-violet-rgb:123,47,190;
+  --accent-text:#00303a; --accent-text-shadow:0 1px 0 rgba(255,255,255,.35); }  /* 電藍（亮底，用深色文字） */
+body.accent-coral {     --m-blue-rgb:255,107,107; --m-blue-light-rgb:255,142,83;  --m-violet-rgb:255,71,87;
+  --accent-text:#4a1400; --accent-text-shadow:0 1px 0 rgba(255,255,255,.35); }  /* 珊瑚橘（亮底，用深色文字） */
+body.accent-lavender {  --m-blue-rgb:155,89,182;  --m-blue-light-rgb:195,155,211; --m-violet-rgb:142,68,173;
+  --accent-text:#2e1438; --accent-text-shadow:0 1px 0 rgba(255,255,255,.35); }  /* 薰衣草（亮底，用深色文字） */
+body.accent-glacier {   --m-blue-rgb:116,185,255; --m-blue-light-rgb:168,216,234; --m-violet-rgb:9,132,227;
+  --accent-text:#00243d; --accent-text-shadow:0 1px 0 rgba(255,255,255,.4); }   /* 冰川藍（亮底，用深色文字） */
+body.accent-charcoal {  --m-blue-rgb:99,110,114;  --m-blue-light-rgb:178,190,195; --m-violet-rgb:45,52,54;
+  --accent-text:#1c1f20; --accent-text-shadow:0 1px 0 rgba(255,255,255,.3); }   /* 炭灰（亮底，用深色文字） */
 body.accent-jadegold {  --m-blue-rgb:26,107,74;   --m-blue-light-rgb:0,184,148;   --m-violet-rgb:200,160,0; }  /* 翡翠金 */
 
 /* ── Reset ─────────────────────────────────────────── */
@@ -202,7 +213,7 @@ body {
   background: linear-gradient(180deg, rgb(var(--m-blue-light-rgb)) 0%, rgb(var(--m-blue-rgb)) 60%, rgb(var(--m-blue-light-rgb)) 100%);
   border-color: rgba(var(--m-blue-light-rgb),.9) rgba(var(--m-blue-rgb),.8) rgba(var(--m-blue-rgb),.6) rgba(var(--m-blue-rgb),.8);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 0 8px var(--glo-blue);
-  color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.4);
+  color: var(--accent-text); text-shadow: var(--accent-text-shadow);
 }
 .skill-btn:active { filter: brightness(.9); }
 
@@ -288,7 +299,7 @@ body:not(.light-theme) .app-title { animation: titlePowerOn 2.4s ease-out 1; }
   background: linear-gradient(180deg, rgb(var(--m-blue-light-rgb)), rgb(var(--m-blue-rgb)));
   border-color: rgba(var(--m-blue-light-rgb),.9) rgba(var(--m-blue-rgb),.85) rgba(var(--m-blue-rgb),.6) rgba(var(--m-blue-rgb),.85);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 0 12px var(--glo-blue);
-  color: #fff;
+  color: var(--accent-text);
 }
 .acc-edit { font-size:11px; color:rgba(255,255,255,.35); }
 
@@ -896,7 +907,7 @@ main { padding:12px 12px calc(var(--nav-h) * 0.55 + 16px); max-width:600px; marg
 .settings-tab.active {
   background: linear-gradient(180deg, rgb(var(--m-blue-light-rgb)), rgb(var(--m-blue-rgb)));
   border-color: rgba(var(--m-blue-light-rgb),.85);
-  color:#fff;
+  color:var(--accent-text);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 0 10px var(--glo-blue);
 }
 
@@ -980,7 +991,7 @@ main { padding:12px 12px calc(var(--nav-h) * 0.55 + 16px); max-width:600px; marg
   background: linear-gradient(180deg, rgb(var(--m-blue-light-rgb)), rgb(var(--m-blue-rgb)));
   border-color: rgba(var(--m-blue-light-rgb),.9) rgba(var(--m-blue-rgb),.85) rgba(var(--m-blue-rgb),.6) rgba(var(--m-blue-rgb),.85);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 0 10px var(--glo-blue);
-  color:#fff;
+  color:var(--accent-text);
 }
 .mbtnrow .mcancel.red {
   background: linear-gradient(180deg, #a83030, #782020);
@@ -1044,7 +1055,7 @@ main { padding:12px 12px calc(var(--nav-h) * 0.55 + 16px); max-width:600px; marg
   background: linear-gradient(180deg, rgb(var(--m-blue-light-rgb)), rgb(var(--m-blue-rgb)));
   border-color: rgba(var(--m-blue-light-rgb),.9) rgba(var(--m-blue-rgb),.85) rgba(var(--m-blue-rgb),.6) rgba(var(--m-blue-rgb),.85);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
-  color: #fff;
+  color: var(--accent-text);
 }
 .sort-dir-btn {
   padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
