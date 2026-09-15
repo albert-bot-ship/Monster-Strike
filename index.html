@@ -38,7 +38,7 @@
 <div class="bg-slide-layer" id="bgLayerA"><div class="bg-blur"></div><div class="bg-contain"></div><div class="bg-overlay"></div></div>
 <div class="bg-slide-layer" id="bgLayerB"><div class="bg-blur"></div><div class="bg-contain"></div><div class="bg-overlay"></div></div>
 
-<div class="pull-refresh-indicator" id="pullRefreshIndicator">↓ 下拉重新整理</div>
+<div class="pull-refresh-indicator" id="pullRefreshIndicator"><div class="pull-refresh-spinner"></div></div>
 
 <header>
   <div class="title-row">
@@ -2901,6 +2901,7 @@ const PULL_THRESHOLD = 70;
 
 function initPullToRefresh(){
   const ind = document.getElementById('pullRefreshIndicator');
+  const spinner = ind.querySelector('.pull-refresh-spinner');
   document.addEventListener('touchstart', e=>{
     if ((document.scrollingElement?.scrollTop||0) <= 0) {
       pullStartY = e.touches[0].clientY;
@@ -2914,9 +2915,10 @@ function initPullToRefresh(){
     if (dy > 0 && (document.scrollingElement?.scrollTop||0) <= 0) {
       pullDist = Math.min(dy, 130);
       ind.classList.add('pulling');
-      ind.style.transform = `translateY(${pullDist - 42}px)`;
-      if (pullDist > PULL_THRESHOLD) { ind.classList.add('ready'); ind.textContent = '放開以重新整理'; }
-      else { ind.classList.remove('ready'); ind.textContent = '↓ 下拉重新整理'; }
+      ind.style.opacity = String(Math.min(pullDist/PULL_THRESHOLD, 1));
+      ind.style.transform = `translate(-50%, ${Math.min(pullDist, 90) - 60}px)`;
+      spinner.style.transform = `rotate(${pullDist*2.4}deg)`; // 跟著拖曳距離轉動，直接對應手指位置
+      ind.classList.toggle('ready', pullDist > PULL_THRESHOLD);
     } else {
       pulling = false;
     }
@@ -2925,10 +2927,22 @@ function initPullToRefresh(){
   document.addEventListener('touchend', ()=>{
     if (!pulling) return;
     ind.classList.remove('pulling');
-    ind.style.transform = 'translateY(-100%)';
-    if (pullDist > PULL_THRESHOLD) triggerPullRefresh();
+    if (pullDist > PULL_THRESHOLD) {
+      ind.style.opacity = '1';
+      ind.style.transform = 'translate(-50%, 8px)';
+      ind.classList.add('spinning'); // 放開後改用連續旋轉動畫，不用再跟手指角度
+      triggerPullRefresh();
+    } else {
+      resetPullIndicator();
+    }
     pulling = false; pullDist = 0;
   }, {passive:true});
+}
+function resetPullIndicator(){
+  const ind = document.getElementById('pullRefreshIndicator');
+  ind.classList.remove('ready', 'spinning');
+  ind.style.opacity = '0';
+  ind.style.transform = 'translate(-50%, -60px)';
 }
 
 function triggerPullRefresh(){
@@ -2936,7 +2950,10 @@ function triggerPullRefresh(){
   else location.reload();
 }
 function openBackupReminder(){ document.getElementById('backupReminderModal').classList.add('open'); }
-function closeBackupReminder(){ document.getElementById('backupReminderModal').classList.remove('open'); }
+function closeBackupReminder(){
+  document.getElementById('backupReminderModal').classList.remove('open');
+  resetPullIndicator();
+}
 function backupThenRefresh(){
   exportBackup();
   closeBackupReminder();
