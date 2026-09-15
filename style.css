@@ -137,22 +137,92 @@ body.light-theme {
 /* ── 主題色（10 組，深色/淺色模式通用；只覆寫品牌色 RGB 三元組，
    --bdr-accent/--glo-blue/--m-blue-glow/--m-violet-glow 都會自動跟著變）──
    對照表：主色 → --m-blue-rgb，主色-light → --m-blue-light-rgb，輔色 → --m-violet-rgb */
-body.accent-mblue {     --m-blue-rgb:0,87,184;    --m-blue-light-rgb:77,159,255;  --m-violet-rgb:111,44,167; }  /* M藍 */
-body.accent-emerald {   --m-blue-rgb:0,137,123;   --m-blue-light-rgb:77,182,172;  --m-violet-rgb:0,105,92; }   /* 翠綠 */
-body.accent-amber {     --m-blue-rgb:192,122,0;   --m-blue-light-rgb:255,179,0;   --m-violet-rgb:230,81,0;
-  --accent-text:#241800; --accent-text-shadow:0 1px 0 rgba(255,255,255,.4); }   /* 琥珀（亮底，用深色文字） */
-body.accent-rose {      --m-blue-rgb:173,20,87;   --m-blue-light-rgb:240,98,146;  --m-violet-rgb:106,27,154; } /* 玫瑰 */
-body.accent-electric {  --m-blue-rgb:0,180,216;   --m-blue-light-rgb:72,202,228;  --m-violet-rgb:123,47,190;
-  --accent-text:#00303a; --accent-text-shadow:0 1px 0 rgba(255,255,255,.35); }  /* 電藍（亮底，用深色文字） */
-body.accent-coral {     --m-blue-rgb:255,107,107; --m-blue-light-rgb:255,142,83;  --m-violet-rgb:255,71,87;
-  --accent-text:#4a1400; --accent-text-shadow:0 1px 0 rgba(255,255,255,.35); }  /* 珊瑚橘（亮底，用深色文字） */
-body.accent-lavender {  --m-blue-rgb:155,89,182;  --m-blue-light-rgb:195,155,211; --m-violet-rgb:142,68,173;
-  --accent-text:#2e1438; --accent-text-shadow:0 1px 0 rgba(255,255,255,.35); }  /* 薰衣草（亮底，用深色文字） */
-body.accent-glacier {   --m-blue-rgb:116,185,255; --m-blue-light-rgb:168,216,234; --m-violet-rgb:9,132,227;
-  --accent-text:#00243d; --accent-text-shadow:0 1px 0 rgba(255,255,255,.4); }   /* 冰川藍（亮底，用深色文字） */
-body.accent-charcoal {  --m-blue-rgb:99,110,114;  --m-blue-light-rgb:178,190,195; --m-violet-rgb:45,52,54;
-  --accent-text:#1c1f20; --accent-text-shadow:0 1px 0 rgba(255,255,255,.3); }   /* 炭灰（亮底，用深色文字） */
-body.accent-jadegold {  --m-blue-rgb:26,107,74;   --m-blue-light-rgb:0,184,148;   --m-violet-rgb:200,160,0; }  /* 翡翠金 */
+body.accent-mblue {
+  --m-blue-rgb:0,87,184; --m-blue-light-rgb:77,159,255; --m-violet-rgb:111,44,167;
+  --m-blue: rgb(var(--m-blue-rgb)); --m-blue-light: rgb(var(--m-blue-light-rgb)); --m-violet: rgb(var(--m-violet-rgb));
+  --bdr-accent: rgba(var(--m-blue-rgb),.40);
+  --glo-blue: rgba(var(--m-blue-rgb),.5);
+  --m-blue-glow: rgba(var(--m-blue-rgb),.16);
+  --m-violet-glow: rgba(var(--m-violet-rgb),.16);
+}
+body.accent-emerald {
+  --m-blue-rgb:0,137,123; --m-blue-light-rgb:77,182,172; --m-violet-rgb:0,105,92;
+  --m-blue: rgb(var(--m-blue-rgb)); --m-blue-light: rgb(var(--m-blue-light-rgb)); --m-violet: rgb(var(--m-violet-rgb));
+  --bdr-accent: rgba(var(--m-blue-rgb),.40);
+  --glo-blue: rgba(var(--m-blue-rgb),.5);
+  --m-blue-glow: rgba(var(--m-blue-rgb),.16);
+  --m-violet-glow: rgba(var(--m-violet-rgb),.16);
+}
+body.accent-amber {
+  --m-blue-rgb:192,122,0; --m-blue-light-rgb:255,179,0; --m-violet-rgb:230,81,0;
+  --m-blue: rgb(var(--m-blue-rgb)); --m-blue-light: rgb(var(--m-blue-light-rgb)); --m-violet: rgb(var(--m-violet-rgb));
+  --bdr-accent: rgba(var(--m-blue-rgb),.40);
+  --glo-blue: rgba(var(--m-blue-rgb),.5);
+  --m-blue-glow: rgba(var(--m-blue-rgb),.16);
+  --m-violet-glow: rgba(var(--m-violet-rgb),.16);
+  --accent-text:#241800; --accent-text-shadow:0 1px 0 rgba(255,255,255,.4);
+}
+body.accent-rose {
+  --m-blue-rgb:173,20,87; --m-blue-light-rgb:240,98,146; --m-violet-rgb:106,27,154;
+  --m-blue: rgb(var(--m-blue-rgb)); --m-blue-light: rgb(var(--m-blue-light-rgb)); --m-violet: rgb(var(--m-violet-rgb));
+  --bdr-accent: rgba(var(--m-blue-rgb),.40);
+  --glo-blue: rgba(var(--m-blue-rgb),.5);
+  --m-blue-glow: rgba(var(--m-blue-rgb),.16);
+  --m-violet-glow: rgba(var(--m-violet-rgb),.16);
+}
+body.accent-electric {
+  --m-blue-rgb:0,180,216; --m-blue-light-rgb:72,202,228; --m-violet-rgb:123,47,190;
+  --m-blue: rgb(var(--m-blue-rgb)); --m-blue-light: rgb(var(--m-blue-light-rgb)); --m-violet: rgb(var(--m-violet-rgb));
+  --bdr-accent: rgba(var(--m-blue-rgb),.40);
+  --glo-blue: rgba(var(--m-blue-rgb),.5);
+  --m-blue-glow: rgba(var(--m-blue-rgb),.16);
+  --m-violet-glow: rgba(var(--m-violet-rgb),.16);
+  --accent-text:#00303a; --accent-text-shadow:0 1px 0 rgba(255,255,255,.35);
+}
+body.accent-coral {
+  --m-blue-rgb:255,107,107; --m-blue-light-rgb:255,142,83; --m-violet-rgb:255,71,87;
+  --m-blue: rgb(var(--m-blue-rgb)); --m-blue-light: rgb(var(--m-blue-light-rgb)); --m-violet: rgb(var(--m-violet-rgb));
+  --bdr-accent: rgba(var(--m-blue-rgb),.40);
+  --glo-blue: rgba(var(--m-blue-rgb),.5);
+  --m-blue-glow: rgba(var(--m-blue-rgb),.16);
+  --m-violet-glow: rgba(var(--m-violet-rgb),.16);
+  --accent-text:#4a1400; --accent-text-shadow:0 1px 0 rgba(255,255,255,.35);
+}
+body.accent-lavender {
+  --m-blue-rgb:155,89,182; --m-blue-light-rgb:195,155,211; --m-violet-rgb:142,68,173;
+  --m-blue: rgb(var(--m-blue-rgb)); --m-blue-light: rgb(var(--m-blue-light-rgb)); --m-violet: rgb(var(--m-violet-rgb));
+  --bdr-accent: rgba(var(--m-blue-rgb),.40);
+  --glo-blue: rgba(var(--m-blue-rgb),.5);
+  --m-blue-glow: rgba(var(--m-blue-rgb),.16);
+  --m-violet-glow: rgba(var(--m-violet-rgb),.16);
+  --accent-text:#2e1438; --accent-text-shadow:0 1px 0 rgba(255,255,255,.35);
+}
+body.accent-glacier {
+  --m-blue-rgb:116,185,255; --m-blue-light-rgb:168,216,234; --m-violet-rgb:9,132,227;
+  --m-blue: rgb(var(--m-blue-rgb)); --m-blue-light: rgb(var(--m-blue-light-rgb)); --m-violet: rgb(var(--m-violet-rgb));
+  --bdr-accent: rgba(var(--m-blue-rgb),.40);
+  --glo-blue: rgba(var(--m-blue-rgb),.5);
+  --m-blue-glow: rgba(var(--m-blue-rgb),.16);
+  --m-violet-glow: rgba(var(--m-violet-rgb),.16);
+  --accent-text:#00243d; --accent-text-shadow:0 1px 0 rgba(255,255,255,.4);
+}
+body.accent-charcoal {
+  --m-blue-rgb:99,110,114; --m-blue-light-rgb:178,190,195; --m-violet-rgb:45,52,54;
+  --m-blue: rgb(var(--m-blue-rgb)); --m-blue-light: rgb(var(--m-blue-light-rgb)); --m-violet: rgb(var(--m-violet-rgb));
+  --bdr-accent: rgba(var(--m-blue-rgb),.40);
+  --glo-blue: rgba(var(--m-blue-rgb),.5);
+  --m-blue-glow: rgba(var(--m-blue-rgb),.16);
+  --m-violet-glow: rgba(var(--m-violet-rgb),.16);
+  --accent-text:#1c1f20; --accent-text-shadow:0 1px 0 rgba(255,255,255,.3);
+}
+body.accent-jadegold {
+  --m-blue-rgb:26,107,74; --m-blue-light-rgb:0,184,148; --m-violet-rgb:200,160,0;
+  --m-blue: rgb(var(--m-blue-rgb)); --m-blue-light: rgb(var(--m-blue-light-rgb)); --m-violet: rgb(var(--m-violet-rgb));
+  --bdr-accent: rgba(var(--m-blue-rgb),.40);
+  --glo-blue: rgba(var(--m-blue-rgb),.5);
+  --m-blue-glow: rgba(var(--m-blue-rgb),.16);
+  --m-violet-glow: rgba(var(--m-violet-rgb),.16);
+}  /* 翡翠金 */
 
 /* ── Reset ─────────────────────────────────────────── */
 *,*::before,*::after { box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
