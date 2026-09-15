@@ -67,7 +67,7 @@
 </main>
 
 <!-- 資訊看板彈窗：收藏統計／每月活動情報／活動月曆 -->
-<div class="modal-overlay" id="infoModal">
+<div class="modal-overlay" id="infoModal" onclick="if(event.target===this) closeInfoModal()">
   <div class="modal-box" style="max-width:420px;max-height:82vh;overflow-y:auto;">
     <h2>📊 資訊看板</h2>
 
@@ -198,7 +198,7 @@
 </div>
 
 <!-- 活動月曆彈窗（獨立、較大版面） -->
-<div class="modal-overlay" id="calModal">
+<div class="modal-overlay" id="calModal" onclick="if(event.target===this) closeEventCalendarModal()">
   <div class="modal-box cal-modal-box">
     <h2>📅 活動月曆</h2>
     <div class="cal-legend">
@@ -639,7 +639,7 @@
 </div>
 
 <!-- 角色簡表（點卡片查看） -->
-<div class="modal-overlay" id="viewCharModal">
+<div class="modal-overlay" id="viewCharModal" onclick="if(event.target===this) closeViewModal()">
   <div class="modal-box view-box">
     <div class="view-header">
       <span class="view-no" id="vNo"></span>
@@ -694,7 +694,7 @@
 </div>
 
 <!-- 從其他帳號複製角色 -->
-<div class="modal-overlay" id="appearanceModal">
+<div class="modal-overlay" id="appearanceModal" onclick="if(event.target===this) closeAppearanceModal()">
   <div class="modal-box" style="max-width:400px;">
     <h2>🎨 外觀設定</h2>
 
@@ -754,7 +754,27 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="copyPickerModal">
+<!-- 背景圖片大圖預覽 -->
+<div class="modal-overlay" id="bgPreviewModal" onclick="if(event.target===this) closeBgPreview()">
+  <div class="modal-box" style="max-width:520px; padding:14px;">
+    <div class="view-img-outer" style="margin-bottom:10px;">
+      <div class="view-img-wrap" id="bgPreviewImgWrap" style="max-height:70vh; background:var(--bg-base);">
+        <img id="bgPreviewImg" src="" alt="背景圖片預覽">
+      </div>
+      <button type="button" class="view-img-arrow left" id="bgPreviewPrev" onclick="bgPreviewNav(-1)">‹</button>
+      <button type="button" class="view-img-arrow right" id="bgPreviewNext" onclick="bgPreviewNav(1)">›</button>
+    </div>
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+      <span id="bgPreviewCounter" style="color:var(--modal-sub); font-size:13px; flex-shrink:0;"></span>
+      <div class="mbtnrow" style="margin-top:0;">
+        <button class="mcancel red" onclick="removeCurrentBgPreview()">🗑 移除這張</button>
+        <button class="mconfirm" onclick="closeBgPreview()">關閉</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="copyPickerModal" onclick="if(event.target===this) closeCopyPicker()">
   <div class="modal-box" style="max-width:400px;">
     <h2>從其他帳號複製角色</h2>
     <input type="text" class="minput" id="copyPickerSearch" placeholder="🔍 搜尋角色名稱..." oninput="renderCopyPickerList()" style="margin-bottom:10px;">
@@ -766,7 +786,7 @@
 </div>
 
 <!-- 全部頁點卡片：角色被多個帳號持有時，先選要看哪個帳號的版本 -->
-<div class="modal-overlay" id="accPickerModal">
+<div class="modal-overlay" id="accPickerModal" onclick="if(event.target===this) closeAccPicker()">
   <div class="modal-box" style="max-width:320px;">
     <h2>選擇要查看的帳號</h2>
     <div id="accPickerList"></div>
@@ -777,7 +797,7 @@
 </div>
 
 <!-- 整理重複圖片（掃描同名同屬性但圖片不同步的角色） -->
-<div class="modal-overlay" id="imageMergeModal">
+<div class="modal-overlay" id="imageMergeModal" onclick="if(event.target===this) closeImageMergeModal()">
   <div class="modal-box" style="max-width:460px;max-height:86vh;overflow-y:auto;">
     <h2>🧹 整理重複圖片</h2>
     <div class="appear-hint" style="margin-bottom:10px;">以下角色在不同帳號存了不同的圖片，點選一張當作共用版本，其餘帳號會自動改用這張，並釋放重複占用的空間。</div>
@@ -789,7 +809,7 @@
 </div>
 
 <!-- 分享收藏卡片 -->
-<div class="modal-overlay" id="shareModal">
+<div class="modal-overlay" id="shareModal" onclick="if(event.target===this) closeShareModal()">
   <div class="modal-box" style="max-width:380px;">
     <h2>📤 分享收藏卡片</h2>
     <div class="theme-btn-row" style="margin-bottom:14px;">
@@ -809,7 +829,7 @@
 </div>
 
 <!-- 分享圖片預覽 -->
-<div class="modal-overlay" id="sharePreviewModal">
+<div class="modal-overlay" id="sharePreviewModal" onclick="if(event.target===this) closeSharePreview()">
   <div class="modal-box" style="max-width:420px;">
     <h2>預覽</h2>
     <div style="max-height:60vh;overflow-y:auto;border-radius:10px;border:1px solid var(--bdr-accent);">
@@ -823,7 +843,7 @@
 </div>
 
 <!-- 下拉更新前的備份提醒 -->
-<div class="modal-overlay" id="backupReminderModal">
+<div class="modal-overlay" id="backupReminderModal" onclick="if(event.target===this) closeBackupReminder()">
   <div class="modal-box" style="max-width:340px;">
     <h2>⚠️ 尚未備份</h2>
     <p style="font-size:13px;color:var(--tx-secondary);line-height:1.6;margin-bottom:16px;">你有尚未備份的變更，重新整理會重新抓取資料，未備份的內容將會遺失。請先備份，備份完成後會自動重新整理。</p>
@@ -835,7 +855,7 @@
 </div>
 
 <!-- 多帳號收藏比對 -->
-<div class="modal-overlay" id="compareModal">
+<div class="modal-overlay" id="compareModal" onclick="if(event.target===this) closeCompareModal()">
   <div class="modal-box" style="max-width:480px;max-height:86vh;overflow-y:auto;">
     <h2>⚖️ 收藏比對</h2>
     <input type="text" class="minput" id="compareSearch" placeholder="🔍 搜尋角色名稱..." oninput="renderCompareTable()" style="margin-bottom:10px;">
@@ -847,7 +867,7 @@
 </div>
 
 <!-- GitHub 備份同步衝突彈窗 -->
-<div class="modal-overlay" id="syncConflictModal">
+<div class="modal-overlay" id="syncConflictModal" onclick="if(event.target===this) useLocalData()">
   <div class="modal-box" style="max-width:380px;">
     <h2>⚠️ 偵測到資料不同步</h2>
     <div class="drawer-lbl" style="margin-bottom:14px;">這台裝置的本機資料，跟 GitHub 上的備份不一樣，選擇要使用哪一份：</div>
@@ -2719,12 +2739,44 @@ function closeAppearanceModal(){
 function renderBgSlideshowGrid(){
   const grid=document.getElementById('bgSlideshowGrid'); if(!grid) return;
   grid.innerHTML = activeBgArray().map((url,i)=>
-    `<div class="bg-slide-thumb"><img src="${url}" alt=""><span class="bg-slide-remove" onclick="removeBgAt(${i})">✕</span></div>`
+    `<div class="bg-slide-thumb"><img src="${url}" alt="" onclick="openBgPreview(${i})"><span class="bg-slide-remove" onclick="event.stopPropagation(); removeBgAt(${i})">✕</span></div>`
   ).join('');
 }
 function removeBgAt(i){
   activeBgArray().splice(i,1);
   applyBackground(); saveState(); renderBgSlideshowGrid();
+}
+// 背景圖片大圖預覽：點縮圖開啟，可左右切換，也能直接在預覽裡移除
+let bgPreviewIdx = 0;
+function openBgPreview(i){
+  bgPreviewIdx = i;
+  renderBgPreview();
+  document.getElementById('bgPreviewModal').classList.add('open');
+}
+function closeBgPreview(){
+  document.getElementById('bgPreviewModal').classList.remove('open');
+}
+function renderBgPreview(){
+  const list = activeBgArray();
+  if(!list.length){ closeBgPreview(); return; }
+  if(bgPreviewIdx>=list.length) bgPreviewIdx = list.length-1;
+  if(bgPreviewIdx<0) bgPreviewIdx = 0;
+  document.getElementById('bgPreviewImg').src = list[bgPreviewIdx];
+  document.getElementById('bgPreviewCounter').textContent = `${bgPreviewIdx+1} / ${list.length}`;
+  const multi = list.length>1;
+  document.getElementById('bgPreviewPrev').style.display = multi?'':'none';
+  document.getElementById('bgPreviewNext').style.display = multi?'':'none';
+}
+function bgPreviewNav(delta){
+  const list = activeBgArray();
+  if(!list.length) return;
+  bgPreviewIdx = (bgPreviewIdx + delta + list.length) % list.length;
+  renderBgPreview();
+}
+function removeCurrentBgPreview(){
+  if(!confirm('確定要移除這張背景圖片嗎？此動作無法復原。')) return;
+  removeBgAt(bgPreviewIdx); // 已經會更新縮圖格線、重新套用背景
+  renderBgPreview(); // 同步更新預覽：索引超出範圍會自動修正，清空時會自動關閉
 }
 function handleBgUpload(e){
   const file=e.target.files[0]; if(!file){ return; }
