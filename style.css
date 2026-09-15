@@ -93,7 +93,8 @@
 }
 
 /* ── 淺色主題（白天自動切換 / 手動選擇；用 body.light-theme 切換）──
-   只覆寫 --bg-*、--bdr-subtle/--bdr-normal/--bdr-accent、
+   覆寫 --bg-base/--bg-primary/--bg-secondary/--bg-card/--bg-card-hov/--bg-input（--bg-modal 不覆寫，見下方說明）、
+   --bdr-subtle/--bdr-normal/--bdr-accent、
    --tx-primary/--tx-secondary/--tx-muted、--glo-blue/--glo-red、
    --sha-md/--sha-lg；品牌色、狀態色其餘變數兩種模式共用同一組值。 */
 body.light-theme {
@@ -103,7 +104,10 @@ body.light-theme {
   --bg-card:      #ffffff;
   --bg-card-hov:  #eef0f6;
   --bg-input:     #eef0f6;
-  --bg-modal:     #ffffff;
+  /* 注意：--bg-modal 不在這裡覆寫，維持 :root 的固定深色值。
+     用到它的元件（側欄、篩選抽屜、下拉更新 spinner）內部文字都是用固定淺色的
+     --modal-text/--modal-sub/--modal-muted，兩者是配套的「固定深色卡片」，
+     背景單獨變白但文字沒有跟著變深，會變成白字白底看不到（之前發生過這個 bug）。 */
 
   --bdr-subtle: rgba(20,24,50,.06);
   --bdr-normal: rgba(20,24,50,.14);
