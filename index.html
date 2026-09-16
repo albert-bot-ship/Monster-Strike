@@ -709,7 +709,7 @@
         <div class="appear-btn-row">
           <label class="gbtn" id="bgAddBtn" style="cursor:pointer;">
             新增圖片
-            <input type="file" accept="image/*" style="display:none" onchange="handleBgUpload(event)">
+            <input type="file" accept="image/*" multiple style="display:none" onchange="handleBgUpload(event)">
           </label>
           <button class="gbtn" onclick="clearBg()">清除全部</button>
         </div>
@@ -2777,12 +2777,18 @@ function removeCurrentBgPreview(){
   renderBgPreview(); // 同步更新預覽：索引超出範圍會自動修正，清空時會自動關閉
 }
 function handleBgUpload(e){
-  const file=e.target.files[0]; if(!file){ return; }
-  compressImage(file, 1920, 0.82).then(dataUrl=>{
-    activeBgArray().push(dataUrl);
+  const files = Array.from(e.target.files || []);
+  if(!files.length) return;
+  Promise.allSettled(files.map(f => compressImage(f, 1920, 0.82))).then(results=>{
+    let failCount = 0;
+    results.forEach(r=>{
+      if(r.status==='fulfilled') activeBgArray().push(r.value);
+      else failCount++;
+    });
     renderBgSlideshowGrid();
     applyBackground(); saveState();
-  }).catch(()=>alert('圖片處理失敗，請換一張圖片'));
+    if(failCount) alert(`有 ${failCount} 張圖片處理失敗，其餘已成功新增`);
+  });
   e.target.value='';
 }
 function clearBg(){
