@@ -311,6 +311,13 @@ header {
   background: linear-gradient(180deg, rgba(24,28,56,.98), rgba(32,36,72,.95));
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--bdr-normal);
+  display:grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "title right"
+    "accounts accounts"
+    "ticker ticker";
+  align-items:center; column-gap:8px; row-gap:5px;
 }
 body.light-theme header {
   background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(244,245,248,.45));
@@ -329,8 +336,7 @@ body.light-theme header::after { opacity:.55; }
   0%,100% { box-shadow: 0 0 6px var(--m-blue), 0 0 10px var(--m-violet); }
   50%     { box-shadow: 0 0 10px var(--m-red), 0 0 16px var(--m-violet); }
 }
-.title-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; }
-.header-right { display:flex; align-items:center; gap:7px; }
+.header-right { grid-area:right; justify-self:end; display:flex; align-items:center; gap:7px; }
 .header-icon-btn {
   width:25px; height:25px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
@@ -338,6 +344,13 @@ body.light-theme header::after { opacity:.55; }
   border:1px solid var(--bdr-normal); transition: filter .15s, transform .12s;
 }
 .header-icon-btn:active { transform:scale(.9); filter:brightness(1.2); }
+/* 標題外面包一層固定深色半透明底，不管背景圖多亮多雜，文字都維持看得清楚 */
+.app-title-chip {
+  grid-area:title; justify-self:start;
+  display:inline-flex; align-items:center;
+  padding: 3px 10px; border-radius: 8px;
+  background: rgba(10,12,28,.55);
+}
 .app-title {
   font-size: 15px; font-weight: 800; letter-spacing: .6px;
   background: linear-gradient(90deg, var(--water), var(--dark) 55%, var(--fire));
@@ -354,7 +367,7 @@ body:not(.light-theme) .app-title { animation: titlePowerOn 2.4s ease-out 1; }
   font-size: 11px; font-weight: 600; background: var(--warn);
   color: #1a0800; padding: 2px 9px; border-radius: 10px; display: none;
 }
-.accounts { display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.accounts { grid-area:accounts; display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
 .accounts::-webkit-scrollbar { display:none; }
 .acc-tab {
   flex-shrink: 0; display:flex; align-items:center; gap:5px;
@@ -374,8 +387,9 @@ body:not(.light-theme) .app-title { animation: titlePowerOn 2.4s ease-out 1; }
 .acc-edit { font-size:11px; color:rgba(255,255,255,.35); }
 
 .event-ticker {
+  grid-area:ticker;
   display:none; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch;
-  scrollbar-width:none; margin-top:4px;
+  scrollbar-width:none;
 }
 .event-ticker::-webkit-scrollbar { display:none; }
 .event-chip {
@@ -1079,6 +1093,17 @@ main { padding:12px 12px calc(var(--nav-h) * 0.55 + 16px); max-width:600px; marg
 @media (min-width:900px) {
   /* 電腦版：搜尋框上下內邊距明顯縮減，變細，手機版不受影響 */
   .search-input { padding-top:4px; padding-bottom:4px; }
+
+  /* 電腦版：header 改兩行——標題／帳號分頁／選單鈕同一行，活動提醒自己一行，整體高度比手機版三行窄 */
+  header {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "title accounts right"
+      "ticker ticker ticker";
+    padding-top: 5px; padding-bottom: 4px; row-gap: 4px;
+  }
+  .accounts { justify-self:start; }
+  .acc-tab { padding: 3px 11px; font-size: 12px; }
 }
 
 /* ── 自訂下拉（Custom Dropdown）──────────────────── */
