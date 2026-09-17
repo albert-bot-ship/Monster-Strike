@@ -1476,3 +1476,20 @@ body.intro .swipe-view { animation: introUp .55s cubic-bezier(.16,1,.3,1) .16s b
   padding:6px 8px; margin-bottom:5px;
 }
 .view-stage-item .vsi-note { color:var(--modal-sub); font-size:12px; margin-top:2px; }
+
+/* ── 活動關卡：替代規則 ───────────────────────────────── */
+.stage-char-via { color: var(--modal-sub); font-size:11px; margin-left:4px; }
+.stage-equiv-wrap { margin-top:10px; padding-top:10px; border-top:1px dashed var(--bdr-normal); }
+.equiv-row {
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  background: rgba(255,255,255,.03); border:1px solid var(--bdr-accent);
+  border-radius:8px; padding:8px 10px; margin-bottom:6px;
+}
+.equiv-row-text { font-size:12px; color:var(--modal-text); line-height:1.6; flex:1; }
+.equiv-covered { color: var(--gold2); font-weight:600; }
+.equiv-arrow { color: var(--modal-sub); margin:0 4px; }
+.equiv-alt { color: var(--water); font-weight:600; }
+.equiv-builder {
+  margin-top:8px; padding:10px; border-radius:8px;
+  background: rgba(255,255,255,.04); border:1px solid var(--bdr-accent);
+}
