@@ -1463,6 +1463,7 @@ body.intro .swipe-view { animation: introUp .55s cubic-bezier(.16,1,.3,1) .16s b
   font-size:12px; display:flex; align-items:center; justify-content:center; cursor:pointer;
 }
 .stage-icon-btn:hover { background: rgba(var(--m-blue-rgb),.6); color: var(--accent-text); }
+.stage-icon-btn-disabled { opacity:.3; pointer-events:none; }
 .stage-char-list {
   margin:4px 0 2px 4px; padding:6px 8px;
   border-left:2px solid var(--bdr-accent);
