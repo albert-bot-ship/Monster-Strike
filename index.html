@@ -257,6 +257,9 @@
       <div class="sidebar-item" onclick="sidebarAction('compare')">
         <span class="sidebar-item-icon">⚖️</span><span class="sidebar-item-text">多帳號收藏比對</span>
       </div>
+      <div class="sidebar-item" onclick="sidebarAction('eventstages')">
+        <span class="sidebar-item-icon">🎯</span><span class="sidebar-item-text">活動關卡</span>
+      </div>
     </div>
     <div class="sidebar-group">
       <div class="sidebar-group-label">工具</div>
@@ -396,6 +399,15 @@
     <div class="cdd-body" id="fCollabBody">
       <input type="text" class="minput cdd-search" placeholder="🔍 搜尋合作活動..." oninput="filterCddSearch(this)">
       <div id="fCollabGrid"></div>
+    </div></div>
+  </div>
+
+  <div class="drawer-section">
+    <div class="drawer-lbl">活動關卡（可多選）</div>
+    <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">全部</span><span class="cdd-arr">▼</span></div>
+    <div class="cdd-body" id="fEventStageBody">
+      <input type="text" class="minput cdd-search" placeholder="🔍 搜尋關卡..." oninput="filterGroupedSearch(this)">
+      <div id="fEventStageGrid"></div>
     </div></div>
   </div>
 
@@ -548,6 +560,17 @@
       </div>
     </div>
 
+    <div class="accordion-section">
+      <div class="accordion-header" onclick="toggleAcc(this)">
+        活動關卡（可多選）<span class="selected-count" id="cntEventStage"></span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <div id="mEventStageBody"></div>
+        <div id="mStageNotesList" style="margin-top:8px;"></div>
+      </div>
+    </div>
+
     <div class="mfield">
       <label>種族（可多選）</label>
       <div class="cdd"><div class="cdd-hdr" onclick="toggleCdd(this)"><span class="cdd-lbl">選擇種族</span><span class="cdd-arr">▼</span></div>
@@ -674,6 +697,11 @@
     <div class="view-section" id="vFormsWrap">
       <div class="view-section-title">型態</div>
       <div class="view-tag-grid" id="vForms"></div>
+    </div>
+
+    <div class="view-section" id="vEventStagesWrap">
+      <div class="view-section-title">活動關卡</div>
+      <div id="vEventStages"></div>
     </div>
 
     <div class="view-section" id="vTrueBeastWrap">
@@ -864,6 +892,18 @@
   </div>
 </div>
 
+<!-- 活動關卡管理／查詢 -->
+<div class="modal-overlay" id="eventStageModal" onclick="if(event.target===this) closeEventStageModal()">
+  <div class="modal-box" style="max-width:480px;max-height:86vh;overflow-y:auto;">
+    <h2>🎯 活動關卡</h2>
+    <div class="appear-hint" style="margin-bottom:10px;">新增／刪除各活動底下的關卡；點關卡名稱可以展開，看目前有哪些角色勾選了它。</div>
+    <div id="eventStageManagerBody"></div>
+    <div class="mbtnrow" style="margin-top:14px;">
+      <button class="mcancel" onclick="closeEventStageModal()" style="flex:1;">關閉</button>
+    </div>
+  </div>
+</div>
+
 <!-- GitHub 備份同步衝突彈窗 -->
 <div class="modal-overlay" id="syncConflictModal" onclick="if(event.target===this) useLocalData()">
   <div class="modal-box" style="max-width:380px;">
@@ -892,6 +932,14 @@ const GOKUUN_ICON_B64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEAC
 const KILLER_GROUPS  = {'屬性殺手':['火屬性','水屬性','木屬性','光屬性','闇屬性','全屬性'],'種族殺手':['龍','機械','魔人','神','鳥','獸','亞人','魔族','妖精','礦物','魔王','幻獸','宇宙','聖騎士','武士','同盟國','軸心國','幻妖','麒神','神獸','怪獸','使徒','鬥士','巨人'],'其他':['反擊','弱點','重力護罩','毒','活力','致命','連擊','雷射護罩','初擊','位置','攻擊回合','雜兵','中BOSS','BOSS','攻擊變化','防禦變化']};
 const SUPER_SKILLS  = ['超反重力護罩','超反傷害壁','超反傳送','超掃雷者','超反風','超反減速壁','超反移轉壁'];
 const FRIEND_SKILLS = ['爆炸','光暈','雷射','導引彈','能量環','擴散彈','衝擊波','散彈槍','電漿','追蹤型貫通彈','衛星彈','隕石','跳彈','電擊','斬擊','橫斬刀','波動','追擊貫通彈','吐息','氣彈','分裂彈','增殖彈','漸伸線','YO-YO彈','炸裂彈','牆壁移動','穿牆','分身彈','交叉刺針彈','圓鋸片','火焰','爆風','彈跳炸彈','血族脈衝','環域','毒','拷貝','數值提升','數值下降','速度提升','SS回合','回復','其他','合作活動'];
+// 活動關卡：5 個固定活動，底下的關卡由使用者自行新增/改名/刪除（存在 eventStages）
+const EVENT_ACTIVITIES = [
+  {id:'tower',  name:'霸者之塔／賽季'},
+  {id:'zekkyu', name:'絕級淘汰賽'},
+  {id:'prison', name:'禁忌之獄／深淵'},
+  {id:'sand',   name:'未開之沙宮'},
+  {id:'tenma',  name:'天魔的孤城'}
+];
 const RACES         = ['龍','機械','魔人','神','鳥','獸','亞人','魔族','妖精','礦物','魔王','幻獸','外星','宇宙','聖騎士','武士','同盟國','軸心國','幻妖','鬥神','神獸','聖域獵人','怪獸','EVA駕駛員','使徒','鬥士','妖怪','青銅聖鬥士','黃金聖鬥士','人造人','怪異','巨人','魔神','人偶','嵌合蟻','米奇與好朋友','死神','燃燒者','BORDER隊員','近界民','十刃','假面軍勢'];
 const FORM_STAGES    = ['進化','神化','獸神化','獸神化改','真獸神化'];
 const HERO_FRUITS   = {'數值強化':['同族','擊種','戰型','加攻','加速','加命','孤高'],'怪物強化':['熱血友擊','傷害減輕','將命削減','兵命削減','一擊失心','加速必殺','耐毒','小小治癒','愛心'],'冒險效果':['學習','發財','超速過關','S級別','賺取點數']};
@@ -905,6 +953,17 @@ const EGG_ICON_B64  = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
 
 // ── 狀態 ─────────────────────────────────────────────
 let charactersByAccount = {}, accounts = [{id:'a1',name:'帳號1'},{id:'a2',name:'帳號2'},{id:'a3',name:'帳號3'},{id:'a4',name:'帳號4'}];
+// 活動關卡：{ tower:[{id,name}], zekkyu:[...], prison:[...], sand:[...], tenma:[...] }（全域共用，不分帳號）
+let eventStages = {};
+function ensureEventStages(){ EVENT_ACTIVITIES.forEach(a=>{ if(!Array.isArray(eventStages[a.id])) eventStages[a.id]=[]; }); }
+function genStageId(){ return 'st_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function findStageInfo(stageId){
+  for(const act of EVENT_ACTIVITIES){
+    const s=(eventStages[act.id]||[]).find(x=>x.id===stageId);
+    if(s) return {activityId:act.id, activityName:act.name, stageName:s.name};
+  }
+  return null;
+}
 // ── 共用圖片庫：同名稱+同屬性的角色，主圖共用同一份，改一次全部帳號一起變 ──
 let sharedImages = {}; // { "名稱__屬性": dataURL }
 function sharedImgKey(name, attribute){ return `${name}__${attribute}`; }
@@ -1052,13 +1111,14 @@ function sortChars(arr) {
   });
 }
 
-const fSets = { skills:new Set(), superSkills:new Set(), strikeType:new Set(), battleType:new Set(), rarity:new Set(), races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), formStages:new Set(), obtain:new Set(), collab:new Set() };
+const fSets = { skills:new Set(), superSkills:new Set(), strikeType:new Set(), battleType:new Set(), rarity:new Set(), races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), formStages:new Set(), obtain:new Set(), collab:new Set(), eventStages:new Set() };
 let filterAttr = '';
 let filterFriendMain = '';
 const mSets = { races:new Set(), friendSkillsSub:new Set(), heroFruits:new Set(), skills:new Set(), superSkills:new Set(), obtain:new Set(), formStages:new Set() };
 // modal single-select states
 let mRarity = '6', mStrike = '反射型', mBattle = '平衡', mFriendMain = '';
 let mTargetAccount = null; // 新增角色時，要存到哪個帳號（從「全部」開新增時需要指定）
+let mUsableStages = new Map(); // 編輯角色視窗暫存：stageId -> 備註文字
 
 // ── 初始化 ───────────────────────────────────────────
 function init() {
@@ -1095,6 +1155,9 @@ function init() {
   buildKillerCdd('mKillerGrid', false);
   buildCddBody('fOtherSkillGrid', OTHER_SKILLS, 'skills', true);
   buildCddBody('mOtherSkillGrid', OTHER_SKILLS, 'skills', false);
+  ensureEventStages();
+  buildEventStageFilterCdd();
+  buildEventStageModalGrid();
   document.getElementById('searchBox').addEventListener('input', ()=>{ renderList(); updateSearchSuggest(); });
   document.getElementById('searchBox').addEventListener('focus', updateSearchSuggest);
   document.getElementById('searchBox').addEventListener('blur', ()=>{ setTimeout(()=>document.getElementById('searchSuggest').classList.remove('open'), 150); });
@@ -1141,6 +1204,77 @@ function buildKillerCdd(bodyId, isFilter) {
     });
     grp.appendChild(grid); body.appendChild(grp);
   });
+}
+
+// ── 活動關卡（篩選：分組格線＋搜尋，跟殺手/英雄果實同樣做法）──
+function buildEventStageFilterCdd(){
+  const body = document.getElementById('fEventStageGrid'); if(!body) return;
+  ensureEventStages();
+  body.innerHTML='';
+  EVENT_ACTIVITIES.forEach((act, idx)=>{
+    const stages = eventStages[act.id]||[];
+    if(!stages.length) return;
+    const grp = document.createElement('div'); grp.className='hf-group hf-group-'+(idx%3);
+    grp.innerHTML = `<div class="hf-group-label">${act.name}</div>`;
+    const grid = document.createElement('div'); grid.className='sg3';
+    stages.forEach(s=>{
+      const b=document.createElement('div'); b.className='skill-btn'; b.textContent=s.name; b.dataset.val=s.id;
+      if(fSets.eventStages.has(s.id)) b.classList.add('active');
+      b.onclick=()=>{ toggleSet(b,'eventStages',s.id,true); updateCddLabel(b.closest('.cdd')); renderList(); };
+      grid.appendChild(b);
+    });
+    grp.appendChild(grid); body.appendChild(grp);
+  });
+  if(!body.innerHTML) body.innerHTML = '<div class="view-empty">尚未新增任何關卡</div>';
+}
+
+// ── 活動關卡（新增/編輯角色視窗：分組格線＋選中後下方出現備註輸入框）──
+function buildEventStageModalGrid(){
+  const body = document.getElementById('mEventStageBody'); if(!body) return;
+  ensureEventStages();
+  body.innerHTML='';
+  EVENT_ACTIVITIES.forEach((act, idx)=>{
+    const stages = eventStages[act.id]||[];
+    if(!stages.length) return;
+    const grp = document.createElement('div'); grp.className='hf-group hf-group-'+(idx%3);
+    grp.innerHTML = `<div class="hf-group-label">${act.name}</div>`;
+    const grid = document.createElement('div'); grid.className='sg3';
+    stages.forEach(s=>{
+      const b=document.createElement('div'); b.className='skill-btn'; b.textContent=s.name; b.dataset.val=s.id;
+      if(mUsableStages.has(s.id)) b.classList.add('active');
+      b.onclick=()=>toggleUsableStage(s.id);
+      grid.appendChild(b);
+    });
+    grp.appendChild(grid); body.appendChild(grp);
+  });
+  if(!body.innerHTML) body.innerHTML = '<div class="view-empty">尚未新增任何關卡，請先到側邊欄「活動關卡」新增。</div>';
+  renderStageNotesList();
+  updateEventStageCntBadge();
+}
+function toggleUsableStage(stageId){
+  if(mUsableStages.has(stageId)) mUsableStages.delete(stageId);
+  else mUsableStages.set(stageId, '');
+  buildEventStageModalGrid();
+}
+function updateStageNote(stageId, val){
+  if(mUsableStages.has(stageId)) mUsableStages.set(stageId, val);
+}
+function renderStageNotesList(){
+  const box=document.getElementById('mStageNotesList'); if(!box) return;
+  if(mUsableStages.size===0){ box.innerHTML=''; return; }
+  box.innerHTML = [...mUsableStages.entries()].map(([sid,note])=>{
+    const info=findStageInfo(sid);
+    const label = info ? `${info.activityName}－${info.stageName}` : '（已刪除的關卡）';
+    const safeNote = (note||'').replace(/"/g,'&quot;');
+    return `<div class="mfield" style="margin-bottom:6px;">
+      <label style="font-size:11px;color:var(--modal-sub);">${label}　備註（選填）</label>
+      <input type="text" class="minput" value="${safeNote}" placeholder="例：主力打手、靠爆屬" oninput="updateStageNote('${sid}', this.value)">
+    </div>`;
+  }).join('');
+}
+function updateEventStageCntBadge(){
+  const el=document.getElementById('cntEventStage'); if(!el) return;
+  el.textContent = mUsableStages.size>0 ? `已選 ${mUsableStages.size}` : '';
 }
 
 // ── 友情技（主／副）建構 ───────────────────────────────
@@ -1486,6 +1620,7 @@ function matchesFilters(c, q) {
   if(filterFriendMain && c.friendSkillMain !== filterFriendMain) return false;
   for(const s of fSets.friendSkillsSub) if(!(c.friendSkillsSub||[]).includes(s)) return false;
   for(const s of fSets.obtain)       if(!(c.obtainMethods||[]).includes(s)) return false;
+  for(const s of fSets.eventStages)  if(!(c.usableStages||[]).some(u=>u.stageId===s)) return false;
   return true;
 }
 function getFiltered() {
@@ -1907,6 +2042,8 @@ function clearModalForm(){
   resetModalSets(); selectAttr('火');
   updateGokuUnVisibility();
   updateFormStageDependents();
+  mUsableStages = new Map();
+  buildEventStageModalGrid();
   // 重設角色編輯視窗內所有下拉搜尋欄（技能／種族／合作活動等），避免上一次搜尋文字殘留、清單維持被篩選狀態
   document.querySelectorAll('#addCharModal .cdd-search').forEach(input=>{
     input.value = '';
@@ -1992,6 +2129,9 @@ function prefillModal(c){
   activateSet('formStages', c.formStages, 'mFormStageGrid', false);
   updateFormStageDependents();
   updateCntBadge('cntSkill','skills','cntSuper','superSkills');
+
+  mUsableStages = new Map((c.usableStages||[]).map(u=>[u.stageId, u.note||'']));
+  buildEventStageModalGrid();
 }
 
 function openAddModal(){
@@ -2040,6 +2180,7 @@ function isModalFormDirty(){
   if(uploadedImg || uploadedImg2) return true;
   if(mFriendMain) return true;
   if(Object.values(mSets).some(s=>s && s.size>0)) return true;
+  if(mUsableStages.size>0) return true;
   return false;
 }
 function deleteCharFromModal(){
@@ -2142,6 +2283,15 @@ function openViewModal(id){
   const stages = c.formStages||[];
   formsWrap.style.display = stages.length ? '' : 'none';
   document.getElementById('vForms').innerHTML = stages.map(s=>`<span class="view-tag">${s}</span>`).join('');
+
+  const stagesWrap = document.getElementById('vEventStagesWrap');
+  const usable = c.usableStages||[];
+  stagesWrap.style.display = usable.length ? '' : 'none';
+  document.getElementById('vEventStages').innerHTML = usable.map(u=>{
+    const info = findStageInfo(u.stageId);
+    const label = info ? `${info.activityName}－${info.stageName}` : '（已刪除的關卡）';
+    return `<div class="view-stage-item"><div>${label}</div>${u.note?`<div class="vsi-note">${u.note}</div>`:''}</div>`;
+  }).join('');
 
   const trueBeastWrap = document.getElementById('vTrueBeastWrap');
   const hasTrueBeastSkills = c.shootSkill || c.supportSkill;
@@ -2504,7 +2654,7 @@ function confirmChar(){
     // 沒有主動換圖、但這組已經有其他帳號的共用圖時，保留原本共用群組的圖片，不覆蓋掉別人的
     imageRef = shareKey;
   }
-  const data={charNo:document.getElementById('newCharNo').value.trim(),charNo2:document.getElementById('newCharNo2').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,collab:document.getElementById('newCollab').value.trim(),quantity:qty,hasGokuUn:document.getElementById('newGokuUn').checked,ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:null,imageRef,imageData2:uploadedImg2,formStages:[...mSets.formStages],shootSkill:mSets.formStages.has('真獸神化')?document.getElementById('newShootSkill').value.trim():'',supportSkill:mSets.formStages.has('真獸神化')?document.getElementById('newSupportSkill').value.trim():''};
+  const data={charNo:document.getElementById('newCharNo').value.trim(),charNo2:document.getElementById('newCharNo2').value.trim(),name,attribute:modalAttr,rarity:parseInt(mRarity),strikeType:mStrike,battleType:mBattle,collab:document.getElementById('newCollab').value.trim(),quantity:qty,hasGokuUn:document.getElementById('newGokuUn').checked,ssRounds:document.getElementById('newSSRounds').value.trim(),ssName:document.getElementById('newSSName').value.trim(),ssDesc:document.getElementById('newSSDesc').value.trim(),races:[...mSets.races],friendSkillMain:mFriendMain,friendSkillsSub:[...mSets.friendSkillsSub],heroFruits:[...mSets.heroFruits],skills:[...mSets.skills],superSkills:[...mSets.superSkills],obtainMethods:[...mSets.obtain],imageData:null,imageRef,imageData2:uploadedImg2,formStages:[...mSets.formStages],shootSkill:mSets.formStages.has('真獸神化')?document.getElementById('newShootSkill').value.trim():'',supportSkill:mSets.formStages.has('真獸神化')?document.getElementById('newSupportSkill').value.trim():'',usableStages:[...mUsableStages.entries()].map(([stageId,note])=>({stageId,note:(note||'').trim()}))};
   if(editCharId!==null){
     const list=currentChars();
     const idx=list.findIndex(x=>x.id===editCharId);if(idx>=0)list[idx]={id:editCharId,...data};
@@ -2659,6 +2809,116 @@ function openCompareModal(){
 }
 function closeCompareModal(){
   document.getElementById('compareModal').classList.remove('open');
+}
+
+// ── 活動關卡管理／查詢 ────────────────────────────────
+function openEventStageModal(){
+  ensureEventStages();
+  renderEventStageManager();
+  document.getElementById('eventStageModal').classList.add('open');
+}
+function closeEventStageModal(){
+  document.getElementById('eventStageModal').classList.remove('open');
+}
+// 查某個關卡目前有哪些角色勾選（依目前分頁：全部帳號時各帳號都查，並標註帳號名稱）
+function getCharsForStage(stageId){
+  const result=[];
+  const addFrom=(list, accTag)=>{
+    (list||[]).forEach(c=>{
+      const hit=(c.usableStages||[]).find(u=>u.stageId===stageId);
+      if(hit) result.push({char:c, note:hit.note||'', accTag});
+    });
+  };
+  if(activeAccount==='__ALL__'){
+    accounts.forEach(a=>addFrom(charactersByAccount[a.id], `[${a.name}] `));
+  } else {
+    addFrom(currentChars(), '');
+  }
+  return result;
+}
+function renderEventStageManager(){
+  const box=document.getElementById('eventStageManagerBody'); if(!box) return;
+  box.innerHTML = EVENT_ACTIVITIES.map(act=>{
+    const stages = eventStages[act.id]||[];
+    return `
+    <div class="accordion-section">
+      <div class="accordion-header" onclick="toggleAcc(this)">
+        ${act.name}<span class="selected-count">${stages.length?stages.length+' 個關卡':''}</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <div class="stage-add-row">
+          <input type="text" class="minput" id="newStageInput_${act.id}" placeholder="輸入新關卡名稱" onkeydown="if(event.key==='Enter')addEventStage('${act.id}')">
+          <button class="gbtn" onclick="addEventStage('${act.id}')">＋ 新增</button>
+        </div>
+        <div class="stage-list">
+          ${stages.length ? stages.map(s=>renderStageRow(act.id, s)).join('') : '<div class="view-empty">尚未新增關卡</div>'}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderStageRow(actId, stage){
+  const chars = getCharsForStage(stage.id);
+  const nameEsc = stage.name.replace(/'/g,"\\'");
+  return `
+  <div>
+    <div class="stage-row" onclick="toggleStageCharList('${stage.id}')">
+      <div class="stage-row-main">
+        <span class="stage-row-name">${stage.name}</span>
+        <span class="stage-row-count">${chars.length} 隻</span>
+      </div>
+      <div class="stage-row-actions">
+        <span class="stage-icon-btn" onclick="event.stopPropagation();renameEventStage('${actId}','${stage.id}','${nameEsc}')">✎</span>
+        <span class="stage-icon-btn" onclick="event.stopPropagation();deleteEventStage('${actId}','${stage.id}')">🗑</span>
+      </div>
+    </div>
+    <div class="stage-char-list" id="stageCharList_${stage.id}" style="display:none;">
+      ${chars.length ? chars.map(x=>`<div class="stage-char-item"><span>${x.accTag}${x.char.name}</span>${x.note?`<span class="stage-char-note">${x.note}</span>`:''}</div>`).join('') : '<div class="view-empty">目前沒有角色勾選這個關卡</div>'}
+    </div>
+  </div>`;
+}
+function toggleStageCharList(stageId){
+  const el=document.getElementById('stageCharList_'+stageId); if(!el) return;
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+function addEventStage(actId){
+  ensureEventStages();
+  const input=document.getElementById('newStageInput_'+actId); if(!input) return;
+  const name=input.value.trim(); if(!name) return;
+  eventStages[actId].push({id:genStageId(), name});
+  input.value='';
+  saveState();
+  renderEventStageManager();
+  buildEventStageFilterCdd();
+  buildEventStageModalGrid();
+}
+function renameEventStage(actId, stageId, oldName){
+  const n=prompt('關卡名稱:', oldName);
+  if(!n || !n.trim()) return;
+  const stage=(eventStages[actId]||[]).find(s=>s.id===stageId); if(!stage) return;
+  stage.name=n.trim();
+  saveState();
+  renderEventStageManager();
+  buildEventStageFilterCdd();
+  buildEventStageModalGrid();
+}
+function deleteEventStage(actId, stageId){
+  const stage=(eventStages[actId]||[]).find(s=>s.id===stageId); if(!stage) return;
+  if(!confirm(`確定要刪除關卡「${stage.name}」嗎？所有角色勾選這個關卡的紀錄也會一併移除，此動作無法復原。`)) return;
+  eventStages[actId]=(eventStages[actId]||[]).filter(s=>s.id!==stageId);
+  // 清除所有帳號、所有角色身上殘留的這個關卡紀錄
+  accounts.forEach(a=>{
+    (charactersByAccount[a.id]||[]).forEach(c=>{
+      if(Array.isArray(c.usableStages) && c.usableStages.some(u=>u.stageId===stageId)){
+        c.usableStages = c.usableStages.filter(u=>u.stageId!==stageId);
+      }
+    });
+  });
+  if(mUsableStages.has(stageId)){ mUsableStages.delete(stageId); buildEventStageModalGrid(); }
+  saveState();
+  renderEventStageManager();
+  buildEventStageFilterCdd();
 }
 function renderCompareTable(){
   const term = document.getElementById('compareSearch').value.trim();
@@ -2855,7 +3115,7 @@ function applyTheme(){
 
 function exportBackup(){
   const savedAt = new Date().toISOString();
-  dl(JSON.stringify({version:6,accounts,charactersByAccount,sharedImages,customBgDesktop,customBgMobile,themeMode,savedAt},null,2),'backup.json');
+  dl(JSON.stringify({version:6,accounts,charactersByAccount,sharedImages,eventStages,customBgDesktop,customBgMobile,themeMode,savedAt},null,2),'backup.json');
   hasUnsaved=false; document.getElementById('unsavedBadge').style.display='none';
 }
 function importBackup(e){
@@ -2867,12 +3127,13 @@ function importBackup(e){
       if(data.accounts)accounts=data.accounts;
       charactersByAccount=migrateToPerAccount(data);
       sharedImages = data.sharedImages || {};
+      eventStages = data.eventStages || {}; ensureEventStages();
       activeAccount='__ALL__';
       loadBgFields(data);
       themeMode = data.themeMode || 'auto';
       applyBackground(); applyTheme();
       hasUnsaved=false; document.getElementById('unsavedBadge').style.display='none';
-      renderAll(); alert('匯入完成');
+      renderAll(); buildEventStageFilterCdd(); buildEventStageModalGrid(); alert('匯入完成');
     }catch{alert('匯入失敗，檔案格式錯誤');}
   };
   reader.readAsText(file);
@@ -2917,6 +3178,7 @@ function migrateCharacterFields(c){
     }
   }
   if(c.imageRef === undefined) c.imageRef = null;
+  if(c.usableStages === undefined) c.usableStages = [];
   return c;
 }
 
@@ -3364,6 +3626,7 @@ function sidebarAction(action){
   switch(action){
     case 'info':       openInfoModal(); break;
     case 'compare':    openCompareModal(); break;
+    case 'eventstages':openEventStageModal(); break;
     case 'appearance': openAppearanceModal(); break;
     case 'multiselect':toggleMultiSelect(); break;
     case 'share':      openShareModal(); break;
@@ -3379,6 +3642,7 @@ fetch('backup.json')
     if(data.accounts)accounts=data.accounts;
     charactersByAccount=migrateToPerAccount(data);
     sharedImages = data.sharedImages || {};
+    eventStages = data.eventStages || {}; ensureEventStages();
     activeAccount='__ALL__';
     loadBgFields(data);
     themeMode = data.themeMode || 'auto';
@@ -3389,8 +3653,8 @@ fetch('backup.json')
 
 // ── GitHub 備份同步比對 ───────────────────────────────
 let pendingRemoteSync = null;
-function snapshotForSync(accs, chars, imgs, bgD, bgM, theme){
-  return JSON.stringify({accounts:accs, charactersByAccount:chars, sharedImages:imgs, customBgDesktop:bgD||null, customBgMobile:bgM||null, themeMode:theme});
+function snapshotForSync(accs, chars, imgs, bgD, bgM, theme, stages){
+  return JSON.stringify({accounts:accs, charactersByAccount:chars, sharedImages:imgs, eventStages:stages||{}, customBgDesktop:bgD||null, customBgMobile:bgM||null, themeMode:theme});
 }
 function formatSyncTime(iso){
   if(!iso) return '無記錄';
@@ -3416,14 +3680,15 @@ function checkGithubSync(){
         remoteBgM = normalizeBgArray(data.customBg);
       }
       const remoteTheme = data.themeMode || 'auto';
+      const remoteStages = data.eventStages || {};
 
-      const localSnap  = snapshotForSync(accounts, charactersByAccount, sharedImages, customBgDesktop, customBgMobile, themeMode);
-      const remoteSnap = snapshotForSync(remoteAccounts, remoteChars, remoteImages, remoteBgD, remoteBgM, remoteTheme);
+      const localSnap  = snapshotForSync(accounts, charactersByAccount, sharedImages, customBgDesktop, customBgMobile, themeMode, eventStages);
+      const remoteSnap = snapshotForSync(remoteAccounts, remoteChars, remoteImages, remoteBgD, remoteBgM, remoteTheme, remoteStages);
       if(localSnap === remoteSnap) return; // 完全相同,不用問
 
       const localCount  = Object.values(charactersByAccount).reduce((s,l)=>s+(l?l.length:0),0);
       const remoteCount = Object.values(remoteChars).reduce((s,l)=>s+(l?l.length:0),0);
-      pendingRemoteSync = {accounts:remoteAccounts, charactersByAccount:remoteChars, sharedImages:remoteImages, customBgDesktop:remoteBgD, customBgMobile:remoteBgM, themeMode:remoteTheme};
+      pendingRemoteSync = {accounts:remoteAccounts, charactersByAccount:remoteChars, sharedImages:remoteImages, eventStages:remoteStages, customBgDesktop:remoteBgD, customBgMobile:remoteBgM, themeMode:remoteTheme};
       document.getElementById('syncLocalInfo').textContent = `更新時間：${formatSyncTime(localSavedAt)}　角色總數：${localCount}　帳號數：${accounts.length}`;
       document.getElementById('syncRemoteInfo').textContent = `更新時間：${formatSyncTime(data.savedAt)}　角色總數：${remoteCount}　帳號數：${remoteAccounts.length}`;
       document.getElementById('syncConflictModal').classList.add('open');
@@ -3439,12 +3704,13 @@ function useGithubData(){
   accounts = pendingRemoteSync.accounts;
   charactersByAccount = pendingRemoteSync.charactersByAccount;
   sharedImages = pendingRemoteSync.sharedImages || {};
+  eventStages = pendingRemoteSync.eventStages || {}; ensureEventStages();
   customBgDesktop = normalizeBgArray(pendingRemoteSync.customBgDesktop);
   customBgMobile = normalizeBgArray(pendingRemoteSync.customBgMobile);
   themeMode = pendingRemoteSync.themeMode;
   activeAccount = '__ALL__';
   applyBackground(); applyTheme();
-  renderAll();
+  renderAll(); buildEventStageFilterCdd(); buildEventStageModalGrid();
   document.getElementById('syncConflictModal').classList.remove('open');
   pendingRemoteSync = null;
 }
