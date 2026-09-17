@@ -2889,9 +2889,10 @@ function renderActivityStagesArea(actId){
   return `
     ${tabBarHtml}
     <div class="stage-add-row">
-      <input type="text" class="minput" id="newStageInput_${actId}" placeholder="輸入新關卡名稱" onkeydown="if(event.key==='Enter')document.getElementById('newStageTrackInput_${actId}').focus()">
+      <input type="text" class="minput" id="newStageInput_${actId}" placeholder="輸入新關卡名稱" onkeydown="if(event.key==='Enter')${actId==='tower'?`document.getElementById('newStageTrackInput_${actId}').focus()`:`addEventStage('${actId}')`}">
+      ${actId==='tower' ? `
       <input type="text" class="minput" id="newStageTrackInput_${actId}" placeholder="路線（選填，如 2nd賽季）" list="stageTrackList_${actId}" style="max-width:132px;" onkeydown="if(event.key==='Enter')addEventStage('${actId}')">
-      <datalist id="stageTrackList_${actId}">${tracks.map(t=>`<option value="${t}">`).join('')}</datalist>
+      <datalist id="stageTrackList_${actId}">${tracks.map(t=>`<option value="${t}">`).join('')}</datalist>` : ''}
       <button class="gbtn" onclick="addEventStage('${actId}')">＋ 新增</button>
     </div>
     <div class="stage-list">
@@ -3054,8 +3055,12 @@ function addEventStage(actId){
 function renameEventStage(actId, stageId, oldName, oldTrack){
   const n=prompt('關卡名稱:', oldName);
   if(!n || !n.trim()) return;
-  const t=prompt('路線（選填，例：經典／2nd賽季／3rd賽季；留空＝不分類）:', oldTrack||'');
-  if(t===null) return;
+  let t = oldTrack||'';
+  if(actId==='tower'){
+    const t2=prompt('路線（選填，例：經典／2nd賽季／3rd賽季；留空＝不分類）:', oldTrack||'');
+    if(t2===null) return;
+    t = t2;
+  }
   const stage=(eventStages[actId]||[]).find(s=>s.id===stageId); if(!stage) return;
   stage.name=n.trim();
   stage.track=(t||'').trim();
