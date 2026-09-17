@@ -955,7 +955,11 @@ const EGG_ICON_B64  = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
 let charactersByAccount = {}, accounts = [{id:'a1',name:'帳號1'},{id:'a2',name:'帳號2'},{id:'a3',name:'帳號3'},{id:'a4',name:'帳號4'}];
 // 活動關卡：{ tower:[{id,name}], zekkyu:[...], prison:[...], sand:[...], tenma:[...] }（全域共用，不分帳號）
 let eventStages = {};
-function ensureEventStages(){ EVENT_ACTIVITIES.forEach(a=>{ if(!Array.isArray(eventStages[a.id])) eventStages[a.id]=[]; }); }
+// 關卡替代規則：例如「2nd賽季-1」「3rd賽季-1」任一過關，等同過了「經典11F」「經典12F」
+// { id, activityId, coveredStageIds:[...], altStageIds:[...] }
+let eventEquivalences = [];
+let equivBuilderState = null; // 新增/編輯替代規則時的暫存狀態
+function ensureEventStages(){ EVENT_ACTIVITIES.forEach(a=>{ if(!Array.isArray(eventStages[a.id])) eventStages[a.id]=[]; }); if(!Array.isArray(eventEquivalences)) eventEquivalences=[]; }
 function genStageId(){ return 'st_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function findStageInfo(stageId){
   for(const act of EVENT_ACTIVITIES){
@@ -963,6 +967,18 @@ function findStageInfo(stageId){
     if(s) return {activityId:act.id, activityName:act.name, stageName:s.name};
   }
   return null;
+}
+function stageNameById(stageId){
+  const info=findStageInfo(stageId);
+  return info ? info.stageName : '（已刪除）';
+}
+// 展開某關卡「等效可用」的所有關卡ID：本身 ＋ 涵蓋它的替代路線關卡
+function expandStageMatch(stageId){
+  const set=new Set([stageId]);
+  eventEquivalences.forEach(eq=>{
+    if(eq.coveredStageIds.includes(stageId)) eq.altStageIds.forEach(id=>set.add(id));
+  });
+  return set;
 }
 // ── 共用圖片庫：同名稱+同屬性的角色，主圖共用同一份，改一次全部帳號一起變 ──
 let sharedImages = {}; // { "名稱__屬性": dataURL }
@@ -1620,7 +1636,10 @@ function matchesFilters(c, q) {
   if(filterFriendMain && c.friendSkillMain !== filterFriendMain) return false;
   for(const s of fSets.friendSkillsSub) if(!(c.friendSkillsSub||[]).includes(s)) return false;
   for(const s of fSets.obtain)       if(!(c.obtainMethods||[]).includes(s)) return false;
-  for(const s of fSets.eventStages)  if(!(c.usableStages||[]).some(u=>u.stageId===s)) return false;
+  for(const s of fSets.eventStages){
+    const matchSet = expandStageMatch(s);
+    if(!(c.usableStages||[]).some(u=>matchSet.has(u.stageId))) return false;
+  }
   return true;
 }
 function getFiltered() {
@@ -2822,11 +2841,12 @@ function closeEventStageModal(){
 }
 // 查某個關卡目前有哪些角色勾選（依目前分頁：全部帳號時各帳號都查，並標註帳號名稱）
 function getCharsForStage(stageId){
+  const matchSet = expandStageMatch(stageId);
   const result=[];
   const addFrom=(list, accTag)=>{
     (list||[]).forEach(c=>{
-      const hit=(c.usableStages||[]).find(u=>u.stageId===stageId);
-      if(hit) result.push({char:c, note:hit.note||'', accTag});
+      const hit=(c.usableStages||[]).find(u=>matchSet.has(u.stageId));
+      if(hit) result.push({char:c, note:hit.note||'', accTag, via: hit.stageId===stageId ? '' : stageNameById(hit.stageId)});
     });
   };
   if(activeAccount==='__ALL__'){
@@ -2852,15 +2872,101 @@ function renderEventStageManager(){
           <button class="gbtn" onclick="addEventStage('${act.id}')">＋ 新增</button>
         </div>
         <div class="stage-list">
-          ${stages.length ? stages.map(s=>renderStageRow(act.id, s)).join('') : '<div class="view-empty">尚未新增關卡</div>'}
+          ${stages.length ? stages.map((s,idx)=>renderStageRow(act.id, s, idx, stages.length)).join('') : '<div class="view-empty">尚未新增關卡</div>'}
+        </div>
+        <div class="stage-equiv-wrap">
+          <div class="drawer-lbl" style="margin-top:14px;">替代路線設定（可選，例：賽季關卡可替代經典關卡）</div>
+          <div id="equivList_${act.id}">${renderEquivListHtml(act.id)}</div>
+          <div id="equivBuilderArea_${act.id}"></div>
+          <button class="gbtn" style="margin-top:6px;width:100%;" onclick="openEquivBuilder('${act.id}')" ${stages.length<2?'disabled':''}>＋ 新增替代規則</button>
+          ${stages.length<2?'<div class="view-empty" style="margin-top:4px;">需要至少 2 個關卡才能設定替代規則</div>':''}
         </div>
       </div>
     </div>`;
   }).join('');
 }
-function renderStageRow(actId, stage){
+function renderEquivListHtml(actId){
+  const list = eventEquivalences.filter(e=>e.activityId===actId);
+  if(!list.length) return '<div class="view-empty">尚未設定替代規則</div>';
+  return list.map(eq=>`
+    <div class="equiv-row">
+      <div class="equiv-row-text">
+        <span class="equiv-covered">${eq.coveredStageIds.map(stageNameById).join('、')}</span>
+        <span class="equiv-arrow">可用其一替代 ⇄</span>
+        <span class="equiv-alt">${eq.altStageIds.map(stageNameById).join('、')}</span>
+      </div>
+      <div class="stage-row-actions">
+        <span class="stage-icon-btn" onclick="openEquivBuilder('${actId}','${eq.id}')">✎</span>
+        <span class="stage-icon-btn" onclick="deleteEquiv('${eq.id}')">🗑</span>
+      </div>
+    </div>`).join('');
+}
+function openEquivBuilder(actId, editId){
+  const existing = editId ? eventEquivalences.find(e=>e.id===editId) : null;
+  equivBuilderState = {
+    activityId: actId,
+    editingId: editId || null,
+    covered: new Set(existing ? existing.coveredStageIds : []),
+    alt: new Set(existing ? existing.altStageIds : [])
+  };
+  renderEquivBuilder();
+}
+function renderEquivBuilder(){
+  const st = equivBuilderState; if(!st) return;
+  const area = document.getElementById('equivBuilderArea_'+st.activityId); if(!area) return;
+  const stages = eventStages[st.activityId]||[];
+  const gridHtml = (kind)=> stages.map(s=>{
+    const set = kind==='covered'?st.covered:st.alt;
+    return `<div class="skill-btn${set.has(s.id)?' active':''}" onclick="toggleEquivStage('${kind}','${s.id}')">${s.name}</div>`;
+  }).join('');
+  area.innerHTML = `
+    <div class="equiv-builder">
+      <div class="drawer-lbl" style="margin-top:8px;">涵蓋關卡（要被替代的那幾關，可多選）</div>
+      <div class="sg3">${gridHtml('covered')}</div>
+      <div class="drawer-lbl" style="margin-top:10px;">替代路線（打其中一關就算過關，可多選）</div>
+      <div class="sg3">${gridHtml('alt')}</div>
+      <div class="mbtnrow" style="margin-top:10px;">
+        <button class="mcancel" onclick="cancelEquivBuilder()">取消</button>
+        <button class="mconfirm" onclick="saveEquivBuilder()">儲存</button>
+      </div>
+    </div>`;
+}
+function toggleEquivStage(kind, stageId){
+  const st=equivBuilderState; if(!st) return;
+  const set = kind==='covered' ? st.covered : st.alt;
+  if(set.has(stageId)) set.delete(stageId); else set.add(stageId);
+  renderEquivBuilder();
+}
+function cancelEquivBuilder(){
+  if(!equivBuilderState) return;
+  const area=document.getElementById('equivBuilderArea_'+equivBuilderState.activityId);
+  if(area) area.innerHTML='';
+  equivBuilderState=null;
+}
+function saveEquivBuilder(){
+  const st=equivBuilderState; if(!st) return;
+  if(st.covered.size===0 || st.alt.size===0){ alert('涵蓋關卡跟替代路線都至少要選一個'); return; }
+  if(st.editingId){
+    const eq=eventEquivalences.find(e=>e.id===st.editingId);
+    if(eq){ eq.coveredStageIds=[...st.covered]; eq.altStageIds=[...st.alt]; }
+  } else {
+    eventEquivalences.push({id:genStageId(), activityId:st.activityId, coveredStageIds:[...st.covered], altStageIds:[...st.alt]});
+  }
+  saveState();
+  equivBuilderState=null;
+  renderEventStageManager();
+}
+function deleteEquiv(equivId){
+  if(!confirm('確定要刪除這條替代規則嗎？（不會刪除關卡本身，只是取消替代關係）')) return;
+  eventEquivalences = eventEquivalences.filter(e=>e.id!==equivId);
+  saveState();
+  renderEventStageManager();
+}
+function renderStageRow(actId, stage, idx, total){
   const chars = getCharsForStage(stage.id);
   const nameEsc = stage.name.replace(/'/g,"\\'");
+  const upDisabled = idx===0 ? ' stage-icon-btn-disabled' : '';
+  const downDisabled = idx===total-1 ? ' stage-icon-btn-disabled' : '';
   return `
   <div>
     <div class="stage-row" onclick="toggleStageCharList('${stage.id}')">
@@ -2869,14 +2975,27 @@ function renderStageRow(actId, stage){
         <span class="stage-row-count">${chars.length} 隻</span>
       </div>
       <div class="stage-row-actions">
+        <span class="stage-icon-btn${upDisabled}" onclick="event.stopPropagation();moveStage('${actId}','${stage.id}',-1)">▲</span>
+        <span class="stage-icon-btn${downDisabled}" onclick="event.stopPropagation();moveStage('${actId}','${stage.id}',1)">▼</span>
         <span class="stage-icon-btn" onclick="event.stopPropagation();renameEventStage('${actId}','${stage.id}','${nameEsc}')">✎</span>
         <span class="stage-icon-btn" onclick="event.stopPropagation();deleteEventStage('${actId}','${stage.id}')">🗑</span>
       </div>
     </div>
     <div class="stage-char-list" id="stageCharList_${stage.id}" style="display:none;">
-      ${chars.length ? chars.map(x=>`<div class="stage-char-item"><span>${x.accTag}${x.char.name}</span>${x.note?`<span class="stage-char-note">${x.note}</span>`:''}</div>`).join('') : '<div class="view-empty">目前沒有角色勾選這個關卡</div>'}
+      ${chars.length ? chars.map(x=>`<div class="stage-char-item"><span>${x.accTag}${x.char.name}${x.via?`<span class="stage-char-via">（透過「${x.via}」替代）</span>`:''}</span>${x.note?`<span class="stage-char-note">${x.note}</span>`:''}</div>`).join('') : '<div class="view-empty">目前沒有角色勾選這個關卡</div>'}
     </div>
   </div>`;
+}
+function moveStage(actId, stageId, dir){
+  const list = eventStages[actId]; if(!list) return;
+  const idx = list.findIndex(s=>s.id===stageId); if(idx<0) return;
+  const newIdx = idx+dir;
+  if(newIdx<0 || newIdx>=list.length) return;
+  [list[idx], list[newIdx]] = [list[newIdx], list[idx]];
+  saveState();
+  renderEventStageManager();
+  buildEventStageFilterCdd();
+  buildEventStageModalGrid();
 }
 function toggleStageCharList(stageId){
   const el=document.getElementById('stageCharList_'+stageId); if(!el) return;
@@ -2905,7 +3024,7 @@ function renameEventStage(actId, stageId, oldName){
 }
 function deleteEventStage(actId, stageId){
   const stage=(eventStages[actId]||[]).find(s=>s.id===stageId); if(!stage) return;
-  if(!confirm(`確定要刪除關卡「${stage.name}」嗎？所有角色勾選這個關卡的紀錄也會一併移除，此動作無法復原。`)) return;
+  if(!confirm(`確定要刪除關卡「${stage.name}」嗎？所有角色勾選這個關卡的紀錄、以及跟它有關的替代規則也會一併移除，此動作無法復原。`)) return;
   eventStages[actId]=(eventStages[actId]||[]).filter(s=>s.id!==stageId);
   // 清除所有帳號、所有角色身上殘留的這個關卡紀錄
   accounts.forEach(a=>{
@@ -2915,6 +3034,12 @@ function deleteEventStage(actId, stageId){
       }
     });
   });
+  // 清除跟這個關卡有關的替代規則；若清完某一邊變空，整條規則一併移除
+  eventEquivalences.forEach(eq=>{
+    eq.coveredStageIds = eq.coveredStageIds.filter(id=>id!==stageId);
+    eq.altStageIds = eq.altStageIds.filter(id=>id!==stageId);
+  });
+  eventEquivalences = eventEquivalences.filter(eq=>eq.coveredStageIds.length>0 && eq.altStageIds.length>0);
   if(mUsableStages.has(stageId)){ mUsableStages.delete(stageId); buildEventStageModalGrid(); }
   saveState();
   renderEventStageManager();
@@ -3115,7 +3240,7 @@ function applyTheme(){
 
 function exportBackup(){
   const savedAt = new Date().toISOString();
-  dl(JSON.stringify({version:6,accounts,charactersByAccount,sharedImages,eventStages,customBgDesktop,customBgMobile,themeMode,savedAt},null,2),'backup.json');
+  dl(JSON.stringify({version:6,accounts,charactersByAccount,sharedImages,eventStages,eventEquivalences,customBgDesktop,customBgMobile,themeMode,savedAt},null,2),'backup.json');
   hasUnsaved=false; document.getElementById('unsavedBadge').style.display='none';
 }
 function importBackup(e){
@@ -3127,7 +3252,9 @@ function importBackup(e){
       if(data.accounts)accounts=data.accounts;
       charactersByAccount=migrateToPerAccount(data);
       sharedImages = data.sharedImages || {};
-      eventStages = data.eventStages || {}; ensureEventStages();
+      eventStages = data.eventStages || {};
+      eventEquivalences = data.eventEquivalences || [];
+      ensureEventStages();
       activeAccount='__ALL__';
       loadBgFields(data);
       themeMode = data.themeMode || 'auto';
@@ -3642,7 +3769,9 @@ fetch('backup.json')
     if(data.accounts)accounts=data.accounts;
     charactersByAccount=migrateToPerAccount(data);
     sharedImages = data.sharedImages || {};
-    eventStages = data.eventStages || {}; ensureEventStages();
+    eventStages = data.eventStages || {};
+    eventEquivalences = data.eventEquivalences || [];
+    ensureEventStages();
     activeAccount='__ALL__';
     loadBgFields(data);
     themeMode = data.themeMode || 'auto';
@@ -3653,8 +3782,8 @@ fetch('backup.json')
 
 // ── GitHub 備份同步比對 ───────────────────────────────
 let pendingRemoteSync = null;
-function snapshotForSync(accs, chars, imgs, bgD, bgM, theme, stages){
-  return JSON.stringify({accounts:accs, charactersByAccount:chars, sharedImages:imgs, eventStages:stages||{}, customBgDesktop:bgD||null, customBgMobile:bgM||null, themeMode:theme});
+function snapshotForSync(accs, chars, imgs, bgD, bgM, theme, stages, equivs){
+  return JSON.stringify({accounts:accs, charactersByAccount:chars, sharedImages:imgs, eventStages:stages||{}, eventEquivalences:equivs||[], customBgDesktop:bgD||null, customBgMobile:bgM||null, themeMode:theme});
 }
 function formatSyncTime(iso){
   if(!iso) return '無記錄';
@@ -3681,14 +3810,15 @@ function checkGithubSync(){
       }
       const remoteTheme = data.themeMode || 'auto';
       const remoteStages = data.eventStages || {};
+      const remoteEquivs = data.eventEquivalences || [];
 
-      const localSnap  = snapshotForSync(accounts, charactersByAccount, sharedImages, customBgDesktop, customBgMobile, themeMode, eventStages);
-      const remoteSnap = snapshotForSync(remoteAccounts, remoteChars, remoteImages, remoteBgD, remoteBgM, remoteTheme, remoteStages);
+      const localSnap  = snapshotForSync(accounts, charactersByAccount, sharedImages, customBgDesktop, customBgMobile, themeMode, eventStages, eventEquivalences);
+      const remoteSnap = snapshotForSync(remoteAccounts, remoteChars, remoteImages, remoteBgD, remoteBgM, remoteTheme, remoteStages, remoteEquivs);
       if(localSnap === remoteSnap) return; // 完全相同,不用問
 
       const localCount  = Object.values(charactersByAccount).reduce((s,l)=>s+(l?l.length:0),0);
       const remoteCount = Object.values(remoteChars).reduce((s,l)=>s+(l?l.length:0),0);
-      pendingRemoteSync = {accounts:remoteAccounts, charactersByAccount:remoteChars, sharedImages:remoteImages, eventStages:remoteStages, customBgDesktop:remoteBgD, customBgMobile:remoteBgM, themeMode:remoteTheme};
+      pendingRemoteSync = {accounts:remoteAccounts, charactersByAccount:remoteChars, sharedImages:remoteImages, eventStages:remoteStages, eventEquivalences:remoteEquivs, customBgDesktop:remoteBgD, customBgMobile:remoteBgM, themeMode:remoteTheme};
       document.getElementById('syncLocalInfo').textContent = `更新時間：${formatSyncTime(localSavedAt)}　角色總數：${localCount}　帳號數：${accounts.length}`;
       document.getElementById('syncRemoteInfo').textContent = `更新時間：${formatSyncTime(data.savedAt)}　角色總數：${remoteCount}　帳號數：${remoteAccounts.length}`;
       document.getElementById('syncConflictModal').classList.add('open');
@@ -3704,7 +3834,9 @@ function useGithubData(){
   accounts = pendingRemoteSync.accounts;
   charactersByAccount = pendingRemoteSync.charactersByAccount;
   sharedImages = pendingRemoteSync.sharedImages || {};
-  eventStages = pendingRemoteSync.eventStages || {}; ensureEventStages();
+  eventStages = pendingRemoteSync.eventStages || {};
+  eventEquivalences = pendingRemoteSync.eventEquivalences || [];
+  ensureEventStages();
   customBgDesktop = normalizeBgArray(pendingRemoteSync.customBgDesktop);
   customBgMobile = normalizeBgArray(pendingRemoteSync.customBgMobile);
   themeMode = pendingRemoteSync.themeMode;
