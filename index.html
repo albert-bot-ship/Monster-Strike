@@ -959,6 +959,7 @@ let eventStages = {};
 // { id, activityId, coveredStageIds:[...], altStageIds:[...] }
 let eventEquivalences = [];
 let equivBuilderState = null; // 新增/編輯替代規則時的暫存狀態
+let activeStageTrack = {}; // 每個活動目前選到的路線分頁（例：'2nd賽季'）
 function ensureEventStages(){ EVENT_ACTIVITIES.forEach(a=>{ if(!Array.isArray(eventStages[a.id])) eventStages[a.id]=[]; }); if(!Array.isArray(eventEquivalences)) eventEquivalences=[]; }
 function genStageId(){ return 'st_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function findStageInfo(stageId){
@@ -2859,31 +2860,62 @@ function getCharsForStage(stageId){
 function renderEventStageManager(){
   const box=document.getElementById('eventStageManagerBody'); if(!box) return;
   box.innerHTML = EVENT_ACTIVITIES.map(act=>{
-    const stages = eventStages[act.id]||[];
+    const n=(eventStages[act.id]||[]).length;
     return `
     <div class="accordion-section">
       <div class="accordion-header" onclick="toggleAcc(this)">
-        ${act.name}<span class="selected-count">${stages.length?stages.length+' 個關卡':''}</span>
+        ${act.name}<span class="selected-count" id="stageCount_${act.id}">${n?n+' 個關卡':''}</span>
         <span class="acc-arrow">▼</span>
       </div>
       <div class="accordion-body">
-        <div class="stage-add-row">
-          <input type="text" class="minput" id="newStageInput_${act.id}" placeholder="輸入新關卡名稱" onkeydown="if(event.key==='Enter')addEventStage('${act.id}')">
-          <button class="gbtn" onclick="addEventStage('${act.id}')">＋ 新增</button>
-        </div>
-        <div class="stage-list">
-          ${stages.length ? stages.map((s,idx)=>renderStageRow(act.id, s, idx, stages.length)).join('') : '<div class="view-empty">尚未新增關卡</div>'}
-        </div>
-        <div class="stage-equiv-wrap">
-          <div class="drawer-lbl" style="margin-top:14px;">替代路線設定（可選，例：賽季關卡可替代經典關卡）</div>
-          <div id="equivList_${act.id}">${renderEquivListHtml(act.id)}</div>
-          <div id="equivBuilderArea_${act.id}"></div>
-          <button class="gbtn" style="margin-top:6px;width:100%;" onclick="openEquivBuilder('${act.id}')" ${stages.length<2?'disabled':''}>＋ 新增替代規則</button>
-          ${stages.length<2?'<div class="view-empty" style="margin-top:4px;">需要至少 2 個關卡才能設定替代規則</div>':''}
-        </div>
+        <div id="stagesArea_${act.id}">${renderActivityStagesArea(act.id)}</div>
       </div>
     </div>`;
   }).join('');
+}
+// 畫出單一活動底下的內容（路線分頁＋新增列＋關卡清單＋替代規則），可單獨重繪，不影響其他活動或手風琴展開狀態
+function renderActivityStagesArea(actId){
+  const stages = eventStages[actId]||[];
+  const tracks = [...new Set(stages.map(s=>s.track).filter(Boolean))];
+  const hasUntracked = stages.some(s=>!s.track);
+  const tabKeys = tracks.length ? [...tracks, ...(hasUntracked?['__untracked__']:[])] : [];
+  if(tabKeys.length && !tabKeys.includes(activeStageTrack[actId])) activeStageTrack[actId] = tabKeys[0];
+  const currentTrack = activeStageTrack[actId];
+  const visibleStages = tabKeys.length ? stages.filter(s=>(s.track||'__untracked__')===currentTrack) : stages;
+  const tabBarHtml = tabKeys.length ? `
+    <div class="settings-tab-bar" style="margin-bottom:8px;">
+      ${tabKeys.map(t=>`<div class="settings-tab${t===currentTrack?' active':''}" onclick="setActiveStageTrack('${actId}','${t.replace(/'/g,"\\'")}')">${t==='__untracked__'?'未分類':t}</div>`).join('')}
+    </div>` : '';
+  return `
+    ${tabBarHtml}
+    <div class="stage-add-row">
+      <input type="text" class="minput" id="newStageInput_${actId}" placeholder="輸入新關卡名稱" onkeydown="if(event.key==='Enter')document.getElementById('newStageTrackInput_${actId}').focus()">
+      <input type="text" class="minput" id="newStageTrackInput_${actId}" placeholder="路線（選填，如 2nd賽季）" list="stageTrackList_${actId}" style="max-width:132px;" onkeydown="if(event.key==='Enter')addEventStage('${actId}')">
+      <datalist id="stageTrackList_${actId}">${tracks.map(t=>`<option value="${t}">`).join('')}</datalist>
+      <button class="gbtn" onclick="addEventStage('${actId}')">＋ 新增</button>
+    </div>
+    <div class="stage-list">
+      ${visibleStages.length ? visibleStages.map((s,idx)=>renderStageRow(actId, s, idx, visibleStages.length)).join('') : '<div class="view-empty">尚未新增關卡</div>'}
+    </div>
+    <div class="stage-equiv-wrap">
+      <div class="drawer-lbl" style="margin-top:14px;">替代路線設定（可選，例：賽季關卡可替代經典關卡）</div>
+      <div id="equivList_${actId}">${renderEquivListHtml(actId)}</div>
+      <div id="equivBuilderArea_${actId}"></div>
+      <button class="gbtn" style="margin-top:6px;width:100%;" onclick="openEquivBuilder('${actId}')" ${stages.length<2?'disabled':''}>＋ 新增替代規則</button>
+      ${stages.length<2?'<div class="view-empty" style="margin-top:4px;">需要至少 2 個關卡才能設定替代規則</div>':''}
+    </div>
+  `;
+}
+// 只重繪某個活動底下的區塊（切換路線分頁／新增/改名/刪除關卡後呼叫），不會影響其他活動或手風琴的展開/收合狀態
+function refreshActivityArea(actId){
+  const area = document.getElementById('stagesArea_'+actId); if(!area) return;
+  area.innerHTML = renderActivityStagesArea(actId);
+  const cnt = document.getElementById('stageCount_'+actId);
+  if(cnt){ const n=(eventStages[actId]||[]).length; cnt.textContent = n ? n+' 個關卡' : ''; }
+}
+function setActiveStageTrack(actId, track){
+  activeStageTrack[actId] = track;
+  refreshActivityArea(actId);
 }
 function renderEquivListHtml(actId){
   const list = eventEquivalences.filter(e=>e.activityId===actId);
@@ -2954,17 +2986,19 @@ function saveEquivBuilder(){
   }
   saveState();
   equivBuilderState=null;
-  renderEventStageManager();
+  refreshActivityArea(st.activityId);
 }
 function deleteEquiv(equivId){
   if(!confirm('確定要刪除這條替代規則嗎？（不會刪除關卡本身，只是取消替代關係）')) return;
+  const eq = eventEquivalences.find(e=>e.id===equivId);
   eventEquivalences = eventEquivalences.filter(e=>e.id!==equivId);
   saveState();
-  renderEventStageManager();
+  if(eq) refreshActivityArea(eq.activityId);
 }
 function renderStageRow(actId, stage, idx, total){
   const chars = getCharsForStage(stage.id);
   const nameEsc = stage.name.replace(/'/g,"\\'");
+  const trackEsc = (stage.track||'').replace(/'/g,"\\'");
   const upDisabled = idx===0 ? ' stage-icon-btn-disabled' : '';
   const downDisabled = idx===total-1 ? ' stage-icon-btn-disabled' : '';
   return `
@@ -2977,7 +3011,7 @@ function renderStageRow(actId, stage, idx, total){
       <div class="stage-row-actions">
         <span class="stage-icon-btn${upDisabled}" onclick="event.stopPropagation();moveStage('${actId}','${stage.id}',-1)">▲</span>
         <span class="stage-icon-btn${downDisabled}" onclick="event.stopPropagation();moveStage('${actId}','${stage.id}',1)">▼</span>
-        <span class="stage-icon-btn" onclick="event.stopPropagation();renameEventStage('${actId}','${stage.id}','${nameEsc}')">✎</span>
+        <span class="stage-icon-btn" onclick="event.stopPropagation();renameEventStage('${actId}','${stage.id}','${nameEsc}','${trackEsc}')">✎</span>
         <span class="stage-icon-btn" onclick="event.stopPropagation();deleteEventStage('${actId}','${stage.id}')">🗑</span>
       </div>
     </div>
@@ -2989,11 +3023,13 @@ function renderStageRow(actId, stage, idx, total){
 function moveStage(actId, stageId, dir){
   const list = eventStages[actId]; if(!list) return;
   const idx = list.findIndex(s=>s.id===stageId); if(idx<0) return;
-  const newIdx = idx+dir;
-  if(newIdx<0 || newIdx>=list.length) return;
-  [list[idx], list[newIdx]] = [list[newIdx], list[idx]];
+  const track = list[idx].track||'';
+  let j = idx+dir;
+  while(j>=0 && j<list.length && (list[j].track||'')!==track) j+=dir;
+  if(j<0 || j>=list.length) return;
+  [list[idx], list[j]] = [list[j], list[idx]];
   saveState();
-  renderEventStageManager();
+  refreshActivityArea(actId);
   buildEventStageFilterCdd();
   buildEventStageModalGrid();
 }
@@ -3004,21 +3040,27 @@ function toggleStageCharList(stageId){
 function addEventStage(actId){
   ensureEventStages();
   const input=document.getElementById('newStageInput_'+actId); if(!input) return;
+  const trackInput=document.getElementById('newStageTrackInput_'+actId);
   const name=input.value.trim(); if(!name) return;
-  eventStages[actId].push({id:genStageId(), name});
+  const track=(trackInput && trackInput.value.trim()) || '';
+  eventStages[actId].push({id:genStageId(), name, track});
   input.value='';
+  if(track) activeStageTrack[actId]=track; // 新增到有路線的關卡時，自動切到該路線分頁方便連續新增
   saveState();
-  renderEventStageManager();
+  refreshActivityArea(actId);
   buildEventStageFilterCdd();
   buildEventStageModalGrid();
 }
-function renameEventStage(actId, stageId, oldName){
+function renameEventStage(actId, stageId, oldName, oldTrack){
   const n=prompt('關卡名稱:', oldName);
   if(!n || !n.trim()) return;
+  const t=prompt('路線（選填，例：經典／2nd賽季／3rd賽季；留空＝不分類）:', oldTrack||'');
+  if(t===null) return;
   const stage=(eventStages[actId]||[]).find(s=>s.id===stageId); if(!stage) return;
   stage.name=n.trim();
+  stage.track=(t||'').trim();
   saveState();
-  renderEventStageManager();
+  refreshActivityArea(actId);
   buildEventStageFilterCdd();
   buildEventStageModalGrid();
 }
@@ -3042,7 +3084,7 @@ function deleteEventStage(actId, stageId){
   eventEquivalences = eventEquivalences.filter(eq=>eq.coveredStageIds.length>0 && eq.altStageIds.length>0);
   if(mUsableStages.has(stageId)){ mUsableStages.delete(stageId); buildEventStageModalGrid(); }
   saveState();
-  renderEventStageManager();
+  refreshActivityArea(actId);
   buildEventStageFilterCdd();
 }
 function renderCompareTable(){
