@@ -2896,7 +2896,7 @@ function renderActivityStagesArea(actId){
       <button class="gbtn" onclick="addEventStage('${actId}')">＋ 新增</button>
     </div>
     <div class="stage-list">
-      ${visibleStages.length ? visibleStages.map((s,idx)=>renderStageRow(actId, s, idx, visibleStages.length)).join('') : '<div class="view-empty">尚未新增關卡</div>'}
+      ${visibleStages.length ? sortStagesForDisplay(visibleStages).map(s=>renderStageRow(actId, s)).join('') : '<div class="view-empty">尚未新增關卡</div>'}
     </div>
     <div class="stage-equiv-wrap">
       <div class="drawer-lbl" style="margin-top:14px;">替代路線設定（可選，例：賽季關卡可替代經典關卡）</div>
@@ -2996,12 +2996,25 @@ function deleteEquiv(equivId){
   saveState();
   if(eq) refreshActivityArea(eq.activityId);
 }
-function renderStageRow(actId, stage, idx, total){
+// 依名稱裡的數字排序（數字大的在前面，例如「11F」排在「2F」前面），沒有數字的名稱排最後、彼此維持原順序
+function stageSortKey(name){
+  const nums = String(name||'').match(/\d+/g);
+  return nums ? parseInt(nums[nums.length-1], 10) : null;
+}
+function sortStagesForDisplay(list){
+  return list.map((s,i)=>({s,i})).sort((a,b)=>{
+    const ka=stageSortKey(a.s.name), kb=stageSortKey(b.s.name);
+    if(ka===null && kb===null) return a.i-b.i;
+    if(ka===null) return 1;
+    if(kb===null) return -1;
+    if(ka!==kb) return kb-ka;
+    return a.i-b.i;
+  }).map(x=>x.s);
+}
+function renderStageRow(actId, stage){
   const chars = getCharsForStage(stage.id);
   const nameEsc = stage.name.replace(/'/g,"\\'");
   const trackEsc = (stage.track||'').replace(/'/g,"\\'");
-  const upDisabled = idx===0 ? ' stage-icon-btn-disabled' : '';
-  const downDisabled = idx===total-1 ? ' stage-icon-btn-disabled' : '';
   return `
   <div>
     <div class="stage-row" onclick="toggleStageCharList('${stage.id}')">
@@ -3010,8 +3023,6 @@ function renderStageRow(actId, stage, idx, total){
         <span class="stage-row-count">${chars.length} 隻</span>
       </div>
       <div class="stage-row-actions">
-        <span class="stage-icon-btn${upDisabled}" onclick="event.stopPropagation();moveStage('${actId}','${stage.id}',-1)">▲</span>
-        <span class="stage-icon-btn${downDisabled}" onclick="event.stopPropagation();moveStage('${actId}','${stage.id}',1)">▼</span>
         <span class="stage-icon-btn" onclick="event.stopPropagation();renameEventStage('${actId}','${stage.id}','${nameEsc}','${trackEsc}')">✎</span>
         <span class="stage-icon-btn" onclick="event.stopPropagation();deleteEventStage('${actId}','${stage.id}')">🗑</span>
       </div>
@@ -3020,19 +3031,6 @@ function renderStageRow(actId, stage, idx, total){
       ${chars.length ? chars.map(x=>`<div class="stage-char-item"><span>${x.accTag}${x.char.name}${x.via?`<span class="stage-char-via">（透過「${x.via}」替代）</span>`:''}</span>${x.note?`<span class="stage-char-note">${x.note}</span>`:''}</div>`).join('') : '<div class="view-empty">目前沒有角色勾選這個關卡</div>'}
     </div>
   </div>`;
-}
-function moveStage(actId, stageId, dir){
-  const list = eventStages[actId]; if(!list) return;
-  const idx = list.findIndex(s=>s.id===stageId); if(idx<0) return;
-  const track = list[idx].track||'';
-  let j = idx+dir;
-  while(j>=0 && j<list.length && (list[j].track||'')!==track) j+=dir;
-  if(j<0 || j>=list.length) return;
-  [list[idx], list[j]] = [list[j], list[idx]];
-  saveState();
-  refreshActivityArea(actId);
-  buildEventStageFilterCdd();
-  buildEventStageModalGrid();
 }
 function toggleStageCharList(stageId){
   const el=document.getElementById('stageCharList_'+stageId); if(!el) return;
