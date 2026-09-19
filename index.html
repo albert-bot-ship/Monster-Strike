@@ -782,10 +782,10 @@
 
 <!-- 背景圖片大圖預覽 -->
 <div class="modal-overlay" id="bgPreviewModal" onclick="if(event.target===this) closeBgPreview()">
-  <div class="modal-box" style="max-width:520px; padding:14px;">
+  <div class="modal-box" style="max-width:min(92vw, 900px); padding:14px;">
     <div class="view-img-outer" style="margin-bottom:10px;">
-      <div class="view-img-wrap" id="bgPreviewImgWrap" style="max-height:70vh; background:var(--bg-base);">
-        <img id="bgPreviewImg" src="" alt="背景圖片預覽">
+      <div class="view-img-wrap" id="bgPreviewImgWrap" style="max-height:80vh; background:var(--bg-base);">
+        <img id="bgPreviewImg" src="" alt="背景圖片預覽" style="max-height:80vh;">
       </div>
       <button type="button" class="view-img-arrow left" id="bgPreviewPrev" onclick="bgPreviewNav(-1)">‹</button>
       <button type="button" class="view-img-arrow right" id="bgPreviewNext" onclick="bgPreviewNav(1)">›</button>
