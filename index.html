@@ -1182,6 +1182,10 @@ function init() {
   buildEventStageFilterCdd();
   buildEventStageModalGrid();
   document.getElementById('searchBox').addEventListener('input', ()=>{ renderList(); updateSearchSuggest(); });
+  // 篩選抽屜內：選完選項或打完字後按 Enter，直接當作按了「決定」收起抽屜看結果（方便電腦版用鍵盤操作）
+  document.getElementById('filterDrawer').addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){ e.preventDefault(); closeFilter(); }
+  });
   document.getElementById('searchBox').addEventListener('focus', updateSearchSuggest);
   document.getElementById('searchBox').addEventListener('blur', ()=>{ setTimeout(()=>document.getElementById('searchSuggest').classList.remove('open'), 150); });
   enhanceEggIcons();
