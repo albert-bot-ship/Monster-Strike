@@ -965,13 +965,19 @@ function genStageId(){ return 'st_' + Date.now().toString(36) + Math.random().to
 function findStageInfo(stageId){
   for(const act of EVENT_ACTIVITIES){
     const s=(eventStages[act.id]||[]).find(x=>x.id===stageId);
-    if(s) return {activityId:act.id, activityName:act.name, stageName:s.name};
+    if(s) return {activityId:act.id, activityName:act.name, stageName:s.name, track:s.track||''};
   }
   return null;
 }
 function stageNameById(stageId){
   const info=findStageInfo(stageId);
   return info ? info.stageName : '（已刪除）';
+}
+// 同一活動裡不同路線可能取一樣的關卡名稱（例：經典跟2nd賽季都有「11」），這裡回傳「路線＋名稱」避免混淆
+function stageLabelById(stageId){
+  const info=findStageInfo(stageId);
+  if(!info) return '（已刪除）';
+  return info.track ? `${info.track} ${info.stageName}` : info.stageName;
 }
 // 展開某關卡「等效可用」的所有關卡ID：本身 ＋ 涵蓋它的替代路線關卡
 function expandStageMatch(stageId){
@@ -1281,7 +1287,7 @@ function renderStageNotesList(){
   if(mUsableStages.size===0){ box.innerHTML=''; return; }
   box.innerHTML = [...mUsableStages.entries()].map(([sid,note])=>{
     const info=findStageInfo(sid);
-    const label = info ? `${info.activityName}－${info.stageName}` : '（已刪除的關卡）';
+    const label = info ? `${info.activityName}－${info.track?info.track+' ':''}${info.stageName}` : '（已刪除的關卡）';
     const safeNote = (note||'').replace(/"/g,'&quot;');
     return `<div class="mfield" style="margin-bottom:6px;">
       <label style="font-size:11px;color:var(--modal-sub);">${label}　備註（選填）</label>
@@ -1847,7 +1853,7 @@ function appendCardBatch() {
     card.className='char-card owned'+(multiSelectMode?' selectable':'')+(selected?' selected':'');
     card.innerHTML=`
       <div class="card-img ${cImg?'':'bg-'+c.attribute}">
-        ${cImg?`<img src="${cImg}" alt="${c.name}">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`}
+        ${cImg?`<img src="${cImg}" alt="${c.name}" loading="lazy" decoding="async">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`}
       </div>
       ${(c.charNo||c.charNo2)?`<div class="card-no-top">${c.charNo||''}</div>`:''}
       <div class="card-attr attr-${c.attribute}"></div>
@@ -1892,7 +1898,7 @@ function appendAllCardBatch() {
     const cImgAll=resolveCharImage(c);
     card.innerHTML=`
       <div class="card-img ${cImgAll?'':'bg-'+c.attribute}">
-        ${cImgAll?`<img src="${cImgAll}" alt="${c.name}">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`}
+        ${cImgAll?`<img src="${cImgAll}" alt="${c.name}" loading="lazy" decoding="async">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`}
       </div>
       <div class="card-attr attr-${c.attribute}"></div>
       <div class="card-acc-tags">${tagsHtml}</div>
@@ -1952,7 +1958,7 @@ function switchCardImage(e, id, idx){
   const no=idx===0?c.charNo:(c.charNo2||c.charNo);
   const imgWrap=card.querySelector('.card-img');
   imgWrap.className='card-img'+(img?'':' bg-'+c.attribute);
-  imgWrap.innerHTML=img?`<img src="${img}" alt="${c.name}">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`;
+  imgWrap.innerHTML=img?`<img src="${img}" alt="${c.name}" loading="lazy" decoding="async">`:`<span class="card-placeholder">${ATTR_EMOJI[c.attribute]||'？'}</span>`;
   const noEl=card.querySelector('.card-no-top');
   if(noEl) noEl.textContent=no||'';
   card.querySelectorAll('.card-dot').forEach((d,i)=>d.classList.toggle('active', i===idx));
@@ -2309,7 +2315,7 @@ function openViewModal(id){
   stagesWrap.style.display = usable.length ? '' : 'none';
   document.getElementById('vEventStages').innerHTML = usable.map(u=>{
     const info = findStageInfo(u.stageId);
-    const label = info ? `${info.activityName}－${info.stageName}` : '（已刪除的關卡）';
+    const label = info ? `${info.activityName}－${info.track?info.track+' ':''}${info.stageName}` : '（已刪除的關卡）';
     return `<div class="view-stage-item"><div>${label}</div>${u.note?`<div class="vsi-note">${u.note}</div>`:''}</div>`;
   }).join('');
 
@@ -2847,7 +2853,7 @@ function getCharsForStage(stageId){
   const addFrom=(list, accTag)=>{
     (list||[]).forEach(c=>{
       const hit=(c.usableStages||[]).find(u=>matchSet.has(u.stageId));
-      if(hit) result.push({char:c, note:hit.note||'', accTag, via: hit.stageId===stageId ? '' : stageNameById(hit.stageId)});
+      if(hit) result.push({char:c, note:hit.note||'', accTag, via: hit.stageId===stageId ? '' : stageLabelById(hit.stageId)});
     });
   };
   if(activeAccount==='__ALL__'){
@@ -2924,9 +2930,9 @@ function renderEquivListHtml(actId){
   return list.map(eq=>`
     <div class="equiv-row">
       <div class="equiv-row-text">
-        <span class="equiv-covered">${eq.coveredStageIds.map(stageNameById).join('、')}</span>
+        <span class="equiv-covered">${eq.coveredStageIds.map(stageLabelById).join('、')}</span>
         <span class="equiv-arrow">可用其一替代 ⇄</span>
-        <span class="equiv-alt">${eq.altStageIds.map(stageNameById).join('、')}</span>
+        <span class="equiv-alt">${eq.altStageIds.map(stageLabelById).join('、')}</span>
       </div>
       <div class="stage-row-actions">
         <span class="stage-icon-btn" onclick="openEquivBuilder('${actId}','${eq.id}')">✎</span>
@@ -2948,16 +2954,29 @@ function renderEquivBuilder(){
   const st = equivBuilderState; if(!st) return;
   const area = document.getElementById('equivBuilderArea_'+st.activityId); if(!area) return;
   const stages = eventStages[st.activityId]||[];
-  const gridHtml = (kind)=> stages.map(s=>{
+  // 依路線分組顯示：同一活動裡不同路線可能同名（例：經典跟2nd賽季都有「11」），分組才看得出差異
+  const groups = {}; const order = [];
+  stages.forEach(s=>{
+    const key = s.track || '未分類';
+    if(!groups[key]){ groups[key]=[]; order.push(key); }
+    groups[key].push(s);
+  });
+  const gridHtml = (kind)=>{
     const set = kind==='covered'?st.covered:st.alt;
-    return `<div class="skill-btn${set.has(s.id)?' active':''}" onclick="toggleEquivStage('${kind}','${s.id}')">${s.name}</div>`;
-  }).join('');
+    const btn = s=>`<div class="skill-btn${set.has(s.id)?' active':''}" onclick="toggleEquivStage('${kind}','${s.id}')">${s.name}</div>`;
+    if(order.length<=1) return `<div class="sg3">${stages.map(btn).join('')}</div>`;
+    return order.map((track,idx)=>`
+      <div class="hf-group hf-group-${idx%3}">
+        <div class="hf-group-label">${track}</div>
+        <div class="sg3">${groups[track].map(btn).join('')}</div>
+      </div>`).join('');
+  };
   area.innerHTML = `
     <div class="equiv-builder">
       <div class="drawer-lbl" style="margin-top:8px;">涵蓋關卡（要被替代的那幾關，可多選）</div>
-      <div class="sg3">${gridHtml('covered')}</div>
+      ${gridHtml('covered')}
       <div class="drawer-lbl" style="margin-top:10px;">替代路線（打其中一關就算過關，可多選）</div>
-      <div class="sg3">${gridHtml('alt')}</div>
+      ${gridHtml('alt')}
       <div class="mbtnrow" style="margin-top:10px;">
         <button class="mcancel" onclick="cancelEquivBuilder()">取消</button>
         <button class="mconfirm" onclick="saveEquivBuilder()">儲存</button>
