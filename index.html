@@ -2244,9 +2244,11 @@ function renderCopyPickerList(){
     const tags = g.entries.map(e=>
       `<span class="cpg-acc-tag" onclick='pickCopyChar(${JSON.stringify(e.accId)}, ${e.charId})'>${e.accName}</span>`
     ).join('');
+    // 不管幾個帳號都能直接點整行選第一個（清單最上面那個），標籤按鈕保留給想選其他帳號的情況
+    const rowClick = ` onclick='pickCopyChar(${JSON.stringify(g.entries[0].accId)}, ${g.entries[0].charId})' style="cursor:pointer;"`;
     return `
     <div class="copy-picker-group">
-      <div class="cpg-name-row">
+      <div class="cpg-name-row"${rowClick}>
         <span class="card-attr attr-${g.attribute}" style="position:static;display:inline-block;margin-right:7px;flex-shrink:0;"></span>
         <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</span>
       </div>
