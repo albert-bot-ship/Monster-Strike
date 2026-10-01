@@ -75,27 +75,26 @@
     </div>
     <div class="stats" id="statsArea"></div>
 
+    <div class="stats-toggle" id="limitedEventToggle" onclick="toggleLimitedEventSection()">
+      <span>🎉 限時活動<span class="selected-count" id="limitedEventCount"></span></span>
+      <span class="stats-arrow open" id="limitedEventArrow">▼</span>
+    </div>
+    <div class="event-info open" id="limitedEventArea">
+      <div id="limitedEventList"></div>
+      <div class="drawer-lbl" style="margin-top:12px;">新增限時活動（非固定週期，結束時間一到會自動從清單消失）</div>
+      <div class="stage-add-row" style="flex-wrap:wrap;">
+        <input type="text" class="minput" id="newLimitedEventName" placeholder="活動名稱" style="flex:1 1 100%;">
+        <input type="datetime-local" class="minput" id="newLimitedEventStart" style="flex:1;min-width:150px;">
+        <input type="datetime-local" class="minput" id="newLimitedEventEnd" style="flex:1;min-width:150px;">
+        <button class="gbtn" onclick="addLimitedEvent()" style="flex:1 1 100%;">＋ 新增</button>
+      </div>
+    </div>
+
     <div class="stats-toggle" id="eventToggle" onclick="toggleEventInfo()">
       <span>📅 每月活動情報</span>
       <span class="stats-arrow" id="eventArrow">▼</span>
     </div>
     <div class="event-info" id="eventInfoArea">
-
-      <div class="accordion-section">
-        <div class="accordion-header" onclick="toggleAcc(this)">
-          🎉 限時活動<span class="acc-header-right"><span class="selected-count" id="limitedEventCount"></span><span class="acc-arrow">▼</span></span>
-        </div>
-        <div class="accordion-body">
-          <div id="limitedEventList"></div>
-          <div class="drawer-lbl" style="margin-top:12px;">新增限時活動（非固定週期，結束時間一到會自動從清單消失）</div>
-          <div class="stage-add-row" style="flex-wrap:wrap;">
-            <input type="text" class="minput" id="newLimitedEventName" placeholder="活動名稱" style="flex:1 1 100%;">
-            <input type="datetime-local" class="minput" id="newLimitedEventStart" style="flex:1;min-width:150px;">
-            <input type="datetime-local" class="minput" id="newLimitedEventEnd" style="flex:1;min-width:150px;">
-            <button class="gbtn" onclick="addLimitedEvent()" style="flex:1 1 100%;">＋ 新增</button>
-          </div>
-        </div>
-      </div>
 
       <div class="accordion-section" data-event-name="霸者之塔／賽季">
         <div class="accordion-header" onclick="toggleAcc(this)">
@@ -1523,6 +1522,12 @@ function toggleStats() {
   statsExpanded = !statsExpanded;
   document.getElementById('statsArea').classList.toggle('open', statsExpanded);
   document.getElementById('statsArrow').classList.toggle('open', statsExpanded);
+}
+let limitedEventExpanded = true; // 預設展開，不用額外點一次才看得到
+function toggleLimitedEventSection() {
+  limitedEventExpanded = !limitedEventExpanded;
+  document.getElementById('limitedEventArea').classList.toggle('open', limitedEventExpanded);
+  document.getElementById('limitedEventArrow').classList.toggle('open', limitedEventExpanded);
 }
 let eventInfoExpanded = false;
 function toggleEventInfo() {
