@@ -1483,6 +1483,10 @@ body.intro .swipe-view { animation: introUp .55s cubic-bezier(.16,1,.3,1) .16s b
 }
 .view-stage-item .vsi-note { color:var(--modal-sub); font-size:12px; margin-top:2px; }
 
+/* 限時活動（資訊看板）：這個區塊直接鋪在會變色的視窗背景上，跟活動關卡頁面的手風琴深色底不同，文字要單獨轉成跟主題連動的顏色 */
+#limitedEventArea .stage-row-name { color: var(--tx-primary); font-weight: 600; }
+#limitedEventArea .stage-row { background: var(--bg-card-hov); }
+
 /* ── 活動關卡：替代規則 ───────────────────────────────── */
 .stage-char-via { color: var(--modal-sub); font-size:11px; margin-left:4px; }
 .stage-equiv-wrap { margin-top:10px; padding-top:10px; border-top:1px dashed var(--bdr-normal); }
