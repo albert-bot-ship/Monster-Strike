@@ -81,6 +81,22 @@
     </div>
     <div class="event-info" id="eventInfoArea">
 
+      <div class="accordion-section">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          🎉 限時活動<span class="acc-header-right"><span class="selected-count" id="limitedEventCount"></span><span class="acc-arrow">▼</span></span>
+        </div>
+        <div class="accordion-body">
+          <div id="limitedEventList"></div>
+          <div class="drawer-lbl" style="margin-top:12px;">新增限時活動（非固定週期，結束時間一到會自動從清單消失）</div>
+          <div class="stage-add-row" style="flex-wrap:wrap;">
+            <input type="text" class="minput" id="newLimitedEventName" placeholder="活動名稱" style="flex:1 1 100%;">
+            <input type="datetime-local" class="minput" id="newLimitedEventStart" style="flex:1;min-width:150px;">
+            <input type="datetime-local" class="minput" id="newLimitedEventEnd" style="flex:1;min-width:150px;">
+            <button class="gbtn" onclick="addLimitedEvent()" style="flex:1 1 100%;">＋ 新增</button>
+          </div>
+        </div>
+      </div>
+
       <div class="accordion-section" data-event-name="霸者之塔／賽季">
         <div class="accordion-header" onclick="toggleAcc(this)">
           霸者之塔／霸者之塔賽季（每月7日～25日）<span class="acc-header-right"><span class="acc-countdown"></span><span class="acc-arrow">▼</span></span>
@@ -932,6 +948,15 @@ const GOKUUN_ICON_B64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEAC
 const KILLER_GROUPS  = {'屬性殺手':['火屬性','水屬性','木屬性','光屬性','闇屬性','全屬性'],'種族殺手':['龍','機械','魔人','神','鳥','獸','亞人','魔族','妖精','礦物','魔王','幻獸','宇宙','聖騎士','武士','同盟國','軸心國','幻妖','麒神','神獸','怪獸','使徒','鬥士','巨人'],'其他':['反擊','弱點','重力護罩','毒','活力','致命','連擊','雷射護罩','初擊','位置','攻擊回合','雜兵','中BOSS','BOSS','攻擊變化','防禦變化']};
 const SUPER_SKILLS  = ['超反重力護罩','超反傷害壁','超反傳送','超掃雷者','超反風','超反減速壁','超反移轉壁'];
 const FRIEND_SKILLS = ['爆炸','光暈','雷射','導引彈','能量環','擴散彈','衝擊波','散彈槍','電漿','追蹤型貫通彈','衛星彈','隕石','跳彈','電擊','斬擊','橫斬刀','波動','追擊貫通彈','吐息','氣彈','分裂彈','增殖彈','漸伸線','YO-YO彈','炸裂彈','牆壁移動','穿牆','分身彈','交叉刺針彈','圓鋸片','火焰','爆風','彈跳炸彈','血族脈衝','環域','毒','拷貝','數值提升','數值下降','速度提升','SS回合','回復','其他','合作活動'];
+// 限時活動（非固定週期，過了結束時間就不會再顯示；13週年慶預設帶入幾筆）
+const DEFAULT_LIMITED_EVENTS = [
+  {id:'le_default_1', name:'免費會員體驗活動', start:'2026-10-03T04:00', end:'2026-10-11T03:59'},
+  {id:'le_default_2', name:'廣告任務稀有道具出現機率提升', start:'2026-10-04T04:00', end:'2026-10-09T03:59'},
+  {id:'le_default_3', name:'霸者之塔體力減半', start:'2026-10-07T12:00', end:'2026-10-25T11:59'},
+  {id:'le_default_4', name:'特L之園', start:'2026-10-08T00:00', end:'2026-10-12T23:59'},
+  {id:'le_default_5', name:'廣告任務背包格子確定+10', start:'2026-10-09T04:00', end:'2026-10-14T03:59'},
+  {id:'le_default_6', name:'達成130、1300等時獲得6星確定轉蛋', start:'2026-10-14T04:00', end:'2026-11-10T03:59'}
+];
 // 活動關卡：5 個固定活動，底下的關卡由使用者自行新增/改名/刪除（存在 eventStages）
 const EVENT_ACTIVITIES = [
   {id:'tower',  name:'霸者之塔／賽季'},
@@ -960,6 +985,7 @@ let eventStages = {};
 let eventEquivalences = [];
 let equivBuilderState = null; // 新增/編輯替代規則時的暫存狀態
 let activeStageTrack = {}; // 每個活動目前選到的路線分頁（例：'2nd賽季'）
+let limitedEvents = []; // 限時活動：{id, name, start, end}（start/end 為 datetime-local 字串）
 function ensureEventStages(){ EVENT_ACTIVITIES.forEach(a=>{ if(!Array.isArray(eventStages[a.id])) eventStages[a.id]=[]; }); if(!Array.isArray(eventEquivalences)) eventEquivalences=[]; }
 function genStageId(){ return 'st_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function findStageInfo(stageId){
@@ -2813,7 +2839,57 @@ function removeUploadedImg(which){
 
 // ── 外觀設定：背景圖片 ────────────────────────────────
 function openInfoModal(){
+  renderLimitedEvents();
   document.getElementById('infoModal').classList.add('open');
+}
+// ── 限時活動（非固定週期）──────────────────────────────
+function renderLimitedEvents(){
+  const list = document.getElementById('limitedEventList'); if(!list) return;
+  const now = Date.now();
+  const fmt = s=>{ const d=new Date(s); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+  const active = limitedEvents.filter(ev=> new Date(ev.end).getTime() > now).sort((a,b)=> new Date(a.end)-new Date(b.end));
+  list.innerHTML = active.length ? active.map(ev=>{
+    const startMs=new Date(ev.start).getTime(), endMs=new Date(ev.end).getTime();
+    let countdown;
+    if(now < startMs){
+      const d=Math.ceil((startMs-now)/86400000);
+      countdown = `${d}天後開始`;
+    } else {
+      const d=Math.ceil((endMs-now)/86400000);
+      countdown = d<=1 ? '即將結束' : `還有${d}天`;
+    }
+    return `
+    <div class="stage-row" style="cursor:default;">
+      <div class="stage-row-main">
+        <span class="stage-row-name">${ev.name}</span>
+        <span class="stage-row-count">${countdown}</span>
+      </div>
+      <div class="stage-row-actions">
+        <span class="stage-icon-btn" onclick="deleteLimitedEvent('${ev.id}')">🗑</span>
+      </div>
+    </div>
+    <div class="view-empty" style="margin:2px 0 8px 2px;">${fmt(ev.start)} ～ ${fmt(ev.end)}</div>`;
+  }).join('') : '<div class="view-empty">目前沒有進行中的限時活動</div>';
+  const cnt=document.getElementById('limitedEventCount');
+  if(cnt) cnt.textContent = active.length ? active.length+' 個' : '';
+}
+function addLimitedEvent(){
+  const nameInput=document.getElementById('newLimitedEventName');
+  const startInput=document.getElementById('newLimitedEventStart');
+  const endInput=document.getElementById('newLimitedEventEnd');
+  const name=nameInput.value.trim(), start=startInput.value, end=endInput.value;
+  if(!name || !start || !end){ alert('請填寫活動名稱、開始與結束時間'); return; }
+  if(new Date(end).getTime() <= new Date(start).getTime()){ alert('結束時間要晚於開始時間'); return; }
+  limitedEvents.push({id:genStageId(), name, start, end});
+  nameInput.value=''; startInput.value=''; endInput.value='';
+  saveState();
+  renderLimitedEvents();
+}
+function deleteLimitedEvent(id){
+  if(!confirm('確定要刪除這個限時活動嗎？')) return;
+  limitedEvents = limitedEvents.filter(e=>e.id!==id);
+  saveState();
+  renderLimitedEvents();
 }
 function closeInfoModal(){
   document.getElementById('infoModal').classList.remove('open');
@@ -3310,7 +3386,7 @@ function applyTheme(){
 
 function exportBackup(){
   const savedAt = new Date().toISOString();
-  dl(JSON.stringify({version:6,accounts,charactersByAccount,sharedImages,eventStages,eventEquivalences,customBgDesktop,customBgMobile,themeMode,savedAt},null,2),'backup.json');
+  dl(JSON.stringify({version:6,accounts,charactersByAccount,sharedImages,eventStages,eventEquivalences,limitedEvents,customBgDesktop,customBgMobile,themeMode,savedAt},null,2),'backup.json');
   hasUnsaved=false; document.getElementById('unsavedBadge').style.display='none';
 }
 function importBackup(e){
@@ -3324,13 +3400,14 @@ function importBackup(e){
       sharedImages = data.sharedImages || {};
       eventStages = data.eventStages || {};
       eventEquivalences = data.eventEquivalences || [];
+      limitedEvents = data.limitedEvents || [];
       ensureEventStages();
       activeAccount='__ALL__';
       loadBgFields(data);
       themeMode = data.themeMode || 'auto';
       applyBackground(); applyTheme();
       hasUnsaved=false; document.getElementById('unsavedBadge').style.display='none';
-      renderAll(); buildEventStageFilterCdd(); buildEventStageModalGrid(); alert('匯入完成');
+      renderAll(); buildEventStageFilterCdd(); buildEventStageModalGrid(); renderLimitedEvents(); alert('匯入完成');
     }catch{alert('匯入失敗，檔案格式錯誤');}
   };
   reader.readAsText(file);
@@ -3841,6 +3918,7 @@ fetch('backup.json')
     sharedImages = data.sharedImages || {};
     eventStages = data.eventStages || {};
     eventEquivalences = data.eventEquivalences || [];
+    limitedEvents = data.limitedEvents !== undefined ? data.limitedEvents : DEFAULT_LIMITED_EVENTS;
     ensureEventStages();
     activeAccount='__ALL__';
     loadBgFields(data);
@@ -3848,12 +3926,12 @@ fetch('backup.json')
     applyBackground(); applyTheme();
     init(); renderAll();
   })
-  .catch(()=>{applyBackground();applyTheme();init();renderAll();});
+  .catch(()=>{limitedEvents = DEFAULT_LIMITED_EVENTS; applyBackground();applyTheme();init();renderAll();});
 
 // ── GitHub 備份同步比對 ───────────────────────────────
 let pendingRemoteSync = null;
-function snapshotForSync(accs, chars, imgs, bgD, bgM, theme, stages, equivs){
-  return JSON.stringify({accounts:accs, charactersByAccount:chars, sharedImages:imgs, eventStages:stages||{}, eventEquivalences:equivs||[], customBgDesktop:bgD||null, customBgMobile:bgM||null, themeMode:theme});
+function snapshotForSync(accs, chars, imgs, bgD, bgM, theme, stages, equivs, limEvents){
+  return JSON.stringify({accounts:accs, charactersByAccount:chars, sharedImages:imgs, eventStages:stages||{}, eventEquivalences:equivs||[], limitedEvents:limEvents||[], customBgDesktop:bgD||null, customBgMobile:bgM||null, themeMode:theme});
 }
 function formatSyncTime(iso){
   if(!iso) return '無記錄';
@@ -3881,14 +3959,15 @@ function checkGithubSync(){
       const remoteTheme = data.themeMode || 'auto';
       const remoteStages = data.eventStages || {};
       const remoteEquivs = data.eventEquivalences || [];
+      const remoteLimEvents = data.limitedEvents || [];
 
-      const localSnap  = snapshotForSync(accounts, charactersByAccount, sharedImages, customBgDesktop, customBgMobile, themeMode, eventStages, eventEquivalences);
-      const remoteSnap = snapshotForSync(remoteAccounts, remoteChars, remoteImages, remoteBgD, remoteBgM, remoteTheme, remoteStages, remoteEquivs);
+      const localSnap  = snapshotForSync(accounts, charactersByAccount, sharedImages, customBgDesktop, customBgMobile, themeMode, eventStages, eventEquivalences, limitedEvents);
+      const remoteSnap = snapshotForSync(remoteAccounts, remoteChars, remoteImages, remoteBgD, remoteBgM, remoteTheme, remoteStages, remoteEquivs, remoteLimEvents);
       if(localSnap === remoteSnap) return; // 完全相同,不用問
 
       const localCount  = Object.values(charactersByAccount).reduce((s,l)=>s+(l?l.length:0),0);
       const remoteCount = Object.values(remoteChars).reduce((s,l)=>s+(l?l.length:0),0);
-      pendingRemoteSync = {accounts:remoteAccounts, charactersByAccount:remoteChars, sharedImages:remoteImages, eventStages:remoteStages, eventEquivalences:remoteEquivs, customBgDesktop:remoteBgD, customBgMobile:remoteBgM, themeMode:remoteTheme};
+      pendingRemoteSync = {accounts:remoteAccounts, charactersByAccount:remoteChars, sharedImages:remoteImages, eventStages:remoteStages, eventEquivalences:remoteEquivs, limitedEvents:remoteLimEvents, customBgDesktop:remoteBgD, customBgMobile:remoteBgM, themeMode:remoteTheme};
       document.getElementById('syncLocalInfo').textContent = `更新時間：${formatSyncTime(localSavedAt)}　角色總數：${localCount}　帳號數：${accounts.length}`;
       document.getElementById('syncRemoteInfo').textContent = `更新時間：${formatSyncTime(data.savedAt)}　角色總數：${remoteCount}　帳號數：${remoteAccounts.length}`;
       document.getElementById('syncConflictModal').classList.add('open');
@@ -3906,13 +3985,14 @@ function useGithubData(){
   sharedImages = pendingRemoteSync.sharedImages || {};
   eventStages = pendingRemoteSync.eventStages || {};
   eventEquivalences = pendingRemoteSync.eventEquivalences || [];
+  limitedEvents = pendingRemoteSync.limitedEvents || [];
   ensureEventStages();
   customBgDesktop = normalizeBgArray(pendingRemoteSync.customBgDesktop);
   customBgMobile = normalizeBgArray(pendingRemoteSync.customBgMobile);
   themeMode = pendingRemoteSync.themeMode;
   activeAccount = '__ALL__';
   applyBackground(); applyTheme();
-  renderAll(); buildEventStageFilterCdd(); buildEventStageModalGrid();
+  renderAll(); buildEventStageFilterCdd(); buildEventStageModalGrid(); renderLimitedEvents();
   document.getElementById('syncConflictModal').classList.remove('open');
   pendingRemoteSync = null;
 }
